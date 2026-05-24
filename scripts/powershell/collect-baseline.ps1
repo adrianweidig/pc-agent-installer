@@ -34,12 +34,12 @@ platform:
 hardware:
   profile: $(ConvertTo-AgentYamlScalar $platform.hardware_profile)
 container:
-  docker: $([bool](Get-Command docker -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
+  docker: $(([bool](Get-Command docker -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   docker_compose: false
   docker_swarm: false
-  kubernetes: $([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
-  podman: $([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
-  nvidia_container_runtime: $([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
+  kubernetes: $(([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+  podman: $(([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+  nvidia_container_runtime: $(([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
 template_paths_used:
   - Vorlage/common
   - Vorlage/windows/common
@@ -66,7 +66,7 @@ Write-AgentUtf8 -Path (Join-Path $hostRoot 'security/secret-references.yaml') -C
 Write-AgentUtf8 -Path (Join-Path $hostRoot 'state/last-run.yaml') -Content "last_run_at: $now`nstatus: baseline_collected"
 
 try { systeminfo | Out-File -FilePath (Join-Path $hostRoot 'baseline/raw/systeminfo.txt') -Encoding utf8 } catch {}
-try { Get-Service | Sort-Object Name | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/services.md') -Encoding utf8 } catch {}
+try { Get-Service -ErrorAction SilentlyContinue | Sort-Object Name | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/services.md') -Encoding utf8 } catch {}
 try { Get-NetIPConfiguration | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/network.md') -Encoding utf8 } catch {}
 try { Get-NetFirewallRule | Select-Object DisplayName,Enabled,Direction,Action,Profile | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/firewall.md') -Encoding utf8 } catch {}
 try { Get-ChildItem Env: | Sort-Object Name | ForEach-Object { "$($_.Name)=[REDACTED]" } | Out-File -FilePath (Join-Path $hostRoot 'baseline/environment.md') -Encoding utf8 } catch {}

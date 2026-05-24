@@ -36,6 +36,7 @@ Das Projekt ist so gedacht, dass Codex generische Template-Änderungen im öffen
 - Offizielle Änderungen: Vorlagen, Skripte, Schemas, Dokumentation, Beispiele, Lizenz- und Sicherheitsregeln im öffentlichen Template.
 - Private Änderungen: Host-Baselines, lokale Infrastruktur, Secret-Referenzen, Testzustände und maschinenspezifische Änderungen in einem privaten `operational`-Repo oder `local-only`-Klon.
 - Lokale Codex-Aufgaben: nicht als Prompt oder Projektauftrag im öffentlichen Repo speichern; nur generische, wiederverwendbare Regeln in `AGENTS.md` und Dokumentation übernehmen.
+- Workspace-Hygiene: aktive Codex-Projekte sollen unter einem hostabhängigen `<CODEX_WORKSPACE_ROOT>` konsolidiert werden. Der Pfad wird nicht im öffentlichen Template fest verdrahtet; pro Projekt bleibt lokal genau ein aktueller Arbeitsstand.
 
 ## Projektstruktur
 
@@ -158,6 +159,7 @@ Die zentrale Startdokumentation ist diese README. Vertiefende Dokumente bleiben 
 - `docs/11-lizenzmodell.md`
 - `docs/12-codex-arbeitsmodell.md`
 - `docs/13-test-und-validierungsmodell.md`
+- `docs/14-codex-workspace-konsolidierung.md`
 - `docs/99-faq.md`
 
 ## Codex- und Agenten-Hinweise

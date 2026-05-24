@@ -122,6 +122,7 @@ Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 
 - Offizielle Template- und Codeänderungen werden im öffentlichen Template-Repository gepflegt und dürfen automatisch dorthin übernommen werden, wenn Checks erfolgreich sind.
 - Rechner-, Host-, Infrastruktur- und Testdaten werden ausschließlich in einem privaten Operational-Repository oder in einem `local-only`-Klon dokumentiert.
+- Aktive Codex-Arbeitsstände sollen in einem hostabhängigen `<CODEX_WORKSPACE_ROOT>` konsolidiert werden. Das öffentliche Template beschreibt nur die portable Regel, nie einen konkreten lokalen Laufwerks- oder Benutzerpfad.
 
 Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffentliche Template bleibt die Quelle für generische Änderungen, der private oder lokale Operational-Workspace bleibt die Quelle für Hostzustand und Tests. Die konkrete Codex-Aufgabe oder lokale Testabsicht wird nicht als Prompt, Notiz oder Projektauftrag im öffentlichen Repository abgelegt.
 
@@ -138,6 +139,7 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 10. Zeige vor Commit oder Push immer eine Zusammenfassung an.
 11. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
 12. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
+13. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
 
 ## Ausführungsreihenfolge
 1. `Vorlage/common/00-agent-regeln.md` lesen.
@@ -215,6 +217,7 @@ Das Projekt ist so gedacht, dass Codex generische Template-Änderungen im öffen
 - Offizielle Änderungen: Vorlagen, Skripte, Schemas, Dokumentation, Beispiele, Lizenz- und Sicherheitsregeln im öffentlichen Template.
 - Private Änderungen: Host-Baselines, lokale Infrastruktur, Secret-Referenzen, Testzustände und maschinenspezifische Änderungen in einem privaten `operational`-Repo oder `local-only`-Klon.
 - Lokale Codex-Aufgaben: nicht als Prompt oder Projektauftrag im öffentlichen Repo speichern; nur generische, wiederverwendbare Regeln in `AGENTS.md` und Dokumentation übernehmen.
+- Workspace-Hygiene: aktive Codex-Projekte sollen unter einem hostabhängigen `<CODEX_WORKSPACE_ROOT>` konsolidiert werden. Der Pfad wird nicht im öffentlichen Template fest verdrahtet; pro Projekt bleibt lokal genau ein aktueller Arbeitsstand.
 
 ## Projektstruktur
 
@@ -816,6 +819,51 @@ Vor einem Push in das öffentliche Template müssen mindestens diese Bedingungen
 - Template-Validierung ist erfolgreich.
 - Secret-Scan findet keine sensiblen Werte.
 - Git-Diff ist geprüft.
+'@
+    'docs/14-codex-workspace-konsolidierung.md' = @'
+# Codex-Workspace-Konsolidierung
+
+Eine Codex-Umgebung soll genau einen kanonischen lokalen Arbeitsbereich haben. Der konkrete Pfad ist hostabhängig und wird als `<CODEX_WORKSPACE_ROOT>` dokumentiert, nicht als fest verdrahtetes Laufwerk.
+
+Empfohlene Zielstruktur:
+
+```text
+<CODEX_WORKSPACE_ROOT>/
+├── repos
+├── projects
+├── configs
+└── migration
+```
+
+- `repos/` enthält aktive Git-Repositories.
+- `projects/` enthält aktive, nicht sinnvoll versionierbare Projektstände.
+- `configs/` enthält notwendige, nicht systemgebundene Agenten- oder Tool-Konfigurationen.
+- `migration/` enthält nur kleine Inventar- und Abschlussberichte.
+
+## Grundsätze
+
+- Pro Projekt bleibt lokal genau ein aktueller, geprüfter Arbeitsstand erhalten.
+- Versionierbare Projekte werden vor dem Löschen alter Kopien committed und, wenn ein Remote vorhanden ist, gepusht.
+- Neue Remotes für Operational-Daten müssen privat sein; das öffentliche Template bleibt frei von Hostdaten.
+- Lokale Backups, Archive, Scratch-Ordner und doppelte Projektkopien sind kein Dauerzustand.
+- Temporäre Kopien sind nur technische Zwischenschritte und werden nach erfolgreicher Validierung gelöscht.
+- Codex- und Tool-Konfigurationen zeigen nach einer Migration auf `<CODEX_WORKSPACE_ROOT>`, nicht auf alte Quellpfade.
+- Hostnamen, konkrete lokale Pfade, Secret-Referenzen und Infrastrukturdetails gehören nur in ein geprüft privates Operational-Repository oder einen `local-only`-Klon.
+
+## Löschfreigabe
+
+Alte Projektstände dürfen erst entfernt werden, wenn alle Punkte erfüllt sind:
+
+1. Der Zielordner unter `<CODEX_WORKSPACE_ROOT>` existiert und ist vollständig.
+2. `git status --short --branch` ist sauber oder die Abweichung ist dokumentiert.
+3. Der Remote- und Push-Status ist geprüft oder eine begründete Ausnahme ist dokumentiert.
+4. Sensible und generierte Dateien sind nicht versehentlich versioniert.
+5. Aktive Codex-, IDE-, Shell- und Tool-Konfigurationen referenzieren nicht mehr den alten Pfad.
+6. Es gibt keine laufenden Prozesse oder Handles, die den alten Pfad produktiv nutzen.
+
+## Abschlussbericht
+
+Jede größere Konsolidierung erzeugt genau einen kompakten Bericht unter `<CODEX_WORKSPACE_ROOT>/migration/`. Der Bericht enthält Inventar, Entscheidungen, GitHub-Status, aktualisierte Pfade, sensible Ausschlüsse, gelöschte Altstände, Validierungsergebnisse und offene manuelle Entscheidungen.
 '@
     'docs/99-faq.md' = @'
 # FAQ
@@ -1856,12 +1904,12 @@ platform:
 hardware:
   profile: $(ConvertTo-AgentYamlScalar $platform.hardware_profile)
 container:
-  docker: $([bool](Get-Command docker -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
+  docker: $(([bool](Get-Command docker -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   docker_compose: false
   docker_swarm: false
-  kubernetes: $([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
-  podman: $([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
-  nvidia_container_runtime: $([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant()
+  kubernetes: $(([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+  podman: $(([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+  nvidia_container_runtime: $(([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
 template_paths_used:
   - Vorlage/common
   - Vorlage/windows/common
@@ -1888,7 +1936,7 @@ Write-AgentUtf8 -Path (Join-Path $hostRoot 'security/secret-references.yaml') -C
 Write-AgentUtf8 -Path (Join-Path $hostRoot 'state/last-run.yaml') -Content "last_run_at: $now`nstatus: baseline_collected"
 
 try { systeminfo | Out-File -FilePath (Join-Path $hostRoot 'baseline/raw/systeminfo.txt') -Encoding utf8 } catch {}
-try { Get-Service | Sort-Object Name | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/services.md') -Encoding utf8 } catch {}
+try { Get-Service -ErrorAction SilentlyContinue | Sort-Object Name | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/services.md') -Encoding utf8 } catch {}
 try { Get-NetIPConfiguration | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/network.md') -Encoding utf8 } catch {}
 try { Get-NetFirewallRule | Select-Object DisplayName,Enabled,Direction,Action,Profile | Out-String | Out-File -FilePath (Join-Path $hostRoot 'baseline/firewall.md') -Encoding utf8 } catch {}
 try { Get-ChildItem Env: | Sort-Object Name | ForEach-Object { "$($_.Name)=[REDACTED]" } | Out-File -FilePath (Join-Path $hostRoot 'baseline/environment.md') -Encoding utf8 } catch {}

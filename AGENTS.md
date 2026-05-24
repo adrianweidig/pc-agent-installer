@@ -23,6 +23,7 @@ Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 - Der normale Nutzerfluss ist: Template klonen, Codex im Klon starten, `AGENTS.md` lesen, Repo-Modus prüfen, dann den Agenten strukturiert arbeiten lassen.
 - Offizielle Template- und Codeänderungen werden im öffentlichen Template-Repository gepflegt und dürfen automatisch dorthin übernommen werden, wenn Checks erfolgreich sind.
 - Rechner-, Host-, Infrastruktur- und Testdaten werden ausschließlich in einem privaten Operational-Repository oder in einem `local-only`-Klon dokumentiert.
+- Aktive Codex-Arbeitsstände sollen in einem hostabhängigen `<CODEX_WORKSPACE_ROOT>` konsolidiert werden. Das öffentliche Template beschreibt nur die portable Regel, nie einen konkreten lokalen Laufwerks- oder Benutzerpfad.
 
 Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffentliche Template bleibt die Quelle für generische Änderungen, der private oder lokale Operational-Workspace bleibt die Quelle für Hostzustand und Tests. Die konkrete Codex-Aufgabe oder lokale Testabsicht wird nicht als Prompt, Notiz oder Projektauftrag im öffentlichen Repository abgelegt.
 
@@ -49,6 +50,7 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 13. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
 14. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
 15. Halte README, `AGENTS.md` und Codex-Dokumentation so verständlich, dass ein neuer Nutzer erkennt: Dieses Repo wird als Basis für ein eigenes Agenten-Projekt geklont.
+16. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
 
 ## Ausführungsreihenfolge
 
