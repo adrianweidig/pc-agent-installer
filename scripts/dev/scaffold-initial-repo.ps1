@@ -880,6 +880,31 @@ Das ist beabsichtigt. Der Guard schützt Host-Schreibzugriffe. Template-Arbeit b
 
 Nein. Nutze Secret-Referenzen und externe Secret Stores.
 '@
+    'docs/15-klassische-sicherheitseinstellungen.md' = @'
+# Klassische Sicherheitseinstellungen für normale Nutzer-PCs
+
+Dieses Dokument beschreibt die usability-first Sicherheitsbaseline für normale Nutzer-PCs.
+
+Grundsatz: Der Rechner soll weiterhin Browser, Downloads, Store, Games, Entwicklerwerkzeuge, KI-Tools und seriöse Internetsoftware nutzen können. Sicherheit wird deshalb zuerst über eingebaute Betriebssystemfunktionen, aktuelle Software, offizielle Quellen, Backups und dokumentierte Empfehlungen verbessert.
+
+Empfohlene blockadearme Windows-Basis:
+
+- Microsoft Defender als primärer Echtzeitschutz
+- cloudbasierter Defender-Schutz, wenn der Nutzer zustimmt
+- Manipulationsschutz
+- SmartScreen und reputation-based protection
+- Windows Firewall für alle Profile
+- Windows Update und Microsoft Store Updates
+- `winget` für nachvollziehbare App-Updates
+
+Kostenlose Tools dürfen empfohlen, aber nicht blind installiert werden:
+
+- Bitwarden Free oder KeePassXC für Passwörter
+- uBlock Origin oder uBlock Origin Lite für Browser-Schutz
+- Malwarebytes Free als On-Demand-Zweitmeinung
+
+Controlled Folder Access, DNS-Filter, harte ausgehende Firewall-Regeln, WDAC, AppLocker, aggressive Exploit-Protection-Ausnahmen und zusätzliche Echtzeit-Antivirus-Suiten sind keine Defaults. Sie brauchen Nutzerentscheidung, Pilotprüfung, Validierung und Rollback.
+'@
 }
 
 foreach ($entry in $docs.GetEnumerator()) {
@@ -1356,6 +1381,7 @@ $templateFiles = [ordered]@{
     'Vorlage/windows/common/21-powershell-module.md' = 'PowerShell-Module erfassen'
     'Vorlage/windows/common/30-firewall.md' = 'Windows Firewall erfassen'
     'Vorlage/windows/common/31-netzwerkprofile.md' = 'Windows Netzwerkprofile erfassen'
+    'Vorlage/windows/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische Windows-Sicherheitseinstellungen'
     'Vorlage/windows/common/40-env-variablen.md' = 'Windows Umgebungsvariablen erfassen'
     'Vorlage/windows/common/50-dienste.md' = 'Windows Dienste erfassen'
     'Vorlage/windows/common/60-registry.md' = 'Windows Registry dokumentieren'

@@ -192,6 +192,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Sichtbarkeits-Guard | [docs/03-repo-visibility-guard.md](docs/03-repo-visibility-guard.md) |
 | Sicherheitsmodell | [docs/04-sicherheitsmodell.md](docs/04-sicherheitsmodell.md) |
 | Secrets Policy | [docs/05-secrets-policy.md](docs/05-secrets-policy.md) |
+| Klassische Sicherheitseinstellungen | [docs/15-klassische-sicherheitseinstellungen.md](docs/15-klassische-sicherheitseinstellungen.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

@@ -158,6 +158,7 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 - `.env`-Dateien, Secret-Exporte und rohe Credential-Dumps bleiben ausgeschlossen.
 - Secret-Referenzen dürfen nur Zweck, Ablageort, Zugriffsmethode, Laufzeitvariable und Rotationshinweise beschreiben.
 - Bei unklarer Repo-Sichtbarkeit keine Hostdaten, privaten Pfade oder Infrastrukturdetails erfassen.
+- Bei normalen Nutzer-PCs gilt usability-first: Sicherheitssettings sollen kostenlose, aktuelle und seriöse Schutzmaßnahmen bevorzugen, aber normale Internet-, Download-, Store-, Game-, Entwickler- und KI-Tool-Nutzung nicht unnötig blockieren.
 
 ## Datei-Löschungen
 
