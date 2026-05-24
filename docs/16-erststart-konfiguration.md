@@ -49,6 +49,7 @@ Wenn die Prüfung fehlschlägt, muss der Agent abbrechen und melden, dass die Ko
 
 ## Abgefragte Entscheidungen
 
+- kurze Nutzerbeschreibung, z. B. `Ich bin Entwickler`, `Ich nutze den PC für Büro und WhatsApp` oder `Ich spiele und streame`
 - Host-Baseline erfassen und dokumentieren
 - usability-first Sicherheitsempfehlungen anzeigen
 - kostenlose, aktuelle Tools und Updates empfehlen
@@ -71,6 +72,18 @@ Die Windows-Erstkonfiguration fragt WSL, Docker und Portainer abhängig voneinan
 Wenn WSL gewählt wurde, muss der Agent zusätzlich die WSL-Vorlagen und WSL-Empfehlungen berücksichtigen. Bei Docker oder Portainer müssen zusätzlich die Container-Vorlagen berücksichtigt werden. Die Baseline dokumentiert dies über `template_paths_used` und `windows_optional_components` in `hosts/<HOSTNAME>/host.yaml`.
 
 Keine dieser Optionen installiert automatisch Software. Sie erlaubt dem Agenten nur, passende Empfehlungen, Prüfungen und spätere freigegebene Installationsschritte vorzubereiten. Vor einer tatsächlichen Änderung bleiben Baseline, Frage-Antwort-Entscheidung, Rollback und Validierung Pflicht.
+
+## Nutzerbeschreibung und Programmempfehlungen
+
+Die Erststart-Konfiguration speichert unter `user_context.person_description` eine kurze, vom Nutzer formulierte Beschreibung. Der Agent nutzt sie, um Zielgruppenprofile abzuleiten und passende Programmkategorien vorzuschlagen.
+
+Beispiele:
+
+- `Ich bin Entwickler` führt zu Vorschlägen für Git, Terminal, Editor, SDKs, WSL oder Container, aber nicht automatisch zu Gaming- oder Messenger-Apps.
+- `Ich nutze den PC für Büro, WhatsApp und Fotos` führt zu alltagstauglichen Vorschlägen wie Browser/Web-Apps, Passwortmanager, Office/PDF, Medien und Backup.
+- `Ich spiele und streame` führt zu Vorschlägen für Spieleplattformen, Voice, OBS und GPU-Prüfung, aber nicht zu Server- oder Homelab-Tools.
+
+Die Beschreibung ist keine Installationsfreigabe. Sie steuert nur, welche Vorschläge der Agent priorisiert. Details stehen in `docs/17-programm-und-installationsempfehlungen.md`.
 
 ## Sicherheitsgrenzen
 

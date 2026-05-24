@@ -177,6 +177,16 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 - Sobald Docker oder Portainer gewählt wurde, müssen Container-Vorlagen, Port-/Exposure-Regeln und volume-sichere Rollback-Regeln berücksichtigt werden.
 - WSL, Docker und Portainer dürfen nicht automatisch installiert, gestartet, exponiert oder als Pflichtkomponenten behandelt werden; jede systemwirksame Änderung braucht Erststart-Präferenz, Nutzerfreigabe, Rollback und Validierung.
 
+## Programm- und Installationsempfehlungen
+
+- Die Erststart-Konfiguration enthält eine kurze Nutzerbeschreibung wie `Ich bin Entwickler`.
+- Der Agent darf daraus Zielgruppenprofile ableiten und passende Programmkategorien vorschlagen.
+- Empfehlungen müssen Betriebssystem, Distribution, Desktop-/Server-Kontext, vorhandene Software und Paketmanager berücksichtigen.
+- Bevorzugt werden kostenlose, aktuelle und offizielle Quellen: Store, Betriebssystem-Paketmanager, Homebrew, Flathub oder Herstellerseite.
+- Programme wie WhatsApp sollen als offizielle App oder Web/PWA-Option behandelt werden; Messenger gehören nicht auf Server- oder Headless-Profile.
+- Cleaner wie CCleaner oder BleachBit sind nur optionale manuelle Werkzeuge, keine Default-Optimierung. Registry-Reinigung, Driver-Updater und Booster-Funktionen nicht empfehlen.
+- Keine Masseninstallation ohne konkrete Frage-Antwort-Entscheidung, Rollback-Hinweis und Validierung.
+
 ## Datei-Löschungen
 
 Lösche Dateien nur, wenn sicher ist, dass sie nicht für Template, Skripte, Dokumentation, Lizenz, Beispiele, Schemas oder spätere Operational-Nutzung benötigt werden. Unsichere Kandidaten bleiben bestehen und werden im Abschlussbericht als prüfpflichtig aufgeführt.

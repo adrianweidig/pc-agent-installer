@@ -44,6 +44,7 @@ Wenn kein GUI-Fenster verfügbar ist, muss der Agent auf Terminal-Fragen zurück
 ## Mindestfragen
 Die Erststart-Konfiguration fragt mindestens:
 
+- Wie beschreibt sich der Nutzer kurz, damit der Agent sinnvolle Programm- und Umgebungsempfehlungen ableiten kann?
 - Darf der Agent eine Host-Baseline erfassen?
 - Darf der Agent usability-first Sicherheitsempfehlungen anzeigen?
 - Darf der Agent kostenlose, aktuelle Tools und Updates empfehlen?
@@ -59,6 +60,8 @@ Die Erststart-Konfiguration fragt mindestens:
 Die Antwort wird unter `hosts/<HOSTNAME>/state/first-run-config.yaml` dokumentiert. Diese Datei enthält nur Präferenzen und keine Klartext-Secrets.
 
 Wenn WSL gewählt wurde, muss der Agent zusätzlich die WSL-Vorlagen berücksichtigen. Wenn Docker oder Portainer gewählt wurde, muss der Agent zusätzlich die Container-Vorlagen berücksichtigen. Docker und Portainer dürfen nicht unabhängig von WSL als Pflichtkomponenten behandelt werden.
+
+Die Nutzerbeschreibung ist ein Hinweis für Empfehlungen, keine automatische Installationsfreigabe. Der Agent muss daraus Profile ableiten und Programmvorschläge nach `Vorlage/common/15-programm-und-installationsempfehlungen.md` vorbereiten.
 
 ## Pflichtprüfung
 Vor Host-Arbeit muss eine der Prüfungen erfolgreich sein:

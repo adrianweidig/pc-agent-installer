@@ -141,6 +141,8 @@ Keine Standardempfehlung:
 - mehrere gleichzeitige Echtzeit-Antivirus-Produkte
 - pauschale Telemetrie- oder Dienst-Deaktivierung ohne Nebenwirkungsprüfung
 
+Allgemeine Programmempfehlungen nach Nutzerprofil stehen in `docs/17-programm-und-installationsempfehlungen.md`.
+
 ## Agentenablauf für normale PCs
 
 1. Repo-Modus und Sichtbarkeit prüfen.

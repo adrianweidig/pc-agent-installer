@@ -34,6 +34,8 @@ ask_yes_no() {
 echo "ERSTSTART-KONFIGURATION"
 echo "Vor Abschluss dieser Konfiguration fuehrt der Agent keine Host-Arbeit aus."
 
+printf 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler": ' >&2
+read -r person_description || person_description=""
 allow_baseline="$(ask_yes_no 'Host-Baseline erfassen und dokumentieren?' true)"
 allow_security_recommendations="$(ask_yes_no 'Usability-first Sicherheitsempfehlungen anzeigen?' true)"
 allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Updates empfehlen?' true)"
@@ -57,6 +59,7 @@ fi
 require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' true)"
 printf 'Optionale Notiz fuer den Agenten: ' >&2
 read -r note || note=""
+person_description="$(printf '%s' "$person_description" | agent_redact | sed 's/"/\\"/g')"
 note="$(printf '%s' "$note" | agent_redact | sed 's/"/\\"/g')"
 
 cat > "$CONFIG_PATH" <<YAML
@@ -65,6 +68,8 @@ configured_at: "$(date -Iseconds)"
 configured_by: "first-run-config.sh"
 ui: "shell"
 host: "$HOSTNAME_VALUE"
+user_context:
+  person_description: "$person_description"
 preferences:
   allow_baseline: $allow_baseline
   allow_security_recommendations: $allow_security_recommendations

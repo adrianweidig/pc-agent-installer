@@ -106,6 +106,8 @@ bash ./scripts/common/first-run-config.sh
 
 Auf Windows enthält die Erststart-Konfiguration zusätzlich optionale Fragen zu WSL, Docker mit WSL-Unterstützung und Portainer CE. Wenn WSL gewählt wird, muss der Agent WSL-Vorlagen berücksichtigen; wenn Docker oder Portainer gewählt wird, müssen zusätzlich die Container-Vorlagen berücksichtigt werden. Die Auswahl bereitet nur Empfehlungen und spätere freigegebene Schritte vor, sie installiert nichts automatisch.
 
+Die Erststart-Konfiguration fragt außerdem nach einer kurzen Nutzerbeschreibung, etwa `Ich bin Entwickler` oder `Ich nutze den PC für Büro, WhatsApp und Fotos`. Daraus leitet der Agent passende Programm- und Umgebungsempfehlungen ab, ohne Programme automatisch zu installieren.
+
 Pflichtprüfung vor Host-Arbeit:
 
 ```powershell
@@ -218,6 +220,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Secrets Policy | [docs/05-secrets-policy.md](docs/05-secrets-policy.md) |
 | Klassische Sicherheitseinstellungen | [docs/15-klassische-sicherheitseinstellungen.md](docs/15-klassische-sicherheitseinstellungen.md) |
 | Erststart-Konfiguration | [docs/16-erststart-konfiguration.md](docs/16-erststart-konfiguration.md) |
+| Programm- und Installationsempfehlungen | [docs/17-programm-und-installationsempfehlungen.md](docs/17-programm-und-installationsempfehlungen.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

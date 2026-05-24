@@ -947,6 +947,25 @@ bash ./scripts/common/assert-first-run-config.sh
 Die gespeicherten Präferenzen liegen unter `hosts/<HOSTNAME>/state/first-run-config.yaml` und enthalten keine Klartext-Secrets.
 
 Windows fragt zusätzlich, ob WSL als Backend vorbereitet werden soll. Docker wird nur auf dieser Basis eingeplant; Portainer CE wird nur empfohlen, wenn Docker gewählt wurde. Bei WSL-Auswahl müssen WSL-Vorlagen berücksichtigt werden, bei Docker oder Portainer zusätzlich Container-Vorlagen.
+
+Die Erststart-Konfiguration kann außerdem eine kurze Nutzerbeschreibung speichern, etwa `Ich bin Entwickler`. Der Agent nutzt sie nur für profilbasierte Empfehlungen; sie ist keine Installationsfreigabe.
+'@
+    'docs/17-programm-und-installationsempfehlungen.md' = @'
+# Programm- und Installationsempfehlungen
+
+Der Agent leitet sinnvolle Programme aus Nutzerbeschreibung, Betriebssystem, Distribution, Gerätetyp und vorhandener Software ab. Er installiert nichts pauschal.
+
+Bevorzugte Quellen sind Betriebssystem-Stores, Paketmanager, Homebrew, Flathub und offizielle Herstellerseiten. Bundle-Portale, Driver-Updater, Booster und aggressive Cleaner sind keine Defaults.
+
+Profile:
+
+- normale Nutzer: Browser, Passwortmanager, Office/PDF, Medien, Backup und Messenger/Web-Apps
+- Entwickler: Git, Terminal, Editor, Sprache-SDKs, WSL, Docker oder Podman
+- Creator: OBS, Medienplayer, Bild-/Audio-/Video-Tools
+- Gamer: Launcher und Voice-Tools nur nach Wunsch
+- Server/Headless: keine Desktop-Apps, Fokus auf Updates, SSH, Backup, Monitoring und Container
+
+Cleaner wie CCleaner oder BleachBit dürfen nur optional, manuell und ohne Registry-/Booster-Automatik empfohlen werden.
 '@
 }
 
@@ -1415,6 +1434,7 @@ $templateFiles = [ordered]@{
     'Vorlage/common/12-git-commit-regeln.md' = 'Git-Commit-Regeln'
     'Vorlage/common/13-interaktive-sicherheitsentscheidungen.md' = 'Interaktive Sicherheitsentscheidungen'
     'Vorlage/common/14-erststart-konfiguration.md' = 'Erststart-Konfiguration'
+    'Vorlage/common/15-programm-und-installationsempfehlungen.md' = 'Programm- und Installationsempfehlungen'
     'Vorlage/common/99-abschlussbericht.md' = 'Abschlussbericht'
     'Vorlage/windows/common/00-detect-windows.md' = 'Windows erkennen'
     'Vorlage/windows/common/10-baseline-system.md' = 'Windows System-Baseline'
@@ -1428,6 +1448,7 @@ $templateFiles = [ordered]@{
     'Vorlage/windows/common/31-netzwerkprofile.md' = 'Windows Netzwerkprofile erfassen'
     'Vorlage/windows/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische Windows-Sicherheitseinstellungen'
     'Vorlage/windows/common/33-wsl-docker-portainer.md' = 'Windows WSL-, Docker- und Portainer-Optionen'
+    'Vorlage/windows/common/34-programmempfehlungen.md' = 'Windows Programmempfehlungen'
     'Vorlage/windows/common/40-env-variablen.md' = 'Windows Umgebungsvariablen erfassen'
     'Vorlage/windows/common/50-dienste.md' = 'Windows Dienste erfassen'
     'Vorlage/windows/common/60-registry.md' = 'Windows Registry dokumentieren'
@@ -1455,6 +1476,7 @@ $templateFiles = [ordered]@{
     'Vorlage/linux/common/20-pakete.md' = 'Linux Pakete erfassen'
     'Vorlage/linux/common/30-firewall.md' = 'Linux Firewall erfassen'
     'Vorlage/linux/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische Linux-Sicherheitseinstellungen'
+    'Vorlage/linux/common/33-programmempfehlungen.md' = 'Linux Programmempfehlungen'
     'Vorlage/linux/common/40-shell-env.md' = 'Linux Shell-Environment erfassen'
     'Vorlage/linux/common/50-systemd.md' = 'Systemd erfassen'
     'Vorlage/linux/common/60-ssh.md' = 'SSH erfassen'
@@ -1509,6 +1531,7 @@ $templateFiles = [ordered]@{
     'Vorlage/linux/nvidia/dgx-spark/99-report.md' = 'DGX Spark Report'
     'Vorlage/macos/common/00-detect-macos.md' = 'macOS erkennen'
     'Vorlage/macos/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische macOS-Sicherheitseinstellungen'
+    'Vorlage/macos/common/33-programmempfehlungen.md' = 'macOS Programmempfehlungen'
     'Vorlage/macos/common/99-macos-report.md' = 'macOS Report'
     'Vorlage/wsl/common/00-detect-wsl.md' = 'WSL erkennen'
     'Vorlage/wsl/common/10-wsl-baseline.md' = 'WSL Baseline'
@@ -1518,6 +1541,7 @@ $templateFiles = [ordered]@{
     'Vorlage/wsl/common/50-networking.md' = 'WSL Networking erfassen'
     'Vorlage/wsl/common/60-filesystem-mounts.md' = 'WSL Filesystem Mounts erfassen'
     'Vorlage/wsl/common/70-klassische-sicherheitseinstellungen.md' = 'Klassische WSL-Sicherheitseinstellungen'
+    'Vorlage/wsl/common/80-programmempfehlungen.md' = 'WSL Programmempfehlungen'
     'Vorlage/wsl/common/99-wsl-report.md' = 'WSL Report'
     'Vorlage/wsl/ubuntu/00-detect-wsl-ubuntu.md' = 'Ubuntu WSL erkennen'
     'Vorlage/wsl/ubuntu/10-apt-baseline.md' = 'Ubuntu WSL APT Baseline'
@@ -1861,6 +1885,8 @@ ui: "powershell"
 repo_mode: "$($guard.repo_mode)"
 visibility: "$($guard.visibility)"
 host: "$HostName"
+user_context:
+  person_description: ""
 preferences:
   allow_baseline: true
   allow_security_recommendations: true
@@ -2389,6 +2415,8 @@ configured_at: "$(date -Iseconds)"
 configured_by: "first-run-config.sh"
 ui: "shell"
 host: "$HOSTNAME_VALUE"
+user_context:
+  person_description: ""
 preferences:
   allow_baseline: true
   allow_security_recommendations: true

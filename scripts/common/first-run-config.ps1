@@ -58,7 +58,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form = [System.Windows.Forms.Form]::new()
         $form.Text = 'PC Agent Installer - Erststart-Konfiguration'
         $form.Width = 760
-        $form.Height = 680
+        $form.Height = 760
         $form.StartPosition = 'CenterScreen'
         $form.TopMost = $true
 
@@ -70,6 +70,24 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $intro.Left = 20
         $intro.Top = 20
         $form.Controls.Add($intro)
+
+        $profileLabel = [System.Windows.Forms.Label]::new()
+        $profileLabel.Text = 'Beschreibe dich kurz, damit der Agent sinnvolle Programme und Einstellungen ableiten kann. Beispiel: "Ich bin Entwickler und nutze KI-Tools."'
+        $profileLabel.AutoSize = $false
+        $profileLabel.Width = 700
+        $profileLabel.Height = 40
+        $profileLabel.Left = 20
+        $profileLabel.Top = 75
+        $form.Controls.Add($profileLabel)
+
+        $profile = [System.Windows.Forms.TextBox]::new()
+        $profile.Left = 25
+        $profile.Top = 115
+        $profile.Width = 690
+        $profile.Height = 45
+        $profile.Multiline = $true
+        $profile.Text = ''
+        $form.Controls.Add($profile)
 
         $items = [ordered]@{
             allow_baseline = 'Host-Baseline erfassen und dokumentieren'
@@ -84,7 +102,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
             require_confirmation_for_system_changes = 'Vor systemwirksamen Aenderungen immer bestaetigen lassen'
         }
         $checks = @{}
-        $top = 85
+        $top = 175
         foreach ($key in $items.Keys) {
             $box = [System.Windows.Forms.CheckBox]::new()
             $box.Text = $items[$key]
@@ -143,6 +161,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         if ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             foreach ($key in $items.Keys) { $values[$key] = [bool]$checks[$key].Checked }
             $values['windows_wsl_recommendations'] = [bool]$values.windows_wsl_backend
+            $values['person_description'] = $profile.Text
             $values['note'] = $note.Text
             $usedUi = 'powershell-windows-forms'
         } else {
@@ -155,6 +174,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
 
 if ($values.Count -eq 0) {
     Write-Host 'Erststart-Konfiguration ist noch nicht abgeschlossen.'
+    $values['person_description'] = Read-Host 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler"'
     $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default $true
     $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default $true
     $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default $true
@@ -191,7 +211,8 @@ if (-not $values.windows_wsl_backend) {
 }
 
 $now = (Get-Date).ToString('o')
-$safeNote = (Protect-AgentSecretText -Text ([string]$values.note)).Replace('"', '\"')
+$safePersonDescription = (Protect-AgentSecretText -Text ([string]$values.person_description)).Replace("`r", ' ').Replace("`n", ' ').Replace('"', '\"')
+$safeNote = (Protect-AgentSecretText -Text ([string]$values.note)).Replace("`r", ' ').Replace("`n", ' ').Replace('"', '\"')
 $yaml = @"
 completed: true
 configured_at: "$now"
@@ -200,6 +221,8 @@ ui: "$usedUi"
 repo_mode: "$($guard.repo_mode)"
 visibility: "$($guard.visibility)"
 host: "$HostName"
+user_context:
+  person_description: "$safePersonDescription"
 preferences:
   allow_baseline: $($values.allow_baseline.ToString().ToLowerInvariant())
   allow_security_recommendations: $($values.allow_security_recommendations.ToString().ToLowerInvariant())
