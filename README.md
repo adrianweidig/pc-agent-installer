@@ -195,6 +195,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |
+| GitHub Security Alert Analysis | [docs/SECURITY_ALERT_ANALYSIS.md](docs/SECURITY_ALERT_ANALYSIS.md) |
 | Test- und Validierungsmodell | [docs/13-test-und-validierungsmodell.md](docs/13-test-und-validierungsmodell.md) |
 | Codex-Arbeitsmodell | [docs/12-codex-arbeitsmodell.md](docs/12-codex-arbeitsmodell.md) |
 | Workspace-Konsolidierung | [docs/14-codex-workspace-konsolidierung.md](docs/14-codex-workspace-konsolidierung.md) |

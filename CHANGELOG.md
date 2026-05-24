@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- GitHub-Security-Alerts analysiert und sicherheitsrelevante `Invoke-Expression`-Nutzung in der Docker-Baseline-Erfassung entfernt.
 - Globalen Codex-New-Project-Standard als wiederverwendbare Dokumentation und Bootstrap-Skript ins Template übernommen.
 - Nicht-publizierenden Release-Artefakt-Workflow für ZIP und Release Notes ergänzt.
 - README mit Hero-Grafik, korrekten GitHub-Badges, Quick-Links und klarerer Dokumentationsnavigation überarbeitet.

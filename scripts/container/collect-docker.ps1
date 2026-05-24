@@ -2,17 +2,17 @@
 param([string]$OutputPath = 'docker-baseline.md')
 
 $commands = @(
-    'docker version',
-    'docker info',
-    'docker ps -a',
-    'docker images',
-    'docker network ls',
-    'docker volume ls'
+    @{ Title = 'docker version'; FilePath = 'docker'; ArgumentList = @('version') },
+    @{ Title = 'docker info'; FilePath = 'docker'; ArgumentList = @('info') },
+    @{ Title = 'docker ps -a'; FilePath = 'docker'; ArgumentList = @('ps', '-a') },
+    @{ Title = 'docker images'; FilePath = 'docker'; ArgumentList = @('images') },
+    @{ Title = 'docker network ls'; FilePath = 'docker'; ArgumentList = @('network', 'ls') },
+    @{ Title = 'docker volume ls'; FilePath = 'docker'; ArgumentList = @('volume', 'ls') }
 )
 $parts = @('# Docker Baseline')
 foreach ($cmd in $commands) {
-    $parts += "`n## $cmd`n```text"
-    try { $parts += (Invoke-Expression $cmd | Out-String) } catch { $parts += $_.Exception.Message }
+    $parts += "`n## $($cmd.Title)`n```text"
+    try { $parts += (& $cmd.FilePath @($cmd.ArgumentList) 2>&1 | Out-String) } catch { $parts += $_.Exception.Message }
     $parts += '```'
 }
 $parts -join "`n" | Out-File -FilePath $OutputPath -Encoding utf8
