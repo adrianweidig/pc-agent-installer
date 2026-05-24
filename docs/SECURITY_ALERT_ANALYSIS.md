@@ -26,8 +26,8 @@ Lokale Zusatzscanner wurden temporär außerhalb des Repositories geladen, per S
 | Secret Scanning Alerts | `0` |
 | Repository Security Advisories | `0` |
 | Private Vulnerability Reporting | aktiviert |
-| GitHub Actions Workflows | `Validate template`, `Release artifact` und Dependabot-Workflow aktiv |
-| GitHub Actions Runs | letzte `Validate template`- und `Release artifact`-Runs erfolgreich |
+| GitHub Actions Workflows | `Validate template`, `Release` und Dependabot-Workflow aktiv |
+| GitHub Actions Runs | letzte `Validate template`- und `Release`-Runs erfolgreich |
 | Branch Protection `main` | Required Status Checks, ein Review, Conversation Resolution, keine Force Pushes, keine Branch-Löschung |
 | Offene GitHub Issues | keine offenen Issues |
 
@@ -105,8 +105,7 @@ Das Repository enthält keine klassischen Paketmanager-Manifeste wie `package.js
 
 Dependabot ist für GitHub Actions konfiguriert. Die verwendeten Actions sind:
 
-- `actions/checkout@v4`
-- `actions/upload-artifact@v4`
+- `actions/checkout@v6`
 
 GitHub Dependabot Alerts: keine Befunde.
 
@@ -120,16 +119,21 @@ Zusätzliche lokale Pattern-Suche auf typische Token-, Private-Key- und Credenti
 
 ### GitHub Actions und CI
 
-Die Workflows setzen minimale Berechtigungen:
+Die Workflows setzen minimale Berechtigungen passend zum Zweck. `Validate template` nutzt nur Leserechte; `Release` benötigt Schreibrechte für Tags, Releases und Release-Assets.
 
 ```yaml
 permissions:
   contents: read
 ```
 
-Es gibt keine `pull_request_target`-, `workflow_run`- oder Deployment-Trigger. Workflows verwenden keine Repository-Secrets und keine produktiven Veröffentlichungen.
+```yaml
+permissions:
+  contents: write
+```
 
-Der `Release artifact`-Workflow erzeugt nur Actions-Artefakte. Er erzeugt keine Tags, keine GitHub Releases, keine Package Releases und keine Docker Images.
+Es gibt keine `pull_request_target`- oder Deployment-Trigger. Der `Release`-Workflow nutzt `workflow_run`, veröffentlicht aber erst nach erfolgreichem `Validate template`-Lauf auf `main`. Workflows verwenden keine Repository-Secrets und lösen keine produktiven Deployments aus.
+
+Der `Release`-Workflow erzeugt GitHub Releases mit Repository-ZIP und vollständiger `release-notes.md`. Er erzeugt keine Package Releases, keine Docker Images und keine Deployments.
 
 `actionlint` meldet keine Workflow-Befunde.
 

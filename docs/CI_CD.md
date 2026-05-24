@@ -2,14 +2,14 @@
 
 ## Ziel
 
-Dieses Repository nutzt GitHub Actions für schnelle, nicht destruktive Prüfungen und für nicht-publizierende Release-Artefakte. CI/CD darf keine Hostdaten schreiben, keine Secrets erzeugen und keine produktiven Deployments auslösen.
+Dieses Repository nutzt GitHub Actions für schnelle, nicht destruktive Prüfungen und für automatisierte GitHub Releases nach erfolgreicher Template-Validierung auf `main`. CI/CD darf keine Hostdaten schreiben, keine Secrets erzeugen und keine produktiven Deployments auslösen.
 
 ## Workflows
 
 | Workflow | Datei | Zweck |
 | --- | --- | --- |
 | Validate template | `.github/workflows/validate.yml` | PowerShell- und Bash-Validierung des öffentlichen Templates |
-| Release artifact | `.github/workflows/release-artifact.yml` | ZIP-Archiv und Release Notes als Actions-Artefakte erzeugen |
+| Release | `.github/workflows/release-artifact.yml` | GitHub Release mit ZIP-Archiv und vollständiger Release-Notes-Datei erzeugen |
 
 ## Validate template
 
@@ -35,25 +35,25 @@ Lokale Entsprechung:
 bash ./scripts/common/verify-template.sh
 ```
 
-## Release-Artefakte
+## Releases
 
-Der Release-Artefakt-Workflow läuft bei Pushes auf `main` oder `master` und manuell per `workflow_dispatch`.
+Der Release-Workflow läuft, sobald `Validate template` nach einem Push auf `main` erfolgreich abgeschlossen wurde. Dadurch wird nicht parallel zu den Prüfungen veröffentlicht, sondern erst nach erfolgreicher Validierung. Zusätzlich kann der Workflow manuell per `workflow_dispatch` gestartet werden.
 
 Er erzeugt:
 
 - ein ZIP aus dem aktuellen Commit mit `git archive`
-- eine `release-notes.md` mit Repository, Branch, Commit, Event, Actor, UTC-Zeitpunkt und Commit-Historie
-- ein GitHub-Actions-Artefakt mit ZIP und Release Notes
+- einen eindeutigen GitHub-Release-Tag im Format `release-<short-sha>`
+- einen GitHub Release, der als `latest` markiert wird
+- eine `release-notes.md` mit Repository, Branch, Commit, Event, Actor, UTC-Zeitpunkt, Zusammenfassung der wichtigsten Änderungen und vollständiger Commit-Historie
+- Release-Assets für ZIP und Release Notes
 
 Er erzeugt nicht:
 
-- Tags
-- GitHub Releases
 - Package-Veröffentlichungen
 - Docker Images
 - Deployments
 
-Echte Releases bleiben eine bewusste Maintainer-Entscheidung und sind in `docs/RELEASE_PROCESS.md` beschrieben.
+Docker Images werden weiterhin nur ergänzt, wenn später eine echte Docker-Grundlage entsteht.
 
 ## Docker und GHCR
 

@@ -1,71 +1,277 @@
-name: Release artifact
+name: Release
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Validate template
+    types:
+      - completed
     branches:
       - main
-      - master
   workflow_dispatch:
+    inputs:
+      target_sha:
+        description: Optional commit SHA to release. Defaults to the selected ref.
+        required: false
+        type: string
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  archive:
-    name: Build repository archive
+  release:
+    name: Create GitHub release
     runs-on: ubuntu-latest
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout release commit
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.workflow_run.head_sha || github.event.inputs.target_sha || github.sha }}
 
-      - name: Build artifact metadata
+      - name: Build release metadata
         id: meta
         shell: bash
         run: |
+          set -euo pipefail
+
+          target_sha="$(git rev-parse HEAD)"
+          short_sha="$(git rev-parse --short=12 HEAD)"
           repo_name="${GITHUB_REPOSITORY##*/}"
-          branch_name="${GITHUB_REF_NAME//\//-}"
-          short_sha="${GITHUB_SHA::12}"
+          branch_name="${GITHUB_REF_NAME:-main}"
+          branch_name="${branch_name//\//-}"
+          tag_name="release-${short_sha}"
           archive_name="${repo_name}-${branch_name}-${short_sha}.zip"
           root_dir="${repo_name}-${short_sha}"
-          echo "archive_name=${archive_name}" >> "$GITHUB_OUTPUT"
-          echo "root_dir=${root_dir}" >> "$GITHUB_OUTPUT"
+          release_name="Release ${short_sha} ($(date -u +'%Y-%m-%d'))"
+
+          previous_tag="$(git tag --merged HEAD --sort=-creatordate | grep -v "^${tag_name}$" | head -n 1 || true)"
+
+          {
+            echo "target_sha=${target_sha}"
+            echo "short_sha=${short_sha}"
+            echo "tag_name=${tag_name}"
+            echo "archive_name=${archive_name}"
+            echo "root_dir=${root_dir}"
+            echo "release_name=${release_name}"
+            echo "previous_tag=${previous_tag}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create ZIP from current commit
         shell: bash
         run: |
-          git archive --format=zip --output="${{ steps.meta.outputs.archive_name }}" --prefix="${{ steps.meta.outputs.root_dir }}/" HEAD
+          set -euo pipefail
+          git archive \
+            --format=zip \
+            --output="${{ steps.meta.outputs.archive_name }}" \
+            --prefix="${{ steps.meta.outputs.root_dir }}/" \
+            HEAD
 
-      - name: Create release notes
-        shell: bash
+      - name: Generate release notes
+        shell: python
+        env:
+          ARCHIVE_NAME: ${{ steps.meta.outputs.archive_name }}
+          PREVIOUS_TAG: ${{ steps.meta.outputs.previous_tag }}
+          RELEASE_NAME: ${{ steps.meta.outputs.release_name }}
+          TAG_NAME: ${{ steps.meta.outputs.tag_name }}
+          TARGET_SHA: ${{ steps.meta.outputs.target_sha }}
+          SHORT_SHA: ${{ steps.meta.outputs.short_sha }}
         run: |
-          {
-            echo "# Repository Artifact"
-            echo
-            echo "Repository: ${GITHUB_REPOSITORY}"
-            echo "Branch: ${GITHUB_REF_NAME}"
-            echo "Commit: ${GITHUB_SHA}"
-            echo "Short SHA: ${GITHUB_SHA::12}"
-            echo "Event: ${GITHUB_EVENT_NAME}"
-            echo "Actor: ${GITHUB_ACTOR}"
-            echo "UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            echo "Archive: ${{ steps.meta.outputs.archive_name }}"
-            echo
-            last_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
-            if [[ -n "$last_tag" ]]; then
-              echo "## Changes since $last_tag"
-              git log --oneline "$last_tag..HEAD"
-            else
-              echo "## Recent commits"
-              git log --oneline -10
-            fi
-          } > release-notes.md
+          import datetime as dt
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.meta.outputs.archive_name }}
-          path: |
-            ${{ steps.meta.outputs.archive_name }}
-            release-notes.md
+          def git(args):
+              return subprocess.check_output(["git", *args], text=True, encoding="utf-8").strip()
+
+          def git_lines(args):
+              output = git(args)
+              return [line for line in output.splitlines() if line.strip()]
+
+          def parse_log(range_spec=None):
+              args = [
+                  "log",
+                  "--reverse",
+                  "--date=short",
+                  "--pretty=format:%H%x1f%h%x1f%ad%x1f%an%x1f%s",
+              ]
+              if range_spec:
+                  args.append(range_spec)
+              else:
+                  args.append("HEAD")
+              commits = []
+              for line in git_lines(args):
+                  full, short, date, author, subject = line.split("\x1f", 4)
+                  commits.append(
+                      {
+                          "full": full,
+                          "short": short,
+                          "date": date,
+                          "author": author,
+                          "subject": subject,
+                      }
+                  )
+              return commits
+
+          def classify(subject):
+              lowered = subject.lower()
+              if lowered.startswith("security:"):
+                  return "Sicherheit"
+              if lowered.startswith(("feat:", "feature:")):
+                  return "Funktionen"
+              if lowered.startswith(("fix:", "bugfix:")):
+                  return "Fehlerbehebungen"
+              if lowered.startswith("docs:") or lowered.startswith("dokumentiere"):
+                  return "Dokumentation"
+              if lowered.startswith("chore(deps):") or "dependabot" in lowered or "checkout" in lowered:
+                  return "Abhängigkeiten"
+              if lowered.startswith(("chore:", "ci:", "build:")):
+                  return "Wartung"
+              return "Sonstige Änderungen"
+
+          def esc_table(value):
+              return value.replace("|", "\\|").replace("\n", " ")
+
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+          previous_tag = os.environ.get("PREVIOUS_TAG", "")
+          all_commits = parse_log()
+          if previous_tag:
+              comparison_range = f"{previous_tag}..HEAD"
+              scoped_commits = parse_log(comparison_range)
+          else:
+              comparison_range = "Initiale Historie"
+              scoped_commits = all_commits
+
+          grouped = {}
+          for commit in scoped_commits:
+              grouped.setdefault(classify(commit["subject"]), []).append(commit)
+
+          preferred_order = [
+              "Sicherheit",
+              "Funktionen",
+              "Fehlerbehebungen",
+              "Dokumentation",
+              "Abhängigkeiten",
+              "Wartung",
+              "Sonstige Änderungen",
+          ]
+
+          now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          repo = os.environ["GITHUB_REPOSITORY"]
+          branch = event.get("workflow_run", {}).get("head_branch") or os.environ.get("GITHUB_REF_NAME", "")
+          actor = os.environ.get("GITHUB_ACTOR", "")
+          run_url = f"{os.environ['GITHUB_SERVER_URL']}/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+
+          lines = [
+              f"# {os.environ['RELEASE_NAME']}",
+              "",
+              f"Automatisch erzeugter Release für `{repo}`.",
+              "",
+              "## Zusammenfassung",
+              "",
+              f"- Tag: `{os.environ['TAG_NAME']}`",
+              f"- Commit: `{os.environ['TARGET_SHA']}`",
+              f"- Branch: `{branch or 'main'}`",
+              f"- Vorheriger Tag: `{previous_tag}`" if previous_tag else "- Vorheriger Tag: keiner gefunden",
+              f"- Commit-Umfang seit vorherigem Tag: `{comparison_range}`",
+              f"- Enthaltene Commits insgesamt: `{len(all_commits)}`",
+              f"- Commits seit vorherigem Tag: `{len(scoped_commits)}`",
+              f"- Erstellt: `{now}`",
+              "",
+              "## Wichtigste Änderungen",
+              "",
+          ]
+
+          if scoped_commits:
+              for group in preferred_order:
+                  commits = grouped.get(group, [])
+                  if not commits:
+                      continue
+                  lines.append(f"### {group}")
+                  lines.append("")
+                  for commit in commits[-5:]:
+                      lines.append(f"- {commit['subject']} (`{commit['short']}`)")
+                  lines.append("")
+          else:
+              lines.extend(["- Keine neuen Commits seit dem vorherigen Tag.", ""])
+
+          lines.extend(
+              [
+                  "## Release-Artefakte",
+                  "",
+                  f"- Repository-ZIP: `{os.environ['ARCHIVE_NAME']}`",
+                  "- Vollständige Release Notes: `release-notes.md`",
+                  "",
+                  "## Alle enthaltenen Commits",
+                  "",
+                  "| Datum | Commit | Autor | Änderung |",
+                  "| --- | --- | --- | --- |",
+              ]
+          )
+
+          for commit in all_commits:
+              lines.append(
+                  f"| {commit['date']} | `{commit['short']}` | {esc_table(commit['author'])} | {esc_table(commit['subject'])} |"
+              )
+
+          lines.extend(
+              [
+                  "",
+                  "## Technische Metadaten",
+                  "",
+                  f"- Event: `{os.environ.get('GITHUB_EVENT_NAME', '')}`",
+                  f"- Actor: `{actor}`",
+                  f"- Workflow Run: {run_url}",
+                  f"- Release-Ziel: `{os.environ['TARGET_SHA']}`",
+                  "",
+                  "## Hinweise",
+                  "",
+                  "- Dieser Release enthält keine Hostdaten und keine Klartext-Secrets.",
+                  "- Dieses Repository enthält aktuell keine Docker-Grundlage; es wird deshalb kein GHCR-Image erzeugt.",
+              ]
+          )
+
+          Path("release-notes.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tag_name="${{ steps.meta.outputs.tag_name }}"
+          release_name="${{ steps.meta.outputs.release_name }}"
+          target_sha="${{ steps.meta.outputs.target_sha }}"
+          archive_name="${{ steps.meta.outputs.archive_name }}"
+
+          if gh release view "$tag_name" >/dev/null 2>&1; then
+            gh release edit "$tag_name" \
+              --title "$release_name" \
+              --notes-file release-notes.md \
+              --latest
+            gh release upload "$tag_name" \
+              "${archive_name}#Repository ZIP" \
+              "release-notes.md#Release Notes" \
+              --clobber
+          else
+            gh release create "$tag_name" \
+              "${archive_name}#Repository ZIP" \
+              "release-notes.md#Release Notes" \
+              --target "$target_sha" \
+              --title "$release_name" \
+              --notes-file release-notes.md \
+              --latest
+          fi
