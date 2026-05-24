@@ -34,28 +34,30 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 ## Harte Regeln
 
 1. Prüfe zuerst den Repo-Modus und die Sichtbarkeit.
-2. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
-3. Speichere niemals Klartext-Secrets im Repository.
-4. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
-5. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
-6. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
-7. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
-8. Arbeite Vorlagen in numerischer Reihenfolge ab.
-9. Nutze nur Vorlagen, die zur erkannten Plattform passen.
-10. Zeige vor Commit oder Push immer eine Zusammenfassung an.
-11. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
-12. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
-13. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
+2. Prüfe offene GitHub-Issues, wenn ein Remote vorhanden und GitHub erreichbar ist.
+3. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
+4. Speichere niemals Klartext-Secrets im Repository.
+5. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
+6. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
+7. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
+8. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
+9. Arbeite Vorlagen in numerischer Reihenfolge ab.
+10. Nutze nur Vorlagen, die zur erkannten Plattform passen.
+11. Zeige vor Commit oder Push immer eine Zusammenfassung an.
+12. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
+13. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
+14. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
 
 ## Ausführungsreihenfolge
 
 1. `Vorlage/common/00-agent-regeln.md` lesen.
 2. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
-3. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
-4. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
-5. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
-6. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
-7. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
+3. Falls GitHub erreichbar ist: offene Issues prüfen und relevante Issue-Nummern in der Arbeitsnotiz oder im Commit/PR-Kontext berücksichtigen.
+4. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
+5. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
+6. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
+7. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
+8. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
 
 ## Standardbefehle
 
@@ -63,6 +65,7 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 ./scripts/common/detect-repo-mode.ps1
 ./scripts/common/validate-template.ps1
 git diff --check
+gh issue list --state open --limit 20
 ```
 
 ```bash
@@ -88,6 +91,17 @@ bash ./scripts/common/validate-template.sh
 - Bestehende Nutzeränderungen nicht zurücksetzen oder überschreiben.
 - Große, generierte, lokale oder sensible Dateien nicht ungeprüft hinzufügen.
 - Vor Push in ein öffentliches Template muss `repo-mode.yaml` weiterhin `template` bleiben und `hosts/` darf nur `.gitkeep` enthalten.
+- Wenn Schreibrechte für das öffentliche Repository vorhanden sind, dürfen kleine geprüfte Template-Änderungen direkt auf `main` committed und gepusht werden.
+- Wenn keine Schreibrechte vorhanden sind oder der Push scheitert, nicht abbrechen: detailliertes Issue anlegen, Korrekturvorschlag dokumentieren und einen Pull Request aus einem Fork oder Branch vorbereiten.
+- Kleine zusammenhängende Änderungen früh `git add`en und committen. Lieber mehrere nachvollziehbare Commits als einen großen Sammelcommit.
+
+## Issues und Pull Requests
+
+- Prüfe vor der Arbeit offene Issues auf Überschneidungen.
+- Bei echten Fehlern im öffentlichen Template ein detailliertes Issue anlegen: Ist-Zustand, erwartetes Verhalten, Reproduktion, betroffene Dateien, Risiko, vorgeschlagene Lösung und ausgeführte Checks.
+- Wenn ein Issue bereits existiert, dort ergänzen statt ein Duplikat zu erzeugen.
+- Externe Agenten oder Nutzer ohne Push-Rechte arbeiten über Fork/Branch und Pull Request.
+- Pull Requests müssen die Änderung knapp erklären, relevante Issues verlinken und die ausgeführten Checks nennen.
 
 ## Sicherheitsgrenzen
 
