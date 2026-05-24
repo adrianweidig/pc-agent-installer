@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- README mit Hero-Grafik, korrekten GitHub-Badges, Quick-Links und klarerer Dokumentationsnavigation überarbeitet.
+- Strukturierte GitHub-Issue-Templates, Pull-Request-Vorlage und Dependabot-Konfiguration für GitHub Actions ergänzt.
+- `SUPPORT.md`, `CODE_OF_CONDUCT.md`, Architekturübersicht, Release-Prozess und Maintainer-Checkliste ergänzt.
+- Security- und Contribution-Dokumentation für öffentliche Mitarbeit und sensible Meldewege präzisiert.
 - README als zentrale Einstiegsdokumentation erweitert.
 - AGENTS.md um projektspezifische Codex-Regeln und dauerhafte Hygienevorgaben ergänzt.
 - Öffentliches Template und private Operational-Arbeit als dauerhaftes Codex-Arbeitsmodell dokumentiert.

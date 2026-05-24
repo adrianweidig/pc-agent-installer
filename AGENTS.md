@@ -78,12 +78,40 @@ bash ./scripts/common/verify-template.sh
 
 `assert-private-repo.*` ist für Host-Schreibzugriffe gedacht und darf im `template`-Modus fehlschlagen. Dieser Fehler ist eine Sicherheitsgrenze, kein Template-Fehler.
 
+## Entwicklungs-, Test- und Build-Befehle
+
+Dieses Repository hat keinen Paketmanager, keine installierbaren Abhängigkeiten und keinen klassischen Build-Schritt. Die lokale Qualitätsprüfung besteht aus den Guard- und Template-Checks.
+
+Vor Änderungen:
+
+```powershell
+git status --short --branch
+./scripts/common/detect-repo-mode.ps1
+```
+
+Nach Änderungen an Vorlagen, Skripten, Schemas oder Dokumentation:
+
+```powershell
+./scripts/common/verify-template.ps1
+git diff --check
+```
+
+Zusätzlich auf Bash-Pfaden:
+
+```bash
+bash ./scripts/common/detect-repo-mode.sh
+bash ./scripts/common/verify-template.sh
+```
+
+Ein absichtlich fehlgeschlagenes `assert-private-repo.*` im `template`-Modus ist kein Fehler. Es bestätigt, dass Host-Schreibzugriffe im öffentlichen Template blockiert sind.
+
 ## Konventionen
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
 - Dokumentation beschreibt den Agenten-first-Ablauf: Nutzer klont das Template, der Agent arbeitet im Klon, und Public/Private-Einordnung erfolgt vor jeder Änderung.
 - Deutsche Fließtexte verwenden echte UTF-8-Umlaute; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
 - Markdown-Dateien verwenden klare Überschriften, kurze Abschnitte und relative Pfade in Codeformatierung.
+- Öffentliche Dokumentation bleibt sachlich: keine erfundenen Features, Roadmap-Zusagen, Supportversprechen oder Sicherheitsgarantien.
 - PowerShell-Skripte müssen ohne expliziten `-RepoRoot` aus dem Repository heraus laufen.
 - Guard-Skripte müssen nicht destruktiv und idempotent bleiben.
 - Neue Vorlagen brauchen gültiges YAML-Frontmatter und eine eindeutige numerische Position.

@@ -1,8 +1,15 @@
 ## Zusammenfassung
 
 
-## Zugehörige Issues
+## Betroffener Bereich
 
+- [ ] Dokumentation
+- [ ] Vorlagen
+- [ ] PowerShell-Skripte
+- [ ] Bash-Skripte
+- [ ] Container-Erkennung
+- [ ] Schemas
+- [ ] CI oder Repository-Hygiene
 
 ## Public/Private-Einordnung
 
@@ -13,9 +20,17 @@
 ## Checks
 
 - [ ] `./scripts/common/detect-repo-mode.ps1`
-- [ ] `./scripts/common/validate-template.ps1`
+- [ ] `./scripts/common/verify-template.ps1`
+- [ ] `bash ./scripts/common/detect-repo-mode.sh`
+- [ ] `bash ./scripts/common/verify-template.sh`
 - [ ] `git diff --check`
-- [ ] Secret-Scan oder manuelle Secret-Prüfung
+- [ ] Manuelle Secret-Prüfung
 
-## Hinweise
+## Zugehörige Issues
+
+
+## Risiken oder Grenzen
+
+
+## Hinweise für Reviewer
 

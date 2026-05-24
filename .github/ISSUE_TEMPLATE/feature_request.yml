@@ -1,0 +1,56 @@
+name: Verbesserungsvorschlag
+description: Eine generische Verbesserung für Vorlagen, Skripte oder Dokumentation vorschlagen.
+title: "[Verbesserung] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Vorschläge müssen für das öffentliche Template geeignet sein. Bitte keine Hostdaten, privaten Pfade oder Secrets einfügen.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Ziel
+      description: Welches Problem soll gelöst werden?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Betroffener Bereich
+      options:
+        - Dokumentation
+        - Vorlagen
+        - PowerShell-Skripte
+        - Bash-Skripte
+        - Container-Erkennung
+        - Schemas
+        - CI oder Repository-Hygiene
+        - anderes
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Vorschlag
+      description: Wie könnte die Änderung aussehen?
+    validations:
+      required: true
+  - type: textarea
+    id: benefit
+    attributes:
+      label: Nutzen
+      description: Was wird dadurch klarer, sicherer oder wartbarer?
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risiken oder Grenzen
+      description: Gibt es Kompatibilitäts-, Sicherheits- oder Scope-Risiken?
+  - type: textarea
+    id: checks
+    attributes:
+      label: Bereits geprüfte Befehle
+      placeholder: |
+        ./scripts/common/verify-template.ps1
+        git diff --check

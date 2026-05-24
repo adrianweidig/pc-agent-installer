@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">PC Agent Installer</title>
+  <desc id="desc">A structured template flow from public guard rails to private operational host data.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.52" stop-color="#14313d"/>
+      <stop offset="1" stop-color="#1f3a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="1" stop-color="#86efac"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#020617" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="420" rx="28" fill="url(#bg)"/>
+  <path d="M0 338 C180 294 312 380 508 330 C717 277 835 268 1200 318 L1200 420 L0 420 Z" fill="#0f766e" opacity="0.22"/>
+  <path d="M0 89 C202 132 346 36 531 86 C751 145 901 115 1200 56" fill="none" stroke="#67e8f9" stroke-width="2" opacity="0.25"/>
+
+  <g transform="translate(86 74)">
+    <text x="0" y="0" fill="#d1fae5" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="18" letter-spacing="2">PUBLIC TEMPLATE</text>
+    <text x="0" y="60" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="58" font-weight="700">PC Agent Installer</text>
+    <text x="0" y="108" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="24">Dokumentierte, reproduzierbare und rollbackfähige Rechner-Einrichtung mit Codex.</text>
+  </g>
+
+  <g transform="translate(86 224)" filter="url(#shadow)">
+    <rect x="0" y="0" width="210" height="78" rx="14" fill="#f8fafc"/>
+    <text x="24" y="31" fill="#0f172a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" font-weight="700">Template</text>
+    <text x="24" y="56" fill="#475569" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15">keine Hostdaten</text>
+
+    <rect x="250" y="0" width="210" height="78" rx="14" fill="#f8fafc"/>
+    <text x="274" y="31" fill="#0f172a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" font-weight="700">Guards</text>
+    <text x="274" y="56" fill="#475569" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15">Modus und Sichtbarkeit</text>
+
+    <rect x="500" y="0" width="210" height="78" rx="14" fill="#f8fafc"/>
+    <text x="524" y="31" fill="#0f172a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" font-weight="700">Vorlagen</text>
+    <text x="524" y="56" fill="#475569" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15">Windows, Linux, WSL</text>
+
+    <rect x="750" y="0" width="250" height="78" rx="14" fill="#f8fafc"/>
+    <text x="774" y="31" fill="#0f172a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="17" font-weight="700">Operational Repo</text>
+    <text x="774" y="56" fill="#475569" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15">private Hostnachweise</text>
+  </g>
+
+  <g stroke="url(#accent)" stroke-width="4" stroke-linecap="round" opacity="0.9">
+    <path d="M306 263 H336"/>
+    <path d="M556 263 H586"/>
+    <path d="M806 263 H836"/>
+  </g>
+</svg>

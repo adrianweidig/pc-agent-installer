@@ -1,0 +1,69 @@
+name: Fehlerbericht
+description: Einen reproduzierbaren Fehler im öffentlichen Template melden.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für den Bericht. Bitte keine Secrets, echten Hostnamen, privaten Pfade oder unredigierten Logs einfügen.
+  - type: textarea
+    id: current
+    attributes:
+      label: Ist-Zustand
+      description: Was passiert aktuell?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was sollte stattdessen passieren?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduktion oder Fundstelle
+      description: Schritte, Befehl oder konkrete Datei.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: files
+    attributes:
+      label: Betroffene Dateien oder Vorlagen
+      placeholder: scripts/common/verify-template.ps1, Vorlage/common/...
+  - type: textarea
+    id: checks
+    attributes:
+      label: Ausgeführte Checks
+      description: Welche lokalen Prüfungen liefen bereits?
+      placeholder: |
+        ./scripts/common/verify-template.ps1
+        bash ./scripts/common/verify-template.sh
+  - type: dropdown
+    id: repo_mode
+    attributes:
+      label: Repo-Modus
+      options:
+        - template
+        - operational
+        - local-only
+        - unbekannt
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Risiko und Auswirkung
+      description: Warum ist das relevant?
+  - type: textarea
+    id: context
+    attributes:
+      label: Zusätzlicher Kontext
+      description: Redigierte Hinweise, Screenshots oder Links.

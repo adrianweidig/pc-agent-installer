@@ -1,0 +1,33 @@
+name: Dokumentationshinweis
+description: Unklare, fehlende oder widersprüchliche Dokumentation melden.
+title: "[Docs] "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Fundstelle
+      description: Welche Datei, Überschrift oder welcher Link ist betroffen?
+      placeholder: README.md, docs/05-secrets-policy.md, ...
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Was ist unklar, falsch oder fehlt?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Vorschlag
+      description: Welche konkrete Verbesserung wäre hilfreich?
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Sicherheitscheck
+      options:
+        - label: Der Hinweis enthält keine Secrets, echten Hostnamen, privaten Pfade oder vertraulichen Infrastrukturdetails.
+          required: true

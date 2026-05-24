@@ -2,7 +2,9 @@
 
 ## Zusammenfassung
 
-Das Projekt wurde am 2026-05-24 geprüft. Es ist als öffentliches Template-Repository arbeitsfähig, sauber versioniert und mit GitHub synchron. Es waren keine Initialisierungs- oder Korrekturschritte nötig; diese Datei wurde als kompakter Readiness-Bericht ergänzt.
+Das Projekt wurde am 2026-05-24 geprüft. Es ist als öffentliches Template-Repository arbeitsfähig, sauber versioniert und mit GitHub synchron.
+
+Am 2026-05-24 wurde zusätzlich eine Veröffentlichungsvorbereitung durchgeführt: README, Community-Dateien, Issue-Forms, Support-/Security-Hinweise, Maintainer-Checkliste, Architekturübersicht und GitHub-Actions-Dependabot wurden für öffentliche Nutzung verbessert.
 
 ## Projektroot
 
@@ -28,7 +30,7 @@ Aktueller Branch: `main`
 
 Upstream: `origin/main`
 
-Lokale Zusatzänderung: `CODEX_PROJECT_READINESS.md` wurde neu erstellt.
+Nach der Veröffentlichungsvorbereitung liegen lokale Dokumentations-, GitHub-Template- und Validierungsänderungen vor. Diese Änderungen sind nicht automatisch committed oder gepusht.
 
 ## GitHub-Synchronität
 
@@ -91,6 +93,8 @@ Ergebnis:
 - PowerShell-Template-Validierung erfolgreich.
 - Bash-Repo-Modusprüfung erfolgreich.
 - Bash-Template-Validierung erfolgreich.
+- Lokale Markdown-Links und referenzierte Bilder erfolgreich geprüft.
+- Platzhaltersuche für neue öffentliche Dokumente ohne offene Markierungen.
 
 Hinweis: Der Bash-Check meldete nur Git-Line-Ending-Warnungen zu künftigem CRLF-Verhalten bei zwei Dateien; es entstanden dadurch keine Arbeitsbaumänderungen.
 
@@ -105,7 +109,7 @@ Codex kann das Projekt direkt nutzen:
 - `AGENTS.md` ist vorhanden und wurde geprüft.
 - `Vorlage/common/00-agent-regeln.md` ist vorhanden und wurde geprüft.
 - `repo-mode.yaml` ist vorhanden und setzt `repo_mode: template`.
-- `README.md` beschreibt Arbeitsmodell, Checks und Sicherheitsgrenzen.
+- `README.md` beschreibt Arbeitsmodell, Checks, Sicherheitsgrenzen und öffentliche Kollaboration.
 - `hosts/` enthält im Template-Modus nur `.gitkeep`.
 
 ## Geprüfte alte Pfade
@@ -116,7 +120,11 @@ Gefunden wurden nur generische Platzhalter und dokumentierte Template-Regeln wie
 
 ## Durchgeführte Änderungen
 
-- `CODEX_PROJECT_READINESS.md` erstellt.
+- `CODEX_PROJECT_READINESS.md` erstellt und nach Veröffentlichungsvorbereitung aktualisiert.
+- README-Hero, Badges, Quick-Links und Dokumentationsnavigation ergänzt.
+- Strukturierte GitHub-Issue-Forms, Pull-Request-Template und Dependabot für GitHub Actions ergänzt.
+- `SUPPORT.md`, `CODE_OF_CONDUCT.md`, `docs/ARCHITECTURE.md`, `docs/RELEASE_PROCESS.md` und `docs/MAINTAINER_CHECKLIST.md` ergänzt.
+- Security- und Contribution-Dokumentation präzisiert.
 
 ## Nicht durchgeführte Änderungen
 
@@ -139,10 +147,12 @@ Die ausgeführte Template-Validierung enthielt einen Secret-Pattern-Scan und war
 
 ## Offene manuelle Aufgaben
 
-Keine zwingenden manuellen Aufgaben.
-
-Optional kann dieser Bericht committed und gepusht werden, wenn er dauerhaft Teil des öffentlichen Templates bleiben soll.
+- GitHub Repository Topics prüfen oder setzen.
+- Social Preview aus `docs/assets/pc-agent-installer-hero.svg` oder einem daraus exportierten PNG hochladen.
+- Branch Protection oder Rulesets für `main` konfigurieren.
+- Private Vulnerability Reporting oder privaten Sicherheitskontakt einrichten.
+- Entscheiden, ob Wiki deaktiviert und Discussions aktiviert werden sollen.
 
 ## Endzustand
 
-Das Projekt ist direkt arbeitsfähig, GitHub-synchron geprüft und Codex-nutzbar. Die einzige neue Datei ist dieser Readiness-Bericht.
+Das Projekt ist direkt arbeitsfähig und Codex-nutzbar. Die aktuelle Veröffentlichungsvorbereitung liegt als lokaler Arbeitsbaum-Diff vor und wurde noch nicht committed oder gepusht.
