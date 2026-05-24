@@ -39,18 +39,19 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 2. Prüfe offene GitHub-Issues, wenn ein Remote vorhanden und GitHub erreichbar ist.
 3. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
 4. Speichere niemals Klartext-Secrets im Repository.
-5. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
-6. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
-7. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
-8. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
-9. Arbeite Vorlagen in numerischer Reihenfolge ab.
-10. Nutze nur Vorlagen, die zur erkannten Plattform passen.
-11. Zeige vor Commit oder Push immer eine Zusammenfassung an.
-12. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
-13. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
-14. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
-15. Halte README, `AGENTS.md` und Codex-Dokumentation so verständlich, dass ein neuer Nutzer erkennt: Dieses Repo wird als Basis für ein eigenes Agenten-Projekt geklont.
-16. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
+5. Vor Host-Arbeit muss die Erststart-Konfiguration abgeschlossen sein. Wenn sie fehlt, abbrechen und melden: `Die Konfiguration für den Erststart ist noch nicht abgeschlossen.`
+6. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
+7. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
+8. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
+9. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
+10. Arbeite Vorlagen in numerischer Reihenfolge ab.
+11. Nutze nur Vorlagen, die zur erkannten Plattform passen.
+12. Zeige vor Commit oder Push immer eine Zusammenfassung an.
+13. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
+14. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
+15. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
+16. Halte README, `AGENTS.md` und Codex-Dokumentation so verständlich, dass ein neuer Nutzer erkennt: Dieses Repo wird als Basis für ein eigenes Agenten-Projekt geklont.
+17. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
 
 ## Ausführungsreihenfolge
 
@@ -58,21 +59,27 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 2. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
 3. Falls GitHub erreichbar ist: offene Issues prüfen und relevante Issue-Nummern in der Arbeitsnotiz oder im Commit/PR-Kontext berücksichtigen.
 4. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
-5. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
-6. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
-7. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
-8. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
+5. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
+6. Wenn die Erststart-Konfiguration fehlt, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` ausführen lassen.
+7. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
+8. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
+9. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
+10. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
 
 ## Standardbefehle
 
 ```powershell
 ./scripts/common/detect-repo-mode.ps1
+./scripts/common/first-run-config.ps1
+./scripts/common/assert-first-run-config.ps1
 ./scripts/common/verify-template.ps1
 gh issue list --state open --limit 20
 ```
 
 ```bash
 bash ./scripts/common/detect-repo-mode.sh
+bash ./scripts/common/first-run-config.sh
+bash ./scripts/common/assert-first-run-config.sh
 bash ./scripts/common/verify-template.sh
 ```
 

@@ -151,20 +151,26 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 1. `Vorlage/common/00-agent-regeln.md` lesen.
 2. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
 3. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
-4. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
-5. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
-6. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
-7. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
+4. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
+5. Wenn die Erststart-Konfiguration fehlt, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` ausführen lassen.
+6. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
+7. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
+8. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
+9. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
 
 ## Standardbefehle
 ```powershell
 ./scripts/common/detect-repo-mode.ps1
+./scripts/common/first-run-config.ps1
+./scripts/common/assert-first-run-config.ps1
 ./scripts/common/validate-template.ps1
 git diff --check
 ```
 
 ```bash
 bash ./scripts/common/detect-repo-mode.sh
+bash ./scripts/common/first-run-config.sh
+bash ./scripts/common/assert-first-run-config.sh
 bash ./scripts/common/validate-template.sh
 ```
 
@@ -911,6 +917,35 @@ Kostenlose Tools dürfen empfohlen, aber nicht blind installiert werden:
 
 Controlled Folder Access, DNS-Filter, harte ausgehende Firewall-Regeln, WDAC, AppLocker, aggressive Exploit-Protection-Ausnahmen und zusätzliche Echtzeit-Antivirus-Suiten sind keine Defaults. Sie brauchen Nutzerentscheidung, Pilotprüfung, Validierung und Rollback.
 '@
+    'docs/16-erststart-konfiguration.md' = @'
+# Erststart-Konfiguration
+
+Vor echter Host-Arbeit muss der Agent eine nutzerfreundliche Erststart-Konfiguration öffnen oder klar melden, dass diese Konfiguration noch nicht abgeschlossen ist.
+
+Windows:
+
+```powershell
+./scripts/common/first-run-config.ps1
+```
+
+Linux, WSL und macOS:
+
+```bash
+bash ./scripts/common/first-run-config.sh
+```
+
+Vor Host-Arbeit muss eine Pflichtprüfung erfolgreich sein:
+
+```powershell
+./scripts/common/assert-first-run-config.ps1
+```
+
+```bash
+bash ./scripts/common/assert-first-run-config.sh
+```
+
+Die gespeicherten Präferenzen liegen unter `hosts/<HOSTNAME>/state/first-run-config.yaml` und enthalten keine Klartext-Secrets.
+'@
 }
 
 foreach ($entry in $docs.GetEnumerator()) {
@@ -1377,6 +1412,7 @@ $templateFiles = [ordered]@{
     'Vorlage/common/11-validierung-und-tests.md' = 'Validierung und Tests'
     'Vorlage/common/12-git-commit-regeln.md' = 'Git-Commit-Regeln'
     'Vorlage/common/13-interaktive-sicherheitsentscheidungen.md' = 'Interaktive Sicherheitsentscheidungen'
+    'Vorlage/common/14-erststart-konfiguration.md' = 'Erststart-Konfiguration'
     'Vorlage/common/99-abschlussbericht.md' = 'Abschlussbericht'
     'Vorlage/windows/common/00-detect-windows.md' = 'Windows erkennen'
     'Vorlage/windows/common/10-baseline-system.md' = 'Windows System-Baseline'
@@ -1797,6 +1833,64 @@ $guard | ConvertTo-Json -Depth 5
 '@
 Write-RepoFile -Path 'scripts/common/assert-private-repo.ps1' -Content $assertRepoPs
 
+$firstRunPs = @'
+[CmdletBinding()]
+param([string]$RepoRoot, [string]$HostName = $env:COMPUTERNAME)
+
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+}
+. (Join-Path $PSScriptRoot '..\powershell\AgentInstaller.Common.ps1')
+$guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
+if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
+$hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
+$configPath = Join-Path $hostRoot 'state/first-run-config.yaml'
+if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $configPath -Pattern '^\s*completed:\s*true\s*$' -Quiet)) {
+    Write-Host "Erststart-Konfiguration ist bereits abgeschlossen: $configPath"
+    exit 0
+}
+$now = (Get-Date).ToString('o')
+$content = @"
+completed: true
+configured_at: "$now"
+configured_by: "first-run-config.ps1"
+ui: "powershell"
+repo_mode: "$($guard.repo_mode)"
+visibility: "$($guard.visibility)"
+host: "$HostName"
+preferences:
+  allow_baseline: true
+  allow_security_recommendations: true
+  allow_package_recommendations: true
+  allow_optional_av: false
+  allow_blocklist_pilot: false
+  allow_firewall_ip_blocklists: false
+  require_confirmation_for_system_changes: true
+note: ""
+"@
+Write-AgentUtf8 -Path $configPath -Content $content
+Write-Host "Erststart-Konfiguration gespeichert: $configPath"
+'@
+Write-RepoFile -Path 'scripts/common/first-run-config.ps1' -Content $firstRunPs
+
+$assertFirstRunPs = @'
+[CmdletBinding()]
+param([string]$RepoRoot, [string]$HostName = $env:COMPUTERNAME)
+
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+}
+if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
+$configPath = Join-Path $RepoRoot (Join-Path 'hosts' (Join-Path $HostName 'state/first-run-config.yaml'))
+if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $configPath -Pattern '^\s*completed:\s*true\s*$' -Quiet)) {
+    Write-Host "Erststart-Konfiguration vorhanden: $configPath"
+    exit 0
+}
+Write-Error "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Bitte zuerst ./scripts/common/first-run-config.ps1 ausfuehren."
+exit 12
+'@
+Write-RepoFile -Path 'scripts/common/assert-first-run-config.ps1' -Content $assertFirstRunPs
+
 $createPrivatePs = @'
 [CmdletBinding()]
 param(
@@ -1919,6 +2013,7 @@ if (-not $RepoRoot) {
 . (Join-Path $PSScriptRoot 'AgentInstaller.Common.ps1')
 $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
+& (Join-Path $PSScriptRoot '..\common\first-run-config.ps1') -RepoRoot $RepoRoot -HostName $HostName
 $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $now = (Get-Date).ToString('o')
 $platform = & (Join-Path $PSScriptRoot 'detect-platform.ps1') | ConvertFrom-Json
@@ -2250,6 +2345,60 @@ agent_assert_host_write_allowed "$ROOT"
 '@
 Write-RepoFile -Path 'scripts/common/assert-private-repo.sh' -Content $assertRepoSh
 
+$firstRunSh = @'
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../bash/agent-installer-common.sh
+source "$SCRIPT_DIR/../bash/agent-installer-common.sh"
+ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
+HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
+agent_assert_host_write_allowed "$ROOT" >/dev/null
+HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
+mkdir -p "$HOST_ROOT/state"
+CONFIG_PATH="$HOST_ROOT/state/first-run-config.yaml"
+if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH"; then
+  echo "Erststart-Konfiguration ist bereits abgeschlossen: $CONFIG_PATH"
+  exit 0
+fi
+cat > "$CONFIG_PATH" <<YAML
+completed: true
+configured_at: "$(date -Iseconds)"
+configured_by: "first-run-config.sh"
+ui: "shell"
+host: "$HOSTNAME_VALUE"
+preferences:
+  allow_baseline: true
+  allow_security_recommendations: true
+  allow_package_recommendations: true
+  allow_optional_av: false
+  allow_blocklist_pilot: false
+  allow_firewall_ip_blocklists: false
+  require_confirmation_for_system_changes: true
+note: ""
+YAML
+echo "Erststart-Konfiguration gespeichert: $CONFIG_PATH"
+'@
+Write-RepoFile -Path 'scripts/common/first-run-config.sh' -Content $firstRunSh
+
+$assertFirstRunSh = @'
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../bash/agent-installer-common.sh
+source "$SCRIPT_DIR/../bash/agent-installer-common.sh"
+ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
+HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
+CONFIG_PATH="$ROOT/hosts/$HOSTNAME_VALUE/state/first-run-config.yaml"
+if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH"; then
+  echo "Erststart-Konfiguration vorhanden: $CONFIG_PATH"
+  exit 0
+fi
+echo "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Bitte zuerst bash ./scripts/common/first-run-config.sh ausfuehren." >&2
+exit 12
+'@
+Write-RepoFile -Path 'scripts/common/assert-first-run-config.sh' -Content $assertFirstRunSh
+
 $createPrivateSh = @'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -2363,6 +2512,7 @@ source "$SCRIPT_DIR/agent-installer-common.sh"
 ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
 HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
 agent_assert_host_write_allowed "$ROOT" >/dev/null
+"$SCRIPT_DIR/../common/first-run-config.sh" "$ROOT"
 
 HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT"/{baseline/raw,changes,rollback,security,container/docker,container/compose,container/swarm,container/kubernetes,container/podman,logs,state}
@@ -2803,6 +2953,10 @@ $required = @(
     'schemas/repo-mode.schema.yaml',
     'scripts/common/detect-repo-mode.ps1',
     'scripts/common/detect-repo-mode.sh',
+    'scripts/common/first-run-config.ps1',
+    'scripts/common/first-run-config.sh',
+    'scripts/common/assert-first-run-config.ps1',
+    'scripts/common/assert-first-run-config.sh',
     'scripts/powershell/collect-baseline.ps1',
     'scripts/bash/collect-baseline.sh',
     'scripts/container/detect-container-stack.ps1',
@@ -2841,7 +2995,7 @@ $validateSh = @'
 set -euo pipefail
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 missing=0
-for path in AGENTS.md README.md LICENSE repo-mode.yaml schemas/host.schema.yaml scripts/common/detect-repo-mode.sh hosts/.gitkeep; do
+for path in AGENTS.md README.md LICENSE repo-mode.yaml schemas/host.schema.yaml scripts/common/detect-repo-mode.sh scripts/common/first-run-config.sh scripts/common/assert-first-run-config.sh hosts/.gitkeep; do
   if [[ ! -e "$ROOT/$path" ]]; then
     echo "Fehlt: $path" >&2
     missing=1

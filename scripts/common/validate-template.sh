@@ -21,6 +21,10 @@ for path in \
   schemas/repo-mode.schema.yaml \
   scripts/common/detect-repo-mode.ps1 \
   scripts/common/detect-repo-mode.sh \
+  scripts/common/first-run-config.ps1 \
+  scripts/common/first-run-config.sh \
+  scripts/common/assert-first-run-config.ps1 \
+  scripts/common/assert-first-run-config.sh \
   scripts/common/verify-template.ps1 \
   scripts/common/verify-template.sh \
   scripts/powershell/collect-baseline.ps1 \

@@ -33,6 +33,8 @@ Das Projekt trennt bewusst zwei Welten:
 
 Das Repository ist nicht primär als manuell bedientes Admin-Tool gedacht. Der normale Ablauf ist agentenorientiert: Regeln lesen, Repo-Modus prüfen, Sichtbarkeit bewerten, Public/Private-Einordnung treffen, dann klein und nachvollziehbar arbeiten.
 
+Vor echter Host-Arbeit gibt es eine nutzerfreundliche Erststart-Konfiguration. Der Agent muss sie öffnen oder darauf hinweisen, dass sie noch nicht abgeschlossen ist. Erst danach darf er Baselines erfassen, Sicherheitsoptionen empfehlen oder systemwirksame Schritte vorbereiten.
+
 ## Was dieses Template leistet
 
 | Bereich | Zweck |
@@ -91,6 +93,26 @@ bash ./scripts/common/assert-private-repo.sh
 ```
 
 Im öffentlichen `template`-Modus schlägt `assert-private-repo` absichtlich fehl. Das ist eine Sicherheitsgrenze und schützt vor versehentlichem Schreiben von Hostdaten.
+
+Erststart-Konfiguration in einer privaten oder lokalen Operational-Kopie starten:
+
+```powershell
+./scripts/common/first-run-config.ps1
+```
+
+```bash
+bash ./scripts/common/first-run-config.sh
+```
+
+Pflichtprüfung vor Host-Arbeit:
+
+```powershell
+./scripts/common/assert-first-run-config.ps1
+```
+
+```bash
+bash ./scripts/common/assert-first-run-config.sh
+```
 
 ## Arbeitsmodell
 
@@ -155,7 +177,7 @@ hosts/                 bleibt im Template leer und enthält nur .gitkeep
 
 - Git
 - PowerShell für Windows-Workflows
-- Bash für Linux-, WSL- und Unix-nahe Workflows
+- Bash für Linux-, WSL-, macOS- und Unix-nahe Workflows
 - Optional: GitHub CLI `gh`, wenn GitHub-Sichtbarkeit geprüft oder eine private Kopie erzeugt werden soll
 
 ## Validierung
@@ -193,6 +215,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Sicherheitsmodell | [docs/04-sicherheitsmodell.md](docs/04-sicherheitsmodell.md) |
 | Secrets Policy | [docs/05-secrets-policy.md](docs/05-secrets-policy.md) |
 | Klassische Sicherheitseinstellungen | [docs/15-klassische-sicherheitseinstellungen.md](docs/15-klassische-sicherheitseinstellungen.md) |
+| Erststart-Konfiguration | [docs/16-erststart-konfiguration.md](docs/16-erststart-konfiguration.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

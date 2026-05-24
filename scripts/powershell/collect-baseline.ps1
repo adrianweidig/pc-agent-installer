@@ -11,6 +11,7 @@ if (-not $RepoRoot) {
 . (Join-Path $PSScriptRoot 'AgentInstaller.Common.ps1')
 $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
+& (Join-Path $PSScriptRoot '..\common\first-run-config.ps1') -RepoRoot $RepoRoot -HostName $HostName
 $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $now = (Get-Date).ToString('o')
 $platform = & (Join-Path $PSScriptRoot 'detect-platform.ps1') | ConvertFrom-Json
