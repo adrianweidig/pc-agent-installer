@@ -1,0 +1,39 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Template Frontmatter
+type: object
+required: [id, title, platform, environment, requires_admin, risk, rollback_required, idempotent, applies_to]
+properties:
+  id:
+    type: string
+  title:
+    type: string
+  platform:
+    type: string
+    enum: [windows, linux, any]
+  environment:
+    type: string
+    enum: [native, wsl, container, any]
+  family:
+    type: [string, 'null']
+  distribution:
+    type: [string, 'null']
+  version:
+    type: [string, 'null']
+  hardware_profile:
+    type: [string, 'null']
+  requires_admin:
+    type: boolean
+  risk:
+    type: string
+    enum: [niedrig, mittel, hoch]
+  approval_required:
+    type: boolean
+  rollback_required:
+    type: boolean
+  idempotent:
+    type: boolean
+  applies_to:
+    type: array
+    items:
+      type: string
+additionalProperties: true

@@ -1,0 +1,6 @@
+local_paths:
+  - id: runtime-env-file
+    purpose: Nicht versionierte Laufzeitvariablen
+    path: C:/path/to/local/.env
+    value_stored_in_repo: false
+    commit_allowed: false

@@ -1,0 +1,39 @@
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa
+id_ed25519
+kubeconfig
+kubeconfig.*
+
+# Lokale Dumps und Laufzeitartefakte
+*.dump
+*.bak
+*.tmp
+*.log
+*.log.sensitive
+
+# Lokale Caches
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+
+# Optional: rohe sensitive Exporte
+hosts/**/baseline/raw/*secret*
+hosts/**/baseline/raw/*token*
+hosts/**/baseline/raw/*credential*

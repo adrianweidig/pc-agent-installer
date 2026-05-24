@@ -1,0 +1,12 @@
+detected_at: 2026-05-24T12:00:00+02:00
+runtimes:
+  docker: true
+  docker_compose: true
+  docker_swarm: false
+  kubernetes: false
+  podman: false
+  nvidia_container_runtime: true
+compose_files:
+  - /srv/example/compose.yaml
+notes:
+  - Secrets nur referenzieren, nicht exportieren.

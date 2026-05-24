@@ -1,0 +1,6 @@
+vaults:
+  - id: primary-vault
+    purpose: Zentrale Secret-Ablage
+    backend: password-manager-or-vault
+    value_stored_in_repo: false
+    access: user-mediated

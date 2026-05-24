@@ -1,0 +1,32 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Container Stack
+type: object
+required: [detected_at, runtimes]
+properties:
+  detected_at:
+    type: string
+    format: date-time
+  runtimes:
+    type: object
+    properties:
+      docker:
+        type: boolean
+      docker_compose:
+        type: boolean
+      docker_swarm:
+        type: boolean
+      kubernetes:
+        type: boolean
+      podman:
+        type: boolean
+      nvidia_container_runtime:
+        type: boolean
+  compose_files:
+    type: array
+    items:
+      type: string
+  notes:
+    type: array
+    items:
+      type: string
+additionalProperties: true

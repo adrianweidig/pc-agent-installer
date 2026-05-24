@@ -1,0 +1,47 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Host
+type: object
+required: [host_id, hostname, created_at, last_seen_at, repo, platform]
+properties:
+  host_id:
+    type: string
+  hostname:
+    type: string
+  created_at:
+    type: string
+    format: date-time
+  last_seen_at:
+    type: string
+    format: date-time
+  repo:
+    type: object
+    required: [mode, visibility_checked, visibility, allowed_to_write_hosts]
+    properties:
+      mode:
+        type: string
+        enum: [template, operational, local-only]
+      visibility_checked:
+        type: boolean
+      visibility:
+        type: string
+      allowed_to_write_hosts:
+        type: boolean
+  platform:
+    type: object
+    required: [os, environment, architecture]
+    properties:
+      os:
+        type: string
+      environment:
+        type: string
+      version:
+        type: [string, 'null']
+      edition:
+        type: [string, 'null']
+      architecture:
+        type: string
+  template_paths_used:
+    type: array
+    items:
+      type: string
+additionalProperties: true

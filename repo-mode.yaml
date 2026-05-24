@@ -1,0 +1,5 @@
+repo_mode: template
+visibility_required: public
+allowed_to_write_hosts: false
+allowed_to_document_sensitive_context: false
+allowed_to_store_plaintext_secrets: false

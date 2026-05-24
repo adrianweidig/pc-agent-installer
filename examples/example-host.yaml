@@ -1,0 +1,41 @@
+host_id: DESKTOP-ABC123
+hostname: DESKTOP-ABC123
+created_at: 2026-05-24T12:00:00+02:00
+last_seen_at: 2026-05-24T12:00:00+02:00
+repo:
+  mode: operational
+  visibility_checked: true
+  visibility: private
+  allowed_to_write_hosts: true
+platform:
+  os: windows
+  environment: native
+  version: "11"
+  edition: "Pro"
+  architecture: x64
+linux:
+  family: null
+  distribution: null
+  version_id: null
+wsl:
+  enabled: true
+  distributions:
+    - name: Ubuntu
+      version: "2"
+      default: true
+hardware:
+  profile: laptop
+  vendor: null
+  gpu_vendor: nvidia
+  gpu_present: true
+container:
+  docker: true
+  docker_compose: true
+  docker_swarm: false
+  kubernetes: false
+  podman: false
+  nvidia_container_runtime: true
+template_paths_used:
+  - Vorlage/common
+  - Vorlage/windows/common
+  - Vorlage/windows/windows-11

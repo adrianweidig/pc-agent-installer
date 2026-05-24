@@ -1,0 +1,29 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Change Entry Metadata
+type: object
+required: [datum, hostname, repo_modus, bereich, ebene, risiko, status]
+properties:
+  datum:
+    type: string
+  hostname:
+    type: string
+  repo_modus:
+    type: string
+  repo_sichtbarkeit_geprueft:
+    type: boolean
+  bereich:
+    type: string
+  ebene:
+    type: string
+    enum: [User, System, Repo, Container, Cluster]
+  risiko:
+    type: string
+    enum: [niedrig, mittel, hoch]
+  adminrechte_erforderlich:
+    type: boolean
+  nutzerfreigabe_erforderlich:
+    type: boolean
+  status:
+    type: string
+    enum: [geplant, ausgeführt, fehlgeschlagen, rückgängig gemacht]
+additionalProperties: false

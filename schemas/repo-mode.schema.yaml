@@ -1,0 +1,23 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Repo Mode
+type: object
+required:
+  - repo_mode
+  - visibility_required
+  - allowed_to_write_hosts
+  - allowed_to_document_sensitive_context
+  - allowed_to_store_plaintext_secrets
+properties:
+  repo_mode:
+    type: string
+    enum: [template, operational, local-only]
+  visibility_required:
+    type: string
+    enum: [public, private, no_remote]
+  allowed_to_write_hosts:
+    type: boolean
+  allowed_to_document_sensitive_context:
+    type: boolean
+  allowed_to_store_plaintext_secrets:
+    type: boolean
+additionalProperties: false

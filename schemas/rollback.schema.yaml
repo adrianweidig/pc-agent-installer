@@ -1,0 +1,23 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Rollback
+type: object
+required: [id, change_entry, created_at, commands, validation]
+properties:
+  id:
+    type: string
+  change_entry:
+    type: string
+  created_at:
+    type: string
+    format: date-time
+  commands:
+    type: array
+    items:
+      type: string
+  validation:
+    type: array
+    items:
+      type: string
+  requires_approval:
+    type: boolean
+additionalProperties: false

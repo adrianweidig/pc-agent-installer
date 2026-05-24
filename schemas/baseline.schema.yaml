@@ -1,0 +1,19 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+title: PC Agent Installer Baseline
+type: object
+required: [hostname, collected_at, repo, platform, sections]
+properties:
+  hostname:
+    type: string
+  collected_at:
+    type: string
+    format: date-time
+  repo:
+    type: object
+  platform:
+    type: object
+  sections:
+    type: array
+    items:
+      type: string
+additionalProperties: true

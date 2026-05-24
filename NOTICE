@@ -1,0 +1,7 @@
+PC Agent Installer
+
+Dieses Repository ist als öffentliches Template gedacht. Die Apache-2.0-Lizenz erlaubt das Kopieren, Ändern und private Verwenden des Projekts.
+
+Hostdaten, private Konfigurationsstände, Secret-Referenzen, lokale Infrastrukturinformationen und Nutzerinhalte, die in einem privaten abgeleiteten Repository entstehen, sind nicht Teil des öffentlichen Upstream-Projekts.
+
+Klartext-Secrets sollen weder im öffentlichen noch im privaten Repository gespeichert werden.
