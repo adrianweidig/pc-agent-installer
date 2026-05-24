@@ -7,7 +7,7 @@ Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähi
 ## Projektüberblick
 
 - `repo-mode.yaml` steuert den Sicherheitsmodus.
-- `Vorlage/` enthält numerisch sortierte Agenten-Vorlagen.
+- `Vorlage/` enthält numerisch sortierte Agenten-Vorlagen für Windows, Linux, WSL, macOS, Container und Profile.
 - `scripts/common/` enthält Repo-Guards und Template-Validierung.
 - `scripts/powershell/` und `scripts/bash/` enthalten Host-, Baseline- und Change-Hilfen.
 - `scripts/container/` enthält Container-Erkennung.
@@ -159,6 +159,7 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 - Secret-Referenzen dürfen nur Zweck, Ablageort, Zugriffsmethode, Laufzeitvariable und Rotationshinweise beschreiben.
 - Bei unklarer Repo-Sichtbarkeit keine Hostdaten, privaten Pfade oder Infrastrukturdetails erfassen.
 - Bei normalen Nutzer-PCs gilt usability-first: Sicherheitssettings sollen kostenlose, aktuelle und seriöse Schutzmaßnahmen bevorzugen, aber normale Internet-, Download-, Store-, Game-, Entwickler- und KI-Tool-Nutzung nicht unnötig blockieren.
+- Sicherheitsmaßnahmen mit Blockade-, Installations-, Dienst-, Firewall-, DNS- oder Blocklist-Wirkung brauchen eine dokumentierte Frage-Antwort-Entscheidung nach `Vorlage/common/13-interaktive-sicherheitsentscheidungen.md`.
 
 ## Datei-Löschungen
 

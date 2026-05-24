@@ -39,7 +39,7 @@ Das Repository ist nicht primär als manuell bedientes Admin-Tool gedacht. Der n
 | --- | --- |
 | Repo-Guards | `template`, `operational` und `local-only` sicher unterscheiden |
 | Sichtbarkeitsprüfung | verhindern, dass Hostdaten in ein öffentliches Repository geschrieben werden |
-| Vorlagen | numerische Agenten-Schritte für Windows, Linux, WSL, Container und Hardwareprofile |
+| Vorlagen | numerische Agenten-Schritte für Windows, Linux, WSL, macOS, Container und Hardwareprofile |
 | Baseline- und Change-Hilfen | Hostzustände in privaten oder lokalen Operational-Repositories dokumentieren |
 | Validierung | Struktur, Frontmatter, Skript-Syntax, Encoding, Secret-Pattern und Git-Diff prüfen |
 | Dokumentation | Agenten-first-Ablauf, Sicherheitsmodell, Rollback-Konzept und Workspace-Hygiene beschreiben |
@@ -142,7 +142,7 @@ AGENTS.md              verbindliche Arbeitsregeln für Codex und andere Agenten
 Vorlage/               numerisch sortierte Agenten-Vorlagen
 scripts/common/        Repo-Modus, Sichtbarkeit, Validierung und Moduswechsel
 scripts/powershell/    Windows-Host-, Baseline- und Change-Hilfen
-scripts/bash/          Linux-, WSL- und Unix-nahe Hilfen
+scripts/bash/          Linux-, WSL-, macOS- und Unix-nahe Hilfen
 scripts/container/     Container-, Compose-, Swarm-, Kubernetes-, Podman- und NVIDIA-Erkennung
 schemas/               YAML-Schemas für Host-, Baseline-, Change-, Rollback- und Repo-Modus-Daten
 docs/                  Konzept-, Sicherheits-, Betriebs- und Validierungsdokumentation

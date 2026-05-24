@@ -152,6 +152,61 @@ Keine Standardempfehlung:
 7. Änderung mit Rollback und Validierung dokumentieren.
 8. Nach der Änderung normale Nutzung kurz gegenprüfen: Browser, Downloads, Updates, Store, häufig genutzte Apps.
 
+## Frage-Antwort-Standard
+
+Sicherheitsmaßnahmen mit Installations-, Dienst-, Firewall-, DNS- oder Blocklist-Wirkung werden nicht stillschweigend umgesetzt. Der Agent stellt eine konkrete Frage, erklärt den Tradeoff und dokumentiert die Antwort.
+
+Standardantworten:
+
+- `Ja`: umsetzen, dokumentieren, validieren und Rollback-Pfad anlegen.
+- `Nein`: nicht umsetzen und als bewusste Entscheidung dokumentieren.
+- `Später`: nicht umsetzen, aber als offene optionale Maßnahme notieren.
+
+Beispiel AV:
+
+```text
+Möchtest du einen kostenlosen, sinnvollen Malware-Scanner einrichten, der normale Installationen und Alltagsnutzung möglichst nicht blockiert?
+```
+
+Empfohlene Defaults:
+
+- Windows: Microsoft Defender bleibt der primäre Echtzeitschutz; ClamAV nur optional als On-Demand-Zweitscanner.
+- Linux: ClamAV optional für Downloads, Austauschordner, Mail-/Dateiserver oder Windows-Dateien.
+- WSL: Windows Defender schützt die Windows-Seite; ClamAV in WSL nur bei konkretem Scanbedarf.
+- macOS: eingebaute Schutzmechanismen beibehalten; ClamAV optional für On-Demand-Scans.
+
+Wenn ClamAV installiert wird, soll der Agent FreshClam-Signaturupdates über den passenden Dienst, Timer oder eine dokumentierte Update-Routine einrichten, sofern die Plattform das zuverlässig unterstützt.
+
+## Betriebssystem-Matrix
+
+| Fähigkeit | Windows | Linux | WSL | macOS |
+| --- | --- | --- | --- | --- |
+| Baseline | Windows Security, Firewall, Updates, installierte Programme | Distribution, Paketmanager, Firewall, Dienste | WSL-Version, Distribution, Mounts, Paketmanager | Systemversion, Gatekeeper/XProtect, Firewall, Paketmanager |
+| Primärer Schutz | Microsoft Defender | Paketupdates, Firewall, Berechtigungen | Windows Defender plus Linux-Paketpflege | eingebaute Apple-Schutzmechanismen |
+| Kostenloser Zusatzscanner | ClamAV optional on-demand | ClamAV optional on-demand oder daemonbasiert | ClamAV nur optional in der Distribution | ClamAV optional on-demand |
+| Signaturupdates | FreshClam-Dienst nur bei ClamAV | FreshClam-Service oder Timer | FreshClam-Service oder Timer nur bei systemd | FreshClam nach Installationsweg |
+| Blocklisten | DNS-/Host-Pilot bevorzugt | DNS-/Host-Pilot bevorzugt | meist Windows-seitig sinnvoller | DNS-/Host-Pilot bevorzugt |
+| IP-Firewall-Listen | nicht Default | eher Server/Router | nur bei exponierten Diensten | nicht Default |
+
+## Blocklisten und Firewall-Blacklists
+
+Blocklisten können sinnvoll sein, sind aber eine der häufigsten Quellen für unerwartete Nebenwirkungen. Für normale Nutzer-PCs gilt:
+
+1. DNS- oder Host-Blocklisten zuerst testen.
+2. Leichte oder normale Profile bevorzugen.
+3. Allowlist und Rollback vorbereiten.
+4. IP-Firewall-Listen nicht global als Default aktivieren.
+5. Nach Aktivierung Browser, Downloads, Updates, Store, Paketmanager, Git, Cloud-Sync, Games und KI-Tools prüfen.
+
+Sinnvolle öffentliche Quellen für Pilotbetrieb:
+
+- HaGeZi DNS Blocklists für DNS-basierte Profile von leicht bis aggressiv.
+- StevenBlack hosts als konsolidierte Host-Datei mit Varianten.
+- URLhaus für Malware-URL-Intelligence, eher für Tools und Security-Integrationen als für blinde Desktop-Firewall-Regeln.
+- FireHOL IP Lists oder Spamhaus DROP/EDROP nur bewusst für IP-basierte Firewall-Szenarien, vor allem Router, Server oder exponierte Dienste.
+
+Der Agent darf keine Blockliste als "muss immer blockiert werden" behandeln. Jede Liste kann False Positives enthalten oder legitime Dienste stören.
+
 ## Nicht-Ziele
 
 - keine maximale Härtung auf Kosten der Nutzbarkeit
@@ -171,3 +226,14 @@ Der Nutzer oder Maintainer entscheidet pro Host:
 - ob lokale Adminrechte reduziert werden sollen
 - welches Backup-Ziel verwendet wird
 - ob optionale On-Demand-Scanner installiert werden
+
+## Quellen für Maintainer
+
+- ClamAV-Dokumentation: `https://docs.clamav.net/`
+- ClamAV Services: `https://docs.clamav.net/manual/Usage/Services.html`
+- ClamAV Signature Management: `https://docs.clamav.net/manual/Usage/SignatureManagement.html`
+- HaGeZi DNS Blocklists: `https://github.com/hagezi/dns-blocklists`
+- StevenBlack hosts: `https://github.com/StevenBlack/hosts`
+- URLhaus von abuse.ch und Spamhaus: `https://urlhaus.abuse.ch/`
+- FireHOL IP Lists: `https://iplists.firehol.org/`
+- Spamhaus Blocklists: `https://www.spamhaus.org/blocklists/`

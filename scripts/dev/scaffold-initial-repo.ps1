@@ -37,11 +37,12 @@ function New-TemplateContent {
     $platform = 'any'
     if ($Path -like 'Vorlage/windows/*') { $platform = 'windows' }
     elseif ($Path -like 'Vorlage/linux/*') { $platform = 'linux' }
+    elseif ($Path -like 'Vorlage/macos/*') { $platform = 'macos' }
 
     $environment = 'any'
     if ($Path -like 'Vorlage/wsl/*') { $environment = 'wsl'; $platform = 'linux' }
     elseif ($Path -like 'Vorlage/container/*') { $environment = 'container' }
-    elseif ($platform -in @('windows', 'linux')) { $environment = 'native' }
+    elseif ($platform -in @('windows', 'linux', 'macos')) { $environment = 'native' }
 
     $risk = 'niedrig'
     $requiresAdmin = 'false'
@@ -1370,6 +1371,7 @@ $templateFiles = [ordered]@{
     'Vorlage/common/10-admin-und-sudo-regeln.md' = 'Admin- und Sudo-Regeln'
     'Vorlage/common/11-validierung-und-tests.md' = 'Validierung und Tests'
     'Vorlage/common/12-git-commit-regeln.md' = 'Git-Commit-Regeln'
+    'Vorlage/common/13-interaktive-sicherheitsentscheidungen.md' = 'Interaktive Sicherheitsentscheidungen'
     'Vorlage/common/99-abschlussbericht.md' = 'Abschlussbericht'
     'Vorlage/windows/common/00-detect-windows.md' = 'Windows erkennen'
     'Vorlage/windows/common/10-baseline-system.md' = 'Windows System-Baseline'
@@ -1408,6 +1410,7 @@ $templateFiles = [ordered]@{
     'Vorlage/linux/common/14-baseline-paketmanager.md' = 'Linux Paketmanager erfassen'
     'Vorlage/linux/common/20-pakete.md' = 'Linux Pakete erfassen'
     'Vorlage/linux/common/30-firewall.md' = 'Linux Firewall erfassen'
+    'Vorlage/linux/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische Linux-Sicherheitseinstellungen'
     'Vorlage/linux/common/40-shell-env.md' = 'Linux Shell-Environment erfassen'
     'Vorlage/linux/common/50-systemd.md' = 'Systemd erfassen'
     'Vorlage/linux/common/60-ssh.md' = 'SSH erfassen'
@@ -1460,6 +1463,9 @@ $templateFiles = [ordered]@{
     'Vorlage/linux/nvidia/dgx-spark/10-dgx-spark-baseline.md' = 'DGX Spark Baseline'
     'Vorlage/linux/nvidia/dgx-spark/20-gpu-container-runtime.md' = 'DGX Spark GPU Container Runtime'
     'Vorlage/linux/nvidia/dgx-spark/99-report.md' = 'DGX Spark Report'
+    'Vorlage/macos/common/00-detect-macos.md' = 'macOS erkennen'
+    'Vorlage/macos/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische macOS-Sicherheitseinstellungen'
+    'Vorlage/macos/common/99-macos-report.md' = 'macOS Report'
     'Vorlage/wsl/common/00-detect-wsl.md' = 'WSL erkennen'
     'Vorlage/wsl/common/10-wsl-baseline.md' = 'WSL Baseline'
     'Vorlage/wsl/common/20-wsl-version.md' = 'WSL Version erfassen'
@@ -1467,6 +1473,7 @@ $templateFiles = [ordered]@{
     'Vorlage/wsl/common/40-windows-integration.md' = 'WSL Windows-Integration erfassen'
     'Vorlage/wsl/common/50-networking.md' = 'WSL Networking erfassen'
     'Vorlage/wsl/common/60-filesystem-mounts.md' = 'WSL Filesystem Mounts erfassen'
+    'Vorlage/wsl/common/70-klassische-sicherheitseinstellungen.md' = 'Klassische WSL-Sicherheitseinstellungen'
     'Vorlage/wsl/common/99-wsl-report.md' = 'WSL Report'
     'Vorlage/wsl/ubuntu/00-detect-wsl-ubuntu.md' = 'Ubuntu WSL erkennen'
     'Vorlage/wsl/ubuntu/10-apt-baseline.md' = 'Ubuntu WSL APT Baseline'

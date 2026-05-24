@@ -23,7 +23,7 @@ flowchart LR
 | --- | --- | --- |
 | Agent-Regeln | `AGENTS.md`, `Vorlage/common/` | verbindlicher Ablauf für lokale Agenten |
 | Repo-Guards | `scripts/common/` | Modus, Sichtbarkeit, Template-Struktur und Sicherheitsgrenzen prüfen |
-| Host-Hilfen | `scripts/powershell/`, `scripts/bash/` | Plattform erkennen, Baselines erfassen, Change-Einträge schreiben |
+| Host-Hilfen | `scripts/powershell/`, `scripts/bash/` | Windows-, Linux-, WSL-, macOS- und Unix-nahe Plattformen erkennen, Baselines erfassen, Change-Einträge schreiben |
 | Container-Hilfen | `scripts/container/` | Docker, Compose, Swarm, Kubernetes, Podman und NVIDIA-Umfelder erkennen |
 | Datenmodelle | `schemas/` | YAML-Strukturen für Host-, Baseline-, Change-, Rollback- und Secret-Referenzdaten |
 | Dokumentation | `docs/`, `README.md`, `SECURITY.md` | Arbeitsmodell, Sicherheit, Rollback, Validierung und Maintainer-Hinweise |

@@ -72,6 +72,7 @@ Der Agent darf kostenlose Tools empfehlen, aber nicht blind installieren:
 - Bitwarden Free oder KeePassXC für Passwörter.
 - uBlock Origin oder uBlock Origin Lite für Browser-Schutz.
 - Malwarebytes Free als On-Demand-Zweitmeinung, nicht als zusätzlicher permanenter Echtzeitschutz.
+- ClamAV als optionaler On-Demand-Zweitscanner, nicht als Ersatz für Microsoft Defender auf normalen Windows-PCs.
 - `winget` für nachvollziehbare Updates aus bekannten Quellen.
 
 Vor jeder Empfehlung prüfen:
@@ -81,6 +82,45 @@ Vor jeder Empfehlung prüfen:
 - kostenlos nutzbar
 - keine Bundle- oder Adware-Hinweise aus der Quelle erkennbar
 - keine erwartete Blockade normaler Nutzung
+
+## Frage-Antwort-Entscheidungen
+Stelle blockierende oder installierende Sicherheitsmaßnahmen nach `Vorlage/common/13-interaktive-sicherheitsentscheidungen.md`.
+
+### Kostenloser Malware-Scanner
+
+Frage:
+
+```text
+Möchtest du einen kostenlosen, sinnvollen Malware-Scanner ergänzen, der normale Installationen und Alltagsnutzung möglichst nicht blockiert?
+```
+
+Empfohlene Antwortlogik:
+
+- Default: Microsoft Defender als primären Echtzeitschutz beibehalten.
+- Optional: ClamAV nur als On-Demand-Zweitscanner installieren.
+- Nicht empfohlen: zweites permanentes Echtzeit-AV parallel zu Defender ohne konkreten Grund.
+
+Wenn ClamAV installiert wird:
+
+- offizielle Quelle oder seriöse Paketquelle prüfen,
+- Signaturupdates mit FreshClam einrichten,
+- unter Windows `freshclam` und bei Bedarf `clamd` als Dienst nur nach Zustimmung installieren,
+- Scanpfade gezielt wählen, statt die komplette Alltagsnutzung zu blockieren.
+
+### Blocklisten
+
+Frage:
+
+```text
+Möchtest du eine DNS- oder Host-Blockliste gegen Malware, Phishing, Werbung und Tracking im Pilotmodus testen?
+```
+
+Empfohlene Antwortlogik:
+
+- Default: Pilotmodus statt dauerhafter Sofortaktivierung.
+- DNS-/Host-Blocklisten sind für normale PCs meist blockadearmer als IP-Firewall-Listen.
+- HaGeZi Light/Normal oder StevenBlack base sind geeignete Startpunkte, wenn der Nutzer Blocklisten testen möchte.
+- IP-Firewall-Blocklisten nur separat testen, weil sie CDNs, Games, Updates, Cloud-Dienste oder Paketquellen brechen können.
 
 ## Ablauf
 1. Plattform- und Host-Kontext erkennen.
