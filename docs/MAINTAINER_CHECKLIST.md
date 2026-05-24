@@ -7,7 +7,7 @@ Diese Liste enthält GitHub- und Maintainer-Schritte, die nicht zuverlässig aus
 - Repository-Beschreibung kurz halten: `Template für dokumentierte, rollbackfähige Rechner-Einrichtung mit Codex`
 - Topics prüfen, zum Beispiel: `codex`, `automation`, `powershell`, `bash`, `template`, `infrastructure`, `documentation`, `rollback`
 - Website-URL nur setzen, wenn eine echte Dokumentationsseite oder GitHub Pages existiert.
-- Social Preview aus `docs/assets/pc-agent-installer-hero.svg` oder einem daraus exportierten PNG hochladen.
+- Social Preview aus `docs/assets/social-preview.png` hochladen.
 
 ## Repository-Einstellungen
 
@@ -43,4 +43,4 @@ Diese Liste enthält GitHub- und Maintainer-Schritte, die nicht zuverlässig aus
 - Formales Support-Modell für Releases.
 - Privater Sicherheitsmeldeweg.
 - Ob Discussions als Support- oder Ideenkanal genutzt werden sollen.
-- Ob ein PNG-Social-Preview-Artefakt zusätzlich zum SVG gepflegt werden soll.
+- Ob das PNG-Social-Preview-Artefakt bei größeren README-Grafikänderungen neu exportiert werden soll.
