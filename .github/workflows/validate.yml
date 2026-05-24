@@ -1,0 +1,32 @@
+name: Validate template
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  powershell:
+    name: PowerShell verification
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify template
+        shell: powershell
+        run: ./scripts/common/verify-template.ps1
+
+  bash:
+    name: Bash verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify template
+        shell: bash
+        run: bash ./scripts/common/verify-template.sh

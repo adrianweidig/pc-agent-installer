@@ -60,11 +60,11 @@ Repo-Modus prüfen:
 Template validieren:
 
 ```powershell
-./scripts/common/validate-template.ps1
+./scripts/common/verify-template.ps1
 ```
 
 ```bash
-./scripts/common/validate-template.sh
+bash ./scripts/common/verify-template.sh
 ```
 
 Host-Schreibrechte prüfen:
@@ -111,18 +111,17 @@ git status --short --branch
 Nach Template-Änderungen:
 
 ```powershell
-./scripts/common/validate-template.ps1
-git diff --check
+./scripts/common/verify-template.ps1
 ```
 
 Zusätzlich sinnvoll:
 
 ```bash
 bash ./scripts/common/detect-repo-mode.sh
-bash ./scripts/common/validate-template.sh
+bash ./scripts/common/verify-template.sh
 ```
 
-Es gibt aktuell keinen separaten Test-, Lint-, Typecheck- oder Format-Befehl. Die relevanten Projektchecks sind Guard-Skripte, Template-Validierung, Git-Diff-Prüfung und gezielte Skript-Syntaxprüfungen.
+Es gibt aktuell keinen Paketmanager, Build-Schritt, Typecheck oder klassischen Unit-Test-Runner. Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skripte, Template-Validierung, Skript-Syntax, Encoding, Secret-Scan und Git-Diff-Prüfung.
 
 ## Dokumentation
 
@@ -135,6 +134,7 @@ Die zentrale Startdokumentation ist diese README. Vertiefende Dokumente bleiben 
 - `docs/08-rollback-konzept.md`
 - `docs/11-lizenzmodell.md`
 - `docs/12-codex-arbeitsmodell.md`
+- `docs/13-test-und-validierungsmodell.md`
 - `docs/99-faq.md`
 
 ## Codex- und Agenten-Hinweise

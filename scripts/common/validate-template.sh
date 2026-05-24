@@ -2,7 +2,25 @@
 set -euo pipefail
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 missing=0
-for path in AGENTS.md README.md LICENSE repo-mode.yaml schemas/host.schema.yaml scripts/common/detect-repo-mode.sh hosts/.gitkeep; do
+for path in \
+  AGENTS.md \
+  README.md \
+  LICENSE \
+  repo-mode.yaml \
+  .github/ISSUE_TEMPLATE/bug_report.md \
+  .github/ISSUE_TEMPLATE/improvement.md \
+  .github/PULL_REQUEST_TEMPLATE.md \
+  schemas/host.schema.yaml \
+  schemas/repo-mode.schema.yaml \
+  scripts/common/detect-repo-mode.ps1 \
+  scripts/common/detect-repo-mode.sh \
+  scripts/common/verify-template.ps1 \
+  scripts/common/verify-template.sh \
+  scripts/powershell/collect-baseline.ps1 \
+  scripts/bash/collect-baseline.sh \
+  scripts/container/detect-container-stack.ps1 \
+  scripts/container/detect-container-stack.sh \
+  hosts/.gitkeep; do
   if [[ ! -e "$ROOT/$path" ]]; then
     echo "Fehlt: $path" >&2
     missing=1
@@ -14,4 +32,23 @@ if find "$ROOT/hosts" -mindepth 1 -maxdepth 1 ! -name .gitkeep | grep -q .; then
 fi
 count="$(find "$ROOT/Vorlage" -type f -name '*.md' | wc -l | tr -d ' ')"
 echo "template_file_count=$count"
+while IFS= read -r file; do
+  first_line="$(sed -n '1p' "$file")"
+  if [[ "$first_line" != "---" ]]; then
+    echo "Frontmatter fehlt: $file" >&2
+    missing=1
+    continue
+  fi
+  frontmatter="$(awk 'NR == 1 { next } /^---$/ { exit } { print }' "$file")"
+  for field in id title platform environment area requires_admin risk approval_required rollback_required idempotent applies_to; do
+    if ! printf '%s\n' "$frontmatter" | grep -Eq "^${field}:"; then
+      echo "Frontmatter-Feld fehlt: $file:$field" >&2
+      missing=1
+    fi
+  done
+  if grep -q $'\rollback_required' "$file"; then
+    echo "Beschädigtes rollback_required-Token: $file" >&2
+    missing=1
+  fi
+done < <(find "$ROOT/Vorlage" -type f -name '*.md')
 exit "$missing"

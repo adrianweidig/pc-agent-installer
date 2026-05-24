@@ -63,14 +63,13 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 
 ```powershell
 ./scripts/common/detect-repo-mode.ps1
-./scripts/common/validate-template.ps1
-git diff --check
+./scripts/common/verify-template.ps1
 gh issue list --state open --limit 20
 ```
 
 ```bash
 bash ./scripts/common/detect-repo-mode.sh
-bash ./scripts/common/validate-template.sh
+bash ./scripts/common/verify-template.sh
 ```
 
 `assert-private-repo.*` ist für Host-Schreibzugriffe gedacht und darf im `template`-Modus fehlschlagen. Dieser Fehler ist eine Sicherheitsgrenze, kein Template-Fehler.
@@ -83,6 +82,7 @@ bash ./scripts/common/validate-template.sh
 - PowerShell-Skripte müssen ohne expliziten `-RepoRoot` aus dem Repository heraus laufen.
 - Guard-Skripte müssen nicht destruktiv und idempotent bleiben.
 - Neue Vorlagen brauchen gültiges YAML-Frontmatter und eine eindeutige numerische Position.
+- Nach Änderungen an Vorlagen, Skripten, Schemas oder Dokumentation muss `verify-template.*` ausführbar bleiben.
 
 ## Git-Regeln
 
@@ -116,6 +116,6 @@ Lösche Dateien nur, wenn sicher ist, dass sie nicht für Template, Skripte, Dok
 
 ## Definition of Done
 
-Eine Aufgabe ist erst abgeschlossen, wenn der Ausgangszustand geprüft, Änderungen nachvollziehbar sind und passende Checks gelaufen sind. Für reine Template-Arbeit genügt ein leerer `hosts/`-Ordner mit `.gitkeep`, erfolgreiche Template-Validierung und ein sauber geprüfter Git-Diff.
+Eine Aufgabe ist erst abgeschlossen, wenn der Ausgangszustand geprüft, Änderungen nachvollziehbar sind und passende Checks gelaufen sind. Für reine Template-Arbeit genügt ein leerer `hosts/`-Ordner mit `.gitkeep`, erfolgreiche `verify-template.*`-Prüfung und ein sauber geprüfter Git-Diff.
 
 Der aktuelle saubere Zustand muss bei jeder späteren Codex-Aufgabe erhalten bleiben: Funktionalität nicht absichtlich verändern, Sicherheitsgrenzen einhalten, Dokumentation konsistent halten und alle Abweichungen klar berichten.

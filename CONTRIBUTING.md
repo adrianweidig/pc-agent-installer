@@ -37,7 +37,7 @@ Vor einem Pull Request sollten mindestens ausgeführt werden:
 
 ```powershell
 ./scripts/common/detect-repo-mode.ps1
-./scripts/common/validate-template.ps1
+./scripts/common/verify-template.ps1
 ./scripts/common/assert-private-repo.ps1
 git diff --check
 ```

@@ -50,6 +50,6 @@ Vor einem Push in das öffentliche Template müssen mindestens diese Bedingungen
 
 - `repo-mode.yaml` bleibt im Modus `template`.
 - `hosts/` enthält nur `.gitkeep`.
-- Template-Validierung ist erfolgreich.
+- `verify-template.*` ist erfolgreich.
 - Secret-Scan findet keine sensiblen Werte.
 - Git-Diff ist geprüft.
