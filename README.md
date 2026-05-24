@@ -1,6 +1,6 @@
 # PC Agent Installer
 
-![PC Agent Installer Hero](docs/assets/pc-agent-installer-hero.svg)
+![PC Agent Installer Hero](docs/assets/pc-agent-installer-hero.png)
 
 <p align="center">
   <a href="https://github.com/adrianweidig/pc-agent-installer/actions/workflows/validate.yml"><img alt="Validate template workflow" src="https://github.com/adrianweidig/pc-agent-installer/actions/workflows/validate.yml/badge.svg"></a>
