@@ -112,11 +112,15 @@ Pflichtprüfung vor Host-Arbeit:
 
 ```powershell
 ./scripts/common/assert-first-run-config.ps1
+./scripts/common/assert-infrastructure-snapshot.ps1
 ```
 
 ```bash
 bash ./scripts/common/assert-first-run-config.sh
+bash ./scripts/common/assert-infrastructure-snapshot.sh
 ```
+
+Der Infrastruktur-Snapshot ist die Vollzugriff-Sicherheitsgrenze: bevor der Agent installiert, löscht, Dienste ändert, Container anfasst oder Paketmanager nutzt, muss er Ist-Zustand und Soll-Zustand vergleichen und Duplikate sowie Löschrisiken dokumentieren.
 
 ## Arbeitsmodell
 
@@ -221,6 +225,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Klassische Sicherheitseinstellungen | [docs/15-klassische-sicherheitseinstellungen.md](docs/15-klassische-sicherheitseinstellungen.md) |
 | Erststart-Konfiguration | [docs/16-erststart-konfiguration.md](docs/16-erststart-konfiguration.md) |
 | Programm- und Installationsempfehlungen | [docs/17-programm-und-installationsempfehlungen.md](docs/17-programm-und-installationsempfehlungen.md) |
+| Infrastruktur-Soll-Ist-Abgleich | [docs/18-infrastruktur-soll-ist-abgleich.md](docs/18-infrastruktur-soll-ist-abgleich.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

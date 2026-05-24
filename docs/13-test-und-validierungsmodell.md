@@ -72,3 +72,19 @@ gh issue list --state open --limit 20
 ## Grenzen
 
 Die Verify-Skripte führen keine systemwirksamen Host-Aktionen aus und erzeugen keine Host-Baselines. Solche Tests gehören in ein privates `operational`-Repository oder einen `local-only`-Klon.
+
+## Host-Änderungsbereitschaft
+
+Vor systemwirksamer Arbeit in einem privaten oder lokalen Operational-Repository müssen zusätzlich die Laufzeit-Guards erfolgreich sein:
+
+```powershell
+./scripts/common/assert-first-run-config.ps1
+./scripts/common/assert-infrastructure-snapshot.ps1
+```
+
+```bash
+bash ./scripts/common/assert-first-run-config.sh
+bash ./scripts/common/assert-infrastructure-snapshot.sh
+```
+
+Diese Checks ersetzen keine Validierung nach der Änderung. Sie verhindern nur, dass der Agent ohne aktuelle Infrastrukturprüfung, Baseline und Soll-Ist-Abgleich in den Vollzug geht.

@@ -136,16 +136,18 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 1. Prüfe zuerst den Repo-Modus und die Sichtbarkeit.
 2. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
 3. Speichere niemals Klartext-Secrets im Repository.
-4. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
-5. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
-6. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
-7. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
-8. Arbeite Vorlagen in numerischer Reihenfolge ab.
-9. Nutze nur Vorlagen, die zur erkannten Plattform passen.
-10. Zeige vor Commit oder Push immer eine Zusammenfassung an.
-11. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
-12. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
-13. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
+4. Vor systemwirksamen Änderungen Erststart, aktuellen Infrastruktur-Snapshot und Soll-Ist-Abgleich prüfen.
+5. Installiere nichts doppelt und lösche nichts, solange Nutzdaten-, Volume-, Secret-, Workspace- oder Rollback-Relevanz unklar ist.
+6. Erfasse vor jeder Änderung den Ausgangszustand mit `git status --short --branch`.
+7. Dokumentiere systemwirksame Änderungen in `hosts/<HOSTNAME>/changes/`, aber nur in bestätigtem `operational`- oder `local-only`-Modus.
+8. Erzeuge für systemwirksame Änderungen einen Rollback-Pfad.
+9. Führe keine destruktiven Aktionen ohne Nutzerfreigabe aus.
+10. Arbeite Vorlagen in numerischer Reihenfolge ab.
+11. Nutze nur Vorlagen, die zur erkannten Plattform passen.
+12. Zeige vor Commit oder Push immer eine Zusammenfassung an.
+13. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
+14. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
+15. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
 
 ## Ausführungsreihenfolge
 1. `Vorlage/common/00-agent-regeln.md` lesen.
@@ -153,16 +155,19 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 3. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
 4. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
 5. Wenn die Erststart-Konfiguration fehlt, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` ausführen lassen.
-6. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
-7. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
-8. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
-9. Baseline, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
+6. Infrastruktur-Snapshot mit `scripts/common/assert-infrastructure-snapshot.*` prüfen, bevor Installationen, Löschungen, Dienste, Firewall, DNS, Container, WSL, Paketmanager oder Cleanup betroffen sind.
+7. Wenn der Snapshot fehlt oder unvollständig ist, zuerst aktuelle Baseline mit `collect-baseline.*` erzeugen.
+8. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
+9. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
+10. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
+11. Soll-Zustand, Ist-Zustand, Duplikatprüfung, Löschrisiko, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
 
 ## Standardbefehle
 ```powershell
 ./scripts/common/detect-repo-mode.ps1
 ./scripts/common/first-run-config.ps1
 ./scripts/common/assert-first-run-config.ps1
+./scripts/common/assert-infrastructure-snapshot.ps1
 ./scripts/common/validate-template.ps1
 git diff --check
 ```
@@ -171,6 +176,7 @@ git diff --check
 bash ./scripts/common/detect-repo-mode.sh
 bash ./scripts/common/first-run-config.sh
 bash ./scripts/common/assert-first-run-config.sh
+bash ./scripts/common/assert-infrastructure-snapshot.sh
 bash ./scripts/common/validate-template.sh
 ```
 
@@ -676,7 +682,7 @@ PC Agent Installer trennt Soll-Prozesse von realem Host-Zustand.
 - `scripts/` enthält sichere Erkennungs-, Baseline-, Validierungs- und Rollback-Hilfen.
 - `hosts/<HOSTNAME>/` dokumentiert reale Hosts ausschließlich in sicheren Operational- oder Local-only-Repositories.
 
-Jede systemwirksame Änderung braucht Baseline, Änderungsdokumentation, Prüfung und Rollback-Pfad.
+Jede systemwirksame Änderung braucht Erststart-Prüfung, aktuellen Infrastruktur-Snapshot, Soll-Ist-Abgleich, Änderungsdokumentation, Prüfung und Rollback-Pfad.
 '@
     'docs/01-public-template-vs-private-operational-repo.md' = @'
 # Public Template vs. Private Operational Repo
@@ -746,13 +752,17 @@ Secret-Referenzen pro Host liegen unter `hosts/<HOSTNAME>/security/`.
 `operational` setzt eine bestätigte private Remote-Sichtbarkeit voraus.
 
 `local-only` setzt voraus, dass kein Git-Remote existiert. Push ist gesperrt, bis ein privater Remote erneut geprüft wurde.
+
+Vor Vollzugriff-Aktionen muss der Agent Erststart, Infrastruktur-Snapshot, Soll-Ist-Abgleich, Duplikate und Löschrisiko prüfen. Wenn `assert-infrastructure-snapshot.*` fehlschlägt, wird zuerst eine aktuelle Baseline erzeugt.
 '@
     'docs/07-dokumentationsstandard.md' = @'
 # Dokumentationsstandard
 
-Jede Änderung unter `hosts/<HOSTNAME>/changes/` enthält Metadaten, Ausgangszustand, Zielzustand, Änderung, Ort, Befehle, betroffene Dateien, Prüfung, Rollback und Risiken.
+Jede Änderung unter `hosts/<HOSTNAME>/changes/` enthält Metadaten, Ausgangszustand, Infrastruktur-Snapshot, Zielzustand, Soll-Ist-Abgleich, Duplikatprüfung, Lösch- und Seiteneffektprüfung, Änderung, Ort, Befehle, betroffene Dateien, Prüfung, Rollback und Risiken.
 
 Befehlsausgaben werden redigiert, wenn sie Tokens, Secrets, Credentials oder private Schlüssel enthalten könnten.
+
+Systemwirksame Änderungen ohne dokumentierten Soll-Ist-Abgleich gelten als nicht ausführungsbereit.
 '@
     'docs/08-rollback-konzept.md' = @'
 # Rollback-Konzept
@@ -966,6 +976,27 @@ Profile:
 - Server/Headless: keine Desktop-Apps, Fokus auf Updates, SSH, Backup, Monitoring und Container
 
 Cleaner wie CCleaner oder BleachBit dürfen nur optional, manuell und ohne Registry-/Booster-Automatik empfohlen werden.
+'@
+    'docs/18-infrastruktur-soll-ist-abgleich.md' = @'
+# Infrastruktur-Soll-Ist-Abgleich
+
+Vor jeder systemwirksamen Änderung muss der Agent die aktuelle Infrastruktur prüfen, den Soll-Zustand formulieren und Ist gegen Soll vergleichen.
+
+Vollzugriff bedeutet nur, dass der Agent technisch handeln kann. Es bedeutet nicht, dass er ohne aktuelle Prüfung installieren, löschen, stoppen, überschreiben oder bereinigen darf.
+
+Pflicht:
+
+```powershell
+./scripts/common/assert-first-run-config.ps1
+./scripts/common/assert-infrastructure-snapshot.ps1
+```
+
+```bash
+bash ./scripts/common/assert-first-run-config.sh
+bash ./scripts/common/assert-infrastructure-snapshot.sh
+```
+
+Der Change-Eintrag muss Infrastruktur-Snapshot, Soll-Ist-Abgleich, Duplikatprüfung, Lösch- und Seiteneffektprüfung, Minimaländerung, Validierung und Rollback-Grenzen enthalten.
 '@
 }
 
@@ -1435,6 +1466,7 @@ $templateFiles = [ordered]@{
     'Vorlage/common/13-interaktive-sicherheitsentscheidungen.md' = 'Interaktive Sicherheitsentscheidungen'
     'Vorlage/common/14-erststart-konfiguration.md' = 'Erststart-Konfiguration'
     'Vorlage/common/15-programm-und-installationsempfehlungen.md' = 'Programm- und Installationsempfehlungen'
+    'Vorlage/common/16-infrastruktur-soll-ist-abgleich.md' = 'Infrastruktur-Soll-Ist-Abgleich'
     'Vorlage/common/99-abschlussbericht.md' = 'Abschlussbericht'
     'Vorlage/windows/common/00-detect-windows.md' = 'Windows erkennen'
     'Vorlage/windows/common/10-baseline-system.md' = 'Windows System-Baseline'
@@ -1924,6 +1956,46 @@ exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.ps1' -Content $assertFirstRunPs
 
+$assertInfrastructurePs = @'
+[CmdletBinding()]
+param([string]$RepoRoot, [string]$HostName = $env:COMPUTERNAME)
+
+if (-not $RepoRoot) {
+    $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+}
+. (Join-Path $PSScriptRoot '..\powershell\AgentInstaller.Common.ps1')
+$guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
+if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
+$hostRoot = Join-Path $RepoRoot (Join-Path 'hosts' $HostName)
+$requiredPaths = @(
+    (Join-Path $hostRoot 'state/first-run-config.yaml'),
+    (Join-Path $hostRoot 'host.yaml'),
+    (Join-Path $hostRoot 'baseline'),
+    (Join-Path $hostRoot 'state/last-run.yaml')
+)
+$missing = @($requiredPaths | Where-Object { -not (Test-Path -LiteralPath $_) })
+$baselineFiles = @()
+if (Test-Path -LiteralPath (Join-Path $hostRoot 'baseline')) {
+    $baselineFiles = @(Get-ChildItem -LiteralPath (Join-Path $hostRoot 'baseline') -File -Recurse -ErrorAction SilentlyContinue)
+    if ($baselineFiles.Count -eq 0) { $missing += "$(Join-Path $hostRoot 'baseline') enthält keine Baseline-Dateien" }
+}
+$result = [ordered]@{
+    ok = ($missing.Count -eq 0)
+    repo_mode = $guard.repo_mode
+    visibility = $guard.visibility
+    host = $HostName
+    host_root = $hostRoot
+    baseline_file_count = $baselineFiles.Count
+    missing = @($missing)
+}
+$result | ConvertTo-Json -Depth 4
+if (-not $result.ok) {
+    Write-Error 'Aktueller Infrastruktur-Snapshot fehlt. Vor Vollzug zuerst Baseline erzeugen und Soll-Ist-Abgleich dokumentieren.'
+    exit 20
+}
+'@
+Write-RepoFile -Path 'scripts/common/assert-infrastructure-snapshot.ps1' -Content $assertInfrastructurePs
+
 $createPrivatePs = @'
 [CmdletBinding()]
 param(
@@ -2189,8 +2261,22 @@ $content = @"
 ## Ausgangszustand
 Noch zu dokumentieren.
 
+## Infrastruktur-Snapshot
+Noch zu dokumentieren. Vor Vollzug `assert-infrastructure-snapshot.ps1` ausführen oder aktuelle Baseline erzeugen.
+
 ## Zielzustand
 Noch zu dokumentieren.
+
+## Soll-Ist-Abgleich
+- Soll: Noch zu dokumentieren.
+- Ist: Noch zu dokumentieren.
+- Abweichung: Noch zu dokumentieren.
+
+## Duplikatprüfung
+Noch zu dokumentieren. Prüfen, ob Software, Dienst, Paketquelle, Container, Port, Volume, WSL-Distribution oder Konfiguration bereits existiert.
+
+## Lösch- und Seiteneffektprüfung
+Noch zu dokumentieren. Unklare Nutzdaten, Volumes, Secrets, Projektordner und aktive Workspaces nicht löschen.
 
 ## Änderung
 Noch nicht ausgeführt.
@@ -2452,6 +2538,34 @@ echo "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Bitte z
 exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.sh' -Content $assertFirstRunSh
+
+$assertInfrastructureSh = @'
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../bash/agent-installer-common.sh
+source "$SCRIPT_DIR/../bash/agent-installer-common.sh"
+ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
+HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
+agent_assert_host_write_allowed "$ROOT" >/dev/null
+HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
+missing=()
+for path in "$HOST_ROOT/state/first-run-config.yaml" "$HOST_ROOT/host.yaml" "$HOST_ROOT/baseline" "$HOST_ROOT/state/last-run.yaml"; do
+  [[ -e "$path" ]] || missing+=("$path")
+done
+baseline_file_count=0
+if [[ -d "$HOST_ROOT/baseline" ]]; then
+  baseline_file_count="$(find "$HOST_ROOT/baseline" -type f | wc -l | tr -d ' ')"
+  [[ "$baseline_file_count" != "0" ]] || missing+=("$HOST_ROOT/baseline enthält keine Baseline-Dateien")
+fi
+if [[ "${#missing[@]}" -gt 0 ]]; then
+  printf '{"ok":false,"host":"%s","baseline_file_count":%s}\n' "$HOSTNAME_VALUE" "$baseline_file_count"
+  echo "Aktueller Infrastruktur-Snapshot fehlt. Vor Vollzug zuerst Baseline erzeugen und Soll-Ist-Abgleich dokumentieren." >&2
+  exit 20
+fi
+printf '{"ok":true,"host":"%s","baseline_file_count":%s}\n' "$HOSTNAME_VALUE" "$baseline_file_count"
+'@
+Write-RepoFile -Path 'scripts/common/assert-infrastructure-snapshot.sh' -Content $assertInfrastructureSh
 
 $createPrivateSh = @'
 #!/usr/bin/env bash
@@ -2738,8 +2852,22 @@ cat > "$PATH_OUT" <<MD
 ## Ausgangszustand
 Noch zu dokumentieren.
 
+## Infrastruktur-Snapshot
+Noch zu dokumentieren. Vor Vollzug `assert-infrastructure-snapshot.sh` ausführen oder aktuelle Baseline erzeugen.
+
 ## Zielzustand
 Noch zu dokumentieren.
+
+## Soll-Ist-Abgleich
+- Soll: Noch zu dokumentieren.
+- Ist: Noch zu dokumentieren.
+- Abweichung: Noch zu dokumentieren.
+
+## Duplikatprüfung
+Noch zu dokumentieren. Prüfen, ob Software, Dienst, Paketquelle, Container, Port, Volume, WSL-Distribution oder Konfiguration bereits existiert.
+
+## Lösch- und Seiteneffektprüfung
+Noch zu dokumentieren. Unklare Nutzdaten, Volumes, Secrets, Projektordner und aktive Workspaces nicht löschen.
 
 ## Änderung
 Noch nicht ausgeführt.
@@ -3034,6 +3162,8 @@ $required = @(
     'scripts/common/first-run-config.sh',
     'scripts/common/assert-first-run-config.ps1',
     'scripts/common/assert-first-run-config.sh',
+    'scripts/common/assert-infrastructure-snapshot.ps1',
+    'scripts/common/assert-infrastructure-snapshot.sh',
     'scripts/powershell/collect-baseline.ps1',
     'scripts/bash/collect-baseline.sh',
     'scripts/container/detect-container-stack.ps1',
@@ -3072,7 +3202,7 @@ $validateSh = @'
 set -euo pipefail
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 missing=0
-for path in AGENTS.md README.md LICENSE repo-mode.yaml schemas/host.schema.yaml scripts/common/detect-repo-mode.sh scripts/common/first-run-config.sh scripts/common/assert-first-run-config.sh hosts/.gitkeep; do
+for path in AGENTS.md README.md LICENSE repo-mode.yaml schemas/host.schema.yaml scripts/common/detect-repo-mode.sh scripts/common/first-run-config.sh scripts/common/assert-first-run-config.sh scripts/common/assert-infrastructure-snapshot.sh hosts/.gitkeep; do
   if [[ ! -e "$ROOT/$path" ]]; then
     echo "Fehlt: $path" >&2
     missing=1

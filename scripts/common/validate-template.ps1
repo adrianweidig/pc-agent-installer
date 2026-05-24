@@ -28,6 +28,8 @@ $required = @(
     'scripts/common/first-run-config.sh',
     'scripts/common/assert-first-run-config.ps1',
     'scripts/common/assert-first-run-config.sh',
+    'scripts/common/assert-infrastructure-snapshot.ps1',
+    'scripts/common/assert-infrastructure-snapshot.sh',
     'scripts/common/verify-template.ps1',
     'scripts/common/verify-template.sh',
     'scripts/powershell/collect-baseline.ps1',

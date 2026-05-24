@@ -38,8 +38,22 @@ cat > "$PATH_OUT" <<MD
 ## Ausgangszustand
 Noch zu dokumentieren.
 
+## Infrastruktur-Snapshot
+Noch zu dokumentieren. Vor Vollzug `assert-infrastructure-snapshot.sh` ausführen oder aktuelle Baseline erzeugen.
+
 ## Zielzustand
 Noch zu dokumentieren.
+
+## Soll-Ist-Abgleich
+- Soll: Noch zu dokumentieren.
+- Ist: Noch zu dokumentieren.
+- Abweichung: Noch zu dokumentieren.
+
+## Duplikatprüfung
+Noch zu dokumentieren. Prüfen, ob Software, Dienst, Paketquelle, Container, Port, Volume, WSL-Distribution oder Konfiguration bereits existiert.
+
+## Lösch- und Seiteneffektprüfung
+Noch zu dokumentieren. Unklare Nutzdaten, Volumes, Secrets, Projektordner und aktive Workspaces nicht löschen.
 
 ## Änderung
 Noch nicht ausgeführt.
