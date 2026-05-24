@@ -2,6 +2,20 @@
 
 PC Agent Installer ist ein Template für dokumentierte, reproduzierbare und rollbackfähige Rechner-Einrichtung mit Codex oder anderen lokalen Agenten. Das Repository trennt generische Vorlagen und Skripte von echten Hostdaten, damit ein öffentliches Template nutzbar bleibt, ohne private Infrastrukturinformationen zu speichern.
 
+## Wofür dieses Repository gedacht ist
+
+Dieses Repository ist eine Agenten-Arbeitsbasis. Ein Nutzer soll es klonen oder aus dem Template ein eigenes Repository erzeugen, Codex darin starten und den Agenten anhand von `AGENTS.md`, Vorlagen und Guard-Skripten arbeiten lassen.
+
+Das Projekt ist nicht primär als manuell bedientes Admin-Tool gedacht. Der normale Ablauf ist:
+
+1. Nutzer erstellt eine eigene Kopie dieses Templates.
+2. Nutzer startet Codex oder einen vergleichbaren Agenten im Repository.
+3. Der Agent prüft Modus, Sichtbarkeit, offene Issues und vorhandene Regeln.
+4. Der Agent entscheidet, ob eine Änderung ins öffentliche Template oder in eine private Operational-Struktur gehört.
+5. Der Agent führt Änderungen klein, dokumentiert, überprüfbar und rollbackfähig aus.
+
+Wer dieses Repo für offizielle Template-Verbesserungen nutzt, arbeitet am öffentlichen Teil. Wer echte Rechnerzustände, Hostdaten oder lokale Tests dokumentiert, arbeitet in einem privaten `operational`-Repository oder einem `local-only`-Klon.
+
 ## Status
 
 - Aktueller Modus: `template`, siehe `repo-mode.yaml`.
@@ -46,6 +60,15 @@ Das Projekt ist so gedacht, dass Codex generische Template-Änderungen im öffen
 Es gibt keinen Paketmanager, keine externen Laufzeitabhängigkeiten und keinen klassischen Build-Schritt.
 
 ## Schnellstart
+
+Empfohlener Agenten-Start:
+
+```powershell
+git clone https://github.com/adrianweidig/pc-agent-installer.git
+cd pc-agent-installer
+```
+
+Danach Codex im geklonten Repository starten und zuerst `AGENTS.md` lesen lassen. Für echte Hostdaten vor dem ersten Schreibzugriff eine private Operational-Kopie oder den lokalen Modus verwenden.
 
 Repo-Modus prüfen:
 

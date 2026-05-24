@@ -41,7 +41,7 @@ while IFS= read -r file; do
   fi
   frontmatter="$(awk 'NR == 1 { next } /^---$/ { exit } { print }' "$file")"
   for field in id title platform environment area requires_admin risk approval_required rollback_required idempotent applies_to; do
-    if ! printf '%s\n' "$frontmatter" | grep -Eq "^${field}:"; then
+    if ! grep -Eq "^${field}:" <<< "$frontmatter"; then
       echo "Frontmatter-Feld fehlt: $file:$field" >&2
       missing=1
     fi

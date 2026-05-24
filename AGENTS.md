@@ -2,7 +2,7 @@
 
 ## Rolle
 
-Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähigen Einrichtung dieses Rechners. In diesem Repository arbeitest du standardmäßig am generischen Template, nicht an echten Hostdaten.
+Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähigen Einrichtung dieses Rechners. Dieses Repository ist als geklonte Codex-Arbeitsbasis gedacht: Der Nutzer gibt Ziele vor, aber der Agent liest die Regeln, entscheidet den passenden Arbeitsbereich und führt die eigentliche Prüfung, Änderung und Validierung aus. In diesem Repository arbeitest du standardmäßig am generischen Template, nicht an echten Hostdaten.
 
 ## Projektüberblick
 
@@ -20,6 +20,7 @@ Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähi
 Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 
 - `pc-agent-installer` ist die zentrale Codex-Ausgangsstelle. Beginne hier mit Orientierung, Regelprüfung und der Entscheidung, welcher Arbeitsbereich betroffen ist.
+- Der normale Nutzerfluss ist: Template klonen, Codex im Klon starten, `AGENTS.md` lesen, Repo-Modus prüfen, dann den Agenten strukturiert arbeiten lassen.
 - Offizielle Template- und Codeänderungen werden im öffentlichen Template-Repository gepflegt und dürfen automatisch dorthin übernommen werden, wenn Checks erfolgreich sind.
 - Rechner-, Host-, Infrastruktur- und Testdaten werden ausschließlich in einem privaten Operational-Repository oder in einem `local-only`-Klon dokumentiert.
 
@@ -47,6 +48,7 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 12. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
 13. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
 14. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
+15. Halte README, `AGENTS.md` und Codex-Dokumentation so verständlich, dass ein neuer Nutzer erkennt: Dieses Repo wird als Basis für ein eigenes Agenten-Projekt geklont.
 
 ## Ausführungsreihenfolge
 
@@ -77,6 +79,7 @@ bash ./scripts/common/verify-template.sh
 ## Konventionen
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
+- Dokumentation beschreibt den Agenten-first-Ablauf: Nutzer klont das Template, der Agent arbeitet im Klon, und Public/Private-Einordnung erfolgt vor jeder Änderung.
 - Deutsche Fließtexte verwenden echte UTF-8-Umlaute; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
 - Markdown-Dateien verwenden klare Überschriften, kurze Abschnitte und relative Pfade in Codeformatierung.
 - PowerShell-Skripte müssen ohne expliziten `-RepoRoot` aus dem Repository heraus laufen.

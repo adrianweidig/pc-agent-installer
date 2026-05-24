@@ -18,6 +18,8 @@ bash ./scripts/common/verify-template.sh
 
 Diese Befehle sind die bevorzugten Einstiegspunkte für lokale Codex-Läufe und CI. Sie bündeln die wichtigsten schnellen Prüfungen.
 
+Für neue Agenten-Läufe gilt: Erst `AGENTS.md` lesen, dann Repo-Modus und Git-Status prüfen, danach `verify-template.*` ausführen. So bleibt der Klon als Codex-Projektbasis wiederholbar testbar.
+
 ## Einzelprüfungen
 
 Repo-Modus erkennen:
