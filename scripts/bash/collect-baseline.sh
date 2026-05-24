@@ -19,6 +19,24 @@ case "$OS_VALUE:$ENVIRONMENT_VALUE" in
   linux:wsl) TEMPLATE_PLATFORM_PATH="Vorlage/wsl/common" ;;
   *) TEMPLATE_PLATFORM_PATH="Vorlage/linux/common" ;;
 esac
+CONFIG_PATH="$HOST_ROOT/state/first-run-config.yaml"
+wsl_backend_requested=false
+docker_on_wsl_requested=false
+portainer_requested=false
+if [[ -f "$CONFIG_PATH" ]]; then
+  grep -Eq '^[[:space:]]*windows_wsl_backend:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && wsl_backend_requested=true
+  grep -Eq '^[[:space:]]*windows_wsl_with_docker:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && docker_on_wsl_requested=true
+  grep -Eq '^[[:space:]]*windows_portainer_ui:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && portainer_requested=true
+fi
+extra_template_paths=""
+if [[ "$wsl_backend_requested" == "true" && "$TEMPLATE_PLATFORM_PATH" != "Vorlage/wsl/common" ]]; then
+  extra_template_paths="${extra_template_paths}
+  - Vorlage/wsl/common"
+fi
+if [[ "$docker_on_wsl_requested" == "true" || "$portainer_requested" == "true" ]]; then
+  extra_template_paths="${extra_template_paths}
+  - Vorlage/container/common"
+fi
 
 cat > "$HOST_ROOT/host.yaml" <<YAML
 host_id: $HOSTNAME_VALUE
@@ -33,9 +51,14 @@ platform:
   os: $OS_VALUE
   environment: $ENVIRONMENT_VALUE
   architecture: "$(uname -m)"
+windows_optional_components:
+  wsl_backend_requested: $wsl_backend_requested
+  docker_on_wsl_requested: $docker_on_wsl_requested
+  portainer_requested: $portainer_requested
 template_paths_used:
   - Vorlage/common
   - $TEMPLATE_PLATFORM_PATH
+$extra_template_paths
 YAML
 
 cat > "$HOST_ROOT/baseline/system.md" <<MD

@@ -945,6 +945,8 @@ bash ./scripts/common/assert-first-run-config.sh
 ```
 
 Die gespeicherten Präferenzen liegen unter `hosts/<HOSTNAME>/state/first-run-config.yaml` und enthalten keine Klartext-Secrets.
+
+Windows fragt zusätzlich, ob WSL als Backend vorbereitet werden soll. Docker wird nur auf dieser Basis eingeplant; Portainer CE wird nur empfohlen, wenn Docker gewählt wurde. Bei WSL-Auswahl müssen WSL-Vorlagen berücksichtigt werden, bei Docker oder Portainer zusätzlich Container-Vorlagen.
 '@
 }
 
@@ -1425,6 +1427,7 @@ $templateFiles = [ordered]@{
     'Vorlage/windows/common/30-firewall.md' = 'Windows Firewall erfassen'
     'Vorlage/windows/common/31-netzwerkprofile.md' = 'Windows Netzwerkprofile erfassen'
     'Vorlage/windows/common/32-klassische-sicherheitseinstellungen.md' = 'Klassische Windows-Sicherheitseinstellungen'
+    'Vorlage/windows/common/33-wsl-docker-portainer.md' = 'Windows WSL-, Docker- und Portainer-Optionen'
     'Vorlage/windows/common/40-env-variablen.md' = 'Windows Umgebungsvariablen erfassen'
     'Vorlage/windows/common/50-dienste.md' = 'Windows Dienste erfassen'
     'Vorlage/windows/common/60-registry.md' = 'Windows Registry dokumentieren'
@@ -1865,6 +1868,10 @@ preferences:
   allow_optional_av: false
   allow_blocklist_pilot: false
   allow_firewall_ip_blocklists: false
+  windows_wsl_backend: false
+  windows_wsl_with_docker: false
+  windows_portainer_ui: false
+  windows_wsl_recommendations: false
   require_confirmation_for_system_changes: true
 note: ""
 "@
@@ -2018,6 +2025,18 @@ $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $now = (Get-Date).ToString('o')
 $platform = & (Join-Path $PSScriptRoot 'detect-platform.ps1') | ConvertFrom-Json
 
+$firstRunConfigPath = Join-Path $hostRoot 'state/first-run-config.yaml'
+$firstRunConfig = if (Test-Path -LiteralPath $firstRunConfigPath) { Get-Content -LiteralPath $firstRunConfigPath -Raw } else { '' }
+$prefersWslBackend = $firstRunConfig -match '(?m)^\s*windows_wsl_backend:\s*true\s*$'
+$prefersWslDocker = $firstRunConfig -match '(?m)^\s*windows_wsl_with_docker:\s*true\s*$'
+$prefersPortainer = $firstRunConfig -match '(?m)^\s*windows_portainer_ui:\s*true\s*$'
+$templatePaths = [System.Collections.Generic.List[string]]::new()
+$templatePaths.Add('Vorlage/common')
+$templatePaths.Add('Vorlage/windows/common')
+if ($prefersWslBackend) { $templatePaths.Add('Vorlage/wsl/common') }
+if ($prefersWslDocker -or $prefersPortainer) { $templatePaths.Add('Vorlage/container/common') }
+$templatePathYaml = ($templatePaths | ForEach-Object { "  - $_" }) -join "`n"
+
 $hostYaml = @"
 host_id: $HostName
 hostname: $HostName
@@ -2043,9 +2062,12 @@ container:
   kubernetes: $(([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   podman: $(([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   nvidia_container_runtime: $(([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+windows_optional_components:
+  wsl_backend_requested: $($prefersWslBackend.ToString().ToLowerInvariant())
+  docker_on_wsl_requested: $($prefersWslDocker.ToString().ToLowerInvariant())
+  portainer_requested: $($prefersPortainer.ToString().ToLowerInvariant())
 template_paths_used:
-  - Vorlage/common
-  - Vorlage/windows/common
+$templatePathYaml
 "@
 Write-AgentUtf8 -Path (Join-Path $hostRoot 'host.yaml') -Content $hostYaml
 
@@ -2374,6 +2396,10 @@ preferences:
   allow_optional_av: false
   allow_blocklist_pilot: false
   allow_firewall_ip_blocklists: false
+  windows_wsl_backend: false
+  windows_wsl_with_docker: false
+  windows_portainer_ui: false
+  windows_wsl_recommendations: false
   require_confirmation_for_system_changes: true
 note: ""
 YAML
@@ -2525,6 +2551,24 @@ case "$OS_VALUE:$ENVIRONMENT_VALUE" in
   linux:wsl) TEMPLATE_PLATFORM_PATH="Vorlage/wsl/common" ;;
   *) TEMPLATE_PLATFORM_PATH="Vorlage/linux/common" ;;
 esac
+CONFIG_PATH="$HOST_ROOT/state/first-run-config.yaml"
+wsl_backend_requested=false
+docker_on_wsl_requested=false
+portainer_requested=false
+if [[ -f "$CONFIG_PATH" ]]; then
+  grep -Eq '^[[:space:]]*windows_wsl_backend:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && wsl_backend_requested=true
+  grep -Eq '^[[:space:]]*windows_wsl_with_docker:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && docker_on_wsl_requested=true
+  grep -Eq '^[[:space:]]*windows_portainer_ui:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH" && portainer_requested=true
+fi
+extra_template_paths=""
+if [[ "$wsl_backend_requested" == "true" && "$TEMPLATE_PLATFORM_PATH" != "Vorlage/wsl/common" ]]; then
+  extra_template_paths="${extra_template_paths}
+  - Vorlage/wsl/common"
+fi
+if [[ "$docker_on_wsl_requested" == "true" || "$portainer_requested" == "true" ]]; then
+  extra_template_paths="${extra_template_paths}
+  - Vorlage/container/common"
+fi
 
 cat > "$HOST_ROOT/host.yaml" <<YAML
 host_id: $HOSTNAME_VALUE
@@ -2539,9 +2583,14 @@ platform:
   os: $OS_VALUE
   environment: $ENVIRONMENT_VALUE
   architecture: "$(uname -m)"
+windows_optional_components:
+  wsl_backend_requested: $wsl_backend_requested
+  docker_on_wsl_requested: $docker_on_wsl_requested
+  portainer_requested: $portainer_requested
 template_paths_used:
   - Vorlage/common
   - $TEMPLATE_PLATFORM_PATH
+$extra_template_paths
 YAML
 
 cat > "$HOST_ROOT/baseline/system.md" <<MD

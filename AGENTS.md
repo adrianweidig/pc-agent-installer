@@ -168,6 +168,15 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 - Bei normalen Nutzer-PCs gilt usability-first: Sicherheitssettings sollen kostenlose, aktuelle und seriöse Schutzmaßnahmen bevorzugen, aber normale Internet-, Download-, Store-, Game-, Entwickler- und KI-Tool-Nutzung nicht unnötig blockieren.
 - Sicherheitsmaßnahmen mit Blockade-, Installations-, Dienst-, Firewall-, DNS- oder Blocklist-Wirkung brauchen eine dokumentierte Frage-Antwort-Entscheidung nach `Vorlage/common/13-interaktive-sicherheitsentscheidungen.md`.
 
+## Windows-, WSL- und Container-Optionen
+
+- Die Windows-Erststart-Konfiguration darf WSL als optionales Backend anbieten.
+- Docker darf im normalen Windows-Fluss nur als Option auf Basis von WSL-Unterstützung eingeplant werden.
+- Portainer CE darf nur als optionale Verwaltungsoberfläche empfohlen werden, wenn Docker gewählt wurde.
+- Sobald WSL gewählt wurde, müssen WSL-Vorlagen und WSL-Sicherheitsempfehlungen berücksichtigt werden.
+- Sobald Docker oder Portainer gewählt wurde, müssen Container-Vorlagen, Port-/Exposure-Regeln und volume-sichere Rollback-Regeln berücksichtigt werden.
+- WSL, Docker und Portainer dürfen nicht automatisch installiert, gestartet, exponiert oder als Pflichtkomponenten behandelt werden; jede systemwirksame Änderung braucht Erststart-Präferenz, Nutzerfreigabe, Rollback und Validierung.
+
 ## Datei-Löschungen
 
 Lösche Dateien nur, wenn sicher ist, dass sie nicht für Template, Skripte, Dokumentation, Lizenz, Beispiele, Schemas oder spätere Operational-Nutzung benötigt werden. Unsichere Kandidaten bleiben bestehen und werden im Abschlussbericht als prüfpflichtig aufgeführt.

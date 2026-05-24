@@ -40,6 +40,20 @@ allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Upda
 allow_optional_av="$(ask_yes_no 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' false)"
 allow_blocklist_pilot="$(ask_yes_no 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' false)"
 allow_firewall_ip_blocklists="$(ask_yes_no 'IP-Firewall-Blocklisten als riskante Option anbieten?' false)"
+windows_wsl_backend=false
+windows_wsl_with_docker=false
+windows_portainer_ui=false
+windows_wsl_recommendations=false
+if [[ "${OS:-}" == "Windows_NT" ]] || grep -qi microsoft /proc/version 2>/dev/null; then
+  windows_wsl_backend="$(ask_yes_no 'Windows/WSL: WSL-Backend fuer Linux-Tools vorbereiten oder beruecksichtigen?' false)"
+  if [[ "$windows_wsl_backend" == "true" ]]; then
+    windows_wsl_with_docker="$(ask_yes_no 'Windows/WSL: Docker mit WSL-Unterstuetzung einplanen?' false)"
+    if [[ "$windows_wsl_with_docker" == "true" ]]; then
+      windows_portainer_ui="$(ask_yes_no 'Windows/WSL: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' false)"
+    fi
+    windows_wsl_recommendations=true
+  fi
+fi
 require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' true)"
 printf 'Optionale Notiz fuer den Agenten: ' >&2
 read -r note || note=""
@@ -58,6 +72,10 @@ preferences:
   allow_optional_av: $allow_optional_av
   allow_blocklist_pilot: $allow_blocklist_pilot
   allow_firewall_ip_blocklists: $allow_firewall_ip_blocklists
+  windows_wsl_backend: $windows_wsl_backend
+  windows_wsl_with_docker: $windows_wsl_with_docker
+  windows_portainer_ui: $windows_portainer_ui
+  windows_wsl_recommendations: $windows_wsl_recommendations
   require_confirmation_for_system_changes: $require_confirmation_for_system_changes
 note: "$note"
 YAML

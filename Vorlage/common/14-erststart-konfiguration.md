@@ -50,10 +50,15 @@ Die Erststart-Konfiguration fragt mindestens:
 - Darf der Agent optionale AV-/Malware-Scanner anbieten?
 - Darf der Agent DNS-/Host-Blocklisten im Pilotmodus anbieten?
 - Darf der Agent IP-Firewall-Blocklisten als riskante Option anbieten?
+- Windows: Soll ein WSL-Backend für Linux-Tools, Entwickler- oder KI-Workflows vorbereitet werden?
+- Windows: Wenn WSL gewünscht ist, soll Docker mit WSL-Unterstützung eingeplant werden?
+- Windows: Wenn Docker gewünscht ist, soll Portainer CE als kostenlose Docker-Verwaltungsoberfläche empfohlen werden?
 - Soll vor systemwirksamen Änderungen immer eine Bestätigung verlangt werden?
 
 ## Nachweis
 Die Antwort wird unter `hosts/<HOSTNAME>/state/first-run-config.yaml` dokumentiert. Diese Datei enthält nur Präferenzen und keine Klartext-Secrets.
+
+Wenn WSL gewählt wurde, muss der Agent zusätzlich die WSL-Vorlagen berücksichtigen. Wenn Docker oder Portainer gewählt wurde, muss der Agent zusätzlich die Container-Vorlagen berücksichtigen. Docker und Portainer dürfen nicht unabhängig von WSL als Pflichtkomponenten behandelt werden.
 
 ## Pflichtprüfung
 Vor Host-Arbeit muss eine der Prüfungen erfolgreich sein:

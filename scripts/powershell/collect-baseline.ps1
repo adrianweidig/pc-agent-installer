@@ -16,6 +16,18 @@ $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $now = (Get-Date).ToString('o')
 $platform = & (Join-Path $PSScriptRoot 'detect-platform.ps1') | ConvertFrom-Json
 
+$firstRunConfigPath = Join-Path $hostRoot 'state/first-run-config.yaml'
+$firstRunConfig = if (Test-Path -LiteralPath $firstRunConfigPath) { Get-Content -LiteralPath $firstRunConfigPath -Raw } else { '' }
+$prefersWslBackend = $firstRunConfig -match '(?m)^\s*windows_wsl_backend:\s*true\s*$'
+$prefersWslDocker = $firstRunConfig -match '(?m)^\s*windows_wsl_with_docker:\s*true\s*$'
+$prefersPortainer = $firstRunConfig -match '(?m)^\s*windows_portainer_ui:\s*true\s*$'
+$templatePaths = [System.Collections.Generic.List[string]]::new()
+$templatePaths.Add('Vorlage/common')
+$templatePaths.Add('Vorlage/windows/common')
+if ($prefersWslBackend) { $templatePaths.Add('Vorlage/wsl/common') }
+if ($prefersWslDocker -or $prefersPortainer) { $templatePaths.Add('Vorlage/container/common') }
+$templatePathYaml = ($templatePaths | ForEach-Object { "  - $_" }) -join "`n"
+
 $hostYaml = @"
 host_id: $HostName
 hostname: $HostName
@@ -41,9 +53,12 @@ container:
   kubernetes: $(([bool](Get-Command kubectl -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   podman: $(([bool](Get-Command podman -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
   nvidia_container_runtime: $(([bool](Get-Command nvidia-ctk -ErrorAction SilentlyContinue)).ToString().ToLowerInvariant())
+windows_optional_components:
+  wsl_backend_requested: $($prefersWslBackend.ToString().ToLowerInvariant())
+  docker_on_wsl_requested: $($prefersWslDocker.ToString().ToLowerInvariant())
+  portainer_requested: $($prefersPortainer.ToString().ToLowerInvariant())
 template_paths_used:
-  - Vorlage/common
-  - Vorlage/windows/common
+$templatePathYaml
 "@
 Write-AgentUtf8 -Path (Join-Path $hostRoot 'host.yaml') -Content $hostYaml
 

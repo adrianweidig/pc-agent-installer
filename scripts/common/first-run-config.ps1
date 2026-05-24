@@ -26,6 +26,10 @@ $defaults = [ordered]@{
     allow_optional_av = $false
     allow_blocklist_pilot = $false
     allow_firewall_ip_blocklists = $false
+    windows_wsl_backend = $false
+    windows_wsl_with_docker = $false
+    windows_portainer_ui = $false
+    windows_wsl_recommendations = $false
     require_confirmation_for_system_changes = $true
 }
 $isWindowsHost = $IsWindows -or $env:OS -eq 'Windows_NT'
@@ -54,7 +58,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form = [System.Windows.Forms.Form]::new()
         $form.Text = 'PC Agent Installer - Erststart-Konfiguration'
         $form.Width = 760
-        $form.Height = 520
+        $form.Height = 680
         $form.StartPosition = 'CenterScreen'
         $form.TopMost = $true
 
@@ -74,6 +78,9 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
             allow_optional_av = 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten'
             allow_blocklist_pilot = 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten'
             allow_firewall_ip_blocklists = 'IP-Firewall-Blocklisten als riskante Option anbieten'
+            windows_wsl_backend = 'Windows: WSL-Backend fuer Linux-Tools vorbereiten'
+            windows_wsl_with_docker = 'Windows: Docker mit WSL-Unterstuetzung einplanen'
+            windows_portainer_ui = 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen'
             require_confirmation_for_system_changes = 'Vor systemwirksamen Aenderungen immer bestaetigen lassen'
         }
         $checks = @{}
@@ -89,6 +96,31 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
             $checks[$key] = $box
             $top += 35
         }
+
+        $checks['windows_wsl_with_docker'].Enabled = [bool]$checks['windows_wsl_backend'].Checked
+        $checks['windows_portainer_ui'].Enabled = [bool]$checks['windows_wsl_with_docker'].Checked
+        $checks['windows_wsl_backend'].Add_CheckedChanged({
+            $checks['windows_wsl_with_docker'].Enabled = [bool]$checks['windows_wsl_backend'].Checked
+            if (-not $checks['windows_wsl_backend'].Checked) {
+                $checks['windows_wsl_with_docker'].Checked = $false
+                $checks['windows_portainer_ui'].Checked = $false
+            }
+        })
+        $checks['windows_wsl_with_docker'].Add_CheckedChanged({
+            $checks['windows_portainer_ui'].Enabled = [bool]$checks['windows_wsl_with_docker'].Checked
+            if (-not $checks['windows_wsl_with_docker'].Checked) {
+                $checks['windows_portainer_ui'].Checked = $false
+            }
+            if ($checks['windows_wsl_with_docker'].Checked) {
+                $checks['windows_wsl_backend'].Checked = $true
+            }
+        })
+        $checks['windows_portainer_ui'].Add_CheckedChanged({
+            if ($checks['windows_portainer_ui'].Checked) {
+                $checks['windows_wsl_backend'].Checked = $true
+                $checks['windows_wsl_with_docker'].Checked = $true
+            }
+        })
 
         $note = [System.Windows.Forms.TextBox]::new()
         $note.Left = 25
@@ -110,6 +142,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
 
         if ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             foreach ($key in $items.Keys) { $values[$key] = [bool]$checks[$key].Checked }
+            $values['windows_wsl_recommendations'] = [bool]$values.windows_wsl_backend
             $values['note'] = $note.Text
             $usedUi = 'powershell-windows-forms'
         } else {
@@ -122,11 +155,39 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
 
 if ($values.Count -eq 0) {
     Write-Host 'Erststart-Konfiguration ist noch nicht abgeschlossen.'
-    foreach ($key in $defaults.Keys) {
-        $label = ($key -replace '_', ' ')
-        $values[$key] = Read-AgentYesNo -Prompt $label -Default ([bool]$defaults[$key])
+    $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default $true
+    $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default $true
+    $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default $true
+    $values['allow_optional_av'] = Read-AgentYesNo -Prompt 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' -Default $false
+    $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' -Default $false
+    $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt 'IP-Firewall-Blocklisten als riskante Option anbieten?' -Default $false
+    $values['windows_wsl_backend'] = Read-AgentYesNo -Prompt 'Windows: WSL-Backend fuer Linux-Tools vorbereiten?' -Default $false
+    if ($values.windows_wsl_backend) {
+        $values['windows_wsl_with_docker'] = Read-AgentYesNo -Prompt 'Windows: Docker mit WSL-Unterstuetzung einplanen?' -Default $false
+        if ($values.windows_wsl_with_docker) {
+            $values['windows_portainer_ui'] = Read-AgentYesNo -Prompt 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' -Default $false
+        } else {
+            $values['windows_portainer_ui'] = $false
+        }
+        $values['windows_wsl_recommendations'] = $true
+    } else {
+        $values['windows_wsl_with_docker'] = $false
+        $values['windows_portainer_ui'] = $false
+        $values['windows_wsl_recommendations'] = $false
     }
+    $values['require_confirmation_for_system_changes'] = Read-AgentYesNo -Prompt 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' -Default $true
     $values['note'] = Read-Host 'Optionale Notiz fuer den Agenten'
+}
+
+if (-not $values.windows_wsl_backend) {
+    $values['windows_wsl_with_docker'] = $false
+    $values['windows_portainer_ui'] = $false
+    $values['windows_wsl_recommendations'] = $false
+} elseif (-not $values.windows_wsl_with_docker) {
+    $values['windows_portainer_ui'] = $false
+    $values['windows_wsl_recommendations'] = $true
+} else {
+    $values['windows_wsl_recommendations'] = $true
 }
 
 $now = (Get-Date).ToString('o')
@@ -146,6 +207,10 @@ preferences:
   allow_optional_av: $($values.allow_optional_av.ToString().ToLowerInvariant())
   allow_blocklist_pilot: $($values.allow_blocklist_pilot.ToString().ToLowerInvariant())
   allow_firewall_ip_blocklists: $($values.allow_firewall_ip_blocklists.ToString().ToLowerInvariant())
+  windows_wsl_backend: $($values.windows_wsl_backend.ToString().ToLowerInvariant())
+  windows_wsl_with_docker: $($values.windows_wsl_with_docker.ToString().ToLowerInvariant())
+  windows_portainer_ui: $($values.windows_portainer_ui.ToString().ToLowerInvariant())
+  windows_wsl_recommendations: $($values.windows_wsl_recommendations.ToString().ToLowerInvariant())
   require_confirmation_for_system_changes: $($values.require_confirmation_for_system_changes.ToString().ToLowerInvariant())
 note: "$safeNote"
 "@

@@ -187,6 +187,19 @@ Wenn ClamAV installiert wird, soll der Agent FreshClam-Signaturupdates über den
 | Signaturupdates | FreshClam-Dienst nur bei ClamAV | FreshClam-Service oder Timer | FreshClam-Service oder Timer nur bei systemd | FreshClam nach Installationsweg |
 | Blocklisten | DNS-/Host-Pilot bevorzugt | DNS-/Host-Pilot bevorzugt | meist Windows-seitig sinnvoller | DNS-/Host-Pilot bevorzugt |
 | IP-Firewall-Listen | nicht Default | eher Server/Router | nur bei exponierten Diensten | nicht Default |
+| WSL/Docker/Portainer | WSL optional, Docker nur mit WSL-Unterstützung einplanen, Portainer nur bei Docker | Docker/Podman nach Distribution und Nutzerziel | WSL-Empfehlungen und Container-Vorlagen berücksichtigen | Docker/Podman nur optional nach Nutzerziel |
+
+## Windows mit WSL, Docker und Portainer
+
+Auf normalen Windows-PCs sind WSL, Docker und Portainer Zusatzkomponenten, keine Pflichtbestandteile der Sicherheitsbaseline.
+
+- WSL ist sinnvoll, wenn der Nutzer Linux-Tools, lokale Entwickler- oder KI-Workflows und Shell-Automation nutzen möchte.
+- Docker soll auf Windows bevorzugt mit WSL-Unterstützung eingeplant werden, wenn Container ausdrücklich gewünscht sind.
+- Portainer CE ist eine optionale lokale Docker-Verwaltungsoberfläche und wird nur empfohlen, wenn Docker ausgewählt wurde.
+- Sobald WSL gewählt wurde, berücksichtigt der Agent zusätzlich `Vorlage/wsl/common`.
+- Sobald Docker oder Portainer gewählt wurde, berücksichtigt der Agent zusätzlich `Vorlage/container/common`.
+
+Diese Optionen werden in der Erststart-Konfiguration abgefragt. Sie bereiten nur Empfehlungen und spätere freigegebene Schritte vor; sie installieren oder starten nichts automatisch.
 
 ## Blocklisten und Firewall-Blacklists
 

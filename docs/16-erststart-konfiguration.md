@@ -55,7 +55,22 @@ Wenn die Prüfung fehlschlägt, muss der Agent abbrechen und melden, dass die Ko
 - optionalen kostenlosen On-Demand-Malware-Scanner anbieten
 - DNS-/Host-Blocklisten nur im Pilotmodus anbieten
 - IP-Firewall-Blocklisten als riskante Option anbieten
+- Windows: WSL-Backend für Linux-Tools vorbereiten
+- Windows: Docker mit WSL-Unterstützung einplanen
+- Windows: Portainer CE als Docker-Verwaltungsoberfläche empfehlen
 - vor systemwirksamen Änderungen immer bestätigen lassen
+
+## Windows-Zusatzkomponenten
+
+Die Windows-Erstkonfiguration fragt WSL, Docker und Portainer abhängig voneinander ab:
+
+1. WSL kann als optionales Backend für Linux-Tools, Entwickler-Workflows, KI-Stacks und Container-nahe Aufgaben gewählt werden.
+2. Docker wird nur sinnvoll angeboten, wenn WSL gewählt wurde.
+3. Portainer CE wird nur sinnvoll angeboten, wenn Docker gewählt wurde.
+
+Wenn WSL gewählt wurde, muss der Agent zusätzlich die WSL-Vorlagen und WSL-Empfehlungen berücksichtigen. Bei Docker oder Portainer müssen zusätzlich die Container-Vorlagen berücksichtigt werden. Die Baseline dokumentiert dies über `template_paths_used` und `windows_optional_components` in `hosts/<HOSTNAME>/host.yaml`.
+
+Keine dieser Optionen installiert automatisch Software. Sie erlaubt dem Agenten nur, passende Empfehlungen, Prüfungen und spätere freigegebene Installationsschritte vorzubereiten. Vor einer tatsächlichen Änderung bleiben Baseline, Frage-Antwort-Entscheidung, Rollback und Validierung Pflicht.
 
 ## Sicherheitsgrenzen
 
