@@ -19,10 +19,17 @@ Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähi
 
 Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 
+- `pc-agent-installer` ist die zentrale Codex-Ausgangsstelle. Beginne hier mit Orientierung, Regelprüfung und der Entscheidung, welcher Arbeitsbereich betroffen ist.
 - Offizielle Template- und Codeänderungen werden im öffentlichen Template-Repository gepflegt und dürfen automatisch dorthin übernommen werden, wenn Checks erfolgreich sind.
 - Rechner-, Host-, Infrastruktur- und Testdaten werden ausschließlich in einem privaten Operational-Repository oder in einem `local-only`-Klon dokumentiert.
 
 Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffentliche Template bleibt die Quelle für generische Änderungen, der private oder lokale Operational-Workspace bleibt die Quelle für Hostzustand und Tests. Die konkrete Codex-Aufgabe oder lokale Testabsicht wird nicht als Prompt, Notiz oder Projektauftrag im öffentlichen Repository abgelegt.
+
+Vor jeder Aufgabe muss Codex explizit entscheiden:
+
+- Gehört die Änderung als generische, offizielle Verbesserung in das öffentliche Template?
+- Gehört sie als Host-, Test-, Infrastruktur- oder Betriebszustand in ein privates Operational-Repository oder einen `local-only`-Klon?
+- Muss in beiden Arbeitsbereichen gearbeitet werden, wobei nur der generische Anteil ins öffentliche Repository übernommen wird?
 
 ## Harte Regeln
 
@@ -38,6 +45,7 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 10. Zeige vor Commit oder Push immer eine Zusammenfassung an.
 11. Übernimm nur generische, offizielle Änderungen in das öffentliche Template-Repository.
 12. Lege lokale Codex-Aufgaben, private Testziele und Hostzustände nicht im öffentlichen Repository ab.
+13. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
 
 ## Ausführungsreihenfolge
 

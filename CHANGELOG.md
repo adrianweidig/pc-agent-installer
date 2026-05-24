@@ -5,6 +5,7 @@
 - README als zentrale Einstiegsdokumentation erweitert.
 - AGENTS.md um projektspezifische Codex-Regeln und dauerhafte Hygienevorgaben ergänzt.
 - Öffentliches Template und private Operational-Arbeit als dauerhaftes Codex-Arbeitsmodell dokumentiert.
+- `pc-agent-installer` als zentrale Codex-Ausgangsstelle mit Pflicht zur Public/Private-Einordnung jeder Aufgabe festgelegt.
 - PowerShell-Entrypoints robuster gemacht, damit sie ohne expliziten `-RepoRoot` laufen.
 - Beschädigte `rollback_required`-Zeile in den Template-Dateien korrigiert.
 - Repository-Hygiene für lokale Logs und Caches ergänzt.
