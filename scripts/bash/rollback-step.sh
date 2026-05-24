@@ -6,7 +6,8 @@ if [[ $# -lt 1 ]]; then
 fi
 COMMAND="$1"
 APPROVED="${2:-}"
-if [[ "true" == "true" && "$APPROVED" != "--approved" ]]; then
+APPROVAL_REQUIRED="true"
+if [[ "$APPROVAL_REQUIRED" == "true" && "$APPROVED" != "--approved" ]]; then
   echo "rollback-step benötigt explizite Freigabe mit --approved." >&2
   exit 1
 fi

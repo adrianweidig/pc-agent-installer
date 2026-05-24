@@ -2464,7 +2464,8 @@ if [[ `$# -lt 1 ]]; then
 fi
 COMMAND="`$1"
 APPROVED="`${2:-}"
-if [[ "$approvalRequired" == "true" && "`$APPROVED" != "--approved" ]]; then
+APPROVAL_REQUIRED="$approvalRequired"
+if [[ "`$APPROVAL_REQUIRED" == "true" && "`$APPROVED" != "--approved" ]]; then
   echo "$stepName benötigt explizite Freigabe mit --approved." >&2
   exit 1
 fi

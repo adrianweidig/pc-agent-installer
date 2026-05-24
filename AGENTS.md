@@ -111,6 +111,16 @@ Die globale Codex-Anweisung auf diesem Rechner enthält einen dauerhaften Standa
 
 Wenn Vorlagen, CI/CD-Regeln, Release-Artefakte, Docker/GHCR-Hinweise, Security- oder Kollaborationsstandards geändert werden, müssen globale Codex-Anweisung, öffentliches Template und private Operational-Dokumentation inhaltlich konsistent bleiben. Öffentliche Dateien bleiben generisch; hostbezogene Details gehören nur in geprüfte private Strukturen.
 
+## Security-Remediation-Standard
+
+Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
+
+- GitHub-Quellen aktiv prüfen: Code Scanning, CodeQL/SARIF, Dependabot, Secret Scanning, Repository Advisories, Actions-Runs, Workflow-Konfiguration und Branch Protection.
+- Lokale Prüfungen passend zum Repository ausführen. Für dieses Template sind besonders `gitleaks`, `actionlint`, `shellcheck`, `verify-template.*` und `git diff --check` sinnvoll, wenn verfügbar oder temporär sicher nutzbar.
+- Befunde direkt beheben, wenn sie generisch und template-relevant sind. Host-, Betriebs- oder Testdaten gehören nicht in das öffentliche Template.
+- Secrets niemals ausgeben. Funde nur maskiert dokumentieren und Rotation oder Revocation als manuellen Folgeschritt benennen, wenn sie außerhalb des Repos liegt.
+- Ergebnisse und verbleibende Risiken in `docs/SECURITY_ALERT_ANALYSIS.md` oder im Abschlussbericht nachvollziehbar dokumentieren.
+
 ## Konventionen
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
