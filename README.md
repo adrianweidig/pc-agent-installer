@@ -194,11 +194,13 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Secrets Policy | [docs/05-secrets-policy.md](docs/05-secrets-policy.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |
 | Test- und Validierungsmodell | [docs/13-test-und-validierungsmodell.md](docs/13-test-und-validierungsmodell.md) |
 | Codex-Arbeitsmodell | [docs/12-codex-arbeitsmodell.md](docs/12-codex-arbeitsmodell.md) |
 | Workspace-Konsolidierung | [docs/14-codex-workspace-konsolidierung.md](docs/14-codex-workspace-konsolidierung.md) |
 | FAQ | [docs/99-faq.md](docs/99-faq.md) |
 | Release-Prozess | [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md) |
+| Codex-New-Project-Standard | [docs/CODEX_NEW_PROJECT_STANDARD.md](docs/CODEX_NEW_PROJECT_STANDARD.md) |
 | Maintainer-Checkliste | [docs/MAINTAINER_CHECKLIST.md](docs/MAINTAINER_CHECKLIST.md) |
 | Support | [SUPPORT.md](SUPPORT.md) |
 | Code of Conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
@@ -228,5 +230,7 @@ Das öffentliche Template steht unter der [Apache License 2.0](LICENSE). Private
 ## Status
 
 Der aktuelle Readiness-Stand ist in [CODEX_PROJECT_READINESS.md](CODEX_PROJECT_READINESS.md) dokumentiert. Für geplante Veröffentlichungen siehe [CHANGELOG.md](CHANGELOG.md) und [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md).
+
+Für neue Projekte ist der wiederverwendbare Standard in [docs/CODEX_NEW_PROJECT_STANDARD.md](docs/CODEX_NEW_PROJECT_STANDARD.md) dokumentiert. Das unterstützende Bootstrap-Skript liegt unter [scripts/apply-codex-project-standard.sh](scripts/apply-codex-project-standard.sh).
 
 Wenn dieses Template dir hilft, öffne gern ein Issue mit Feedback oder schlage eine kleine, überprüfbare Verbesserung per Pull Request vor.

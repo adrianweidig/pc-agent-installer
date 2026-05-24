@@ -105,6 +105,12 @@ bash ./scripts/common/verify-template.sh
 
 Ein absichtlich fehlgeschlagenes `assert-private-repo.*` im `template`-Modus ist kein Fehler. Es bestätigt, dass Host-Schreibzugriffe im öffentlichen Template blockiert sind.
 
+## New-Project-Standard
+
+Die globale Codex-Anweisung auf diesem Rechner enthält einen dauerhaften Standard für neue Projekte. Dieses Repository pflegt die wiederverwendbare Projektdokumentation dazu unter `docs/CODEX_NEW_PROJECT_STANDARD.md` und das vorsichtige Bootstrap-Skript unter `scripts/apply-codex-project-standard.sh`.
+
+Wenn Vorlagen, CI/CD-Regeln, Release-Artefakte, Docker/GHCR-Hinweise, Security- oder Kollaborationsstandards geändert werden, müssen globale Codex-Anweisung, öffentliches Template und private Operational-Dokumentation inhaltlich konsistent bleiben. Öffentliche Dateien bleiben generisch; hostbezogene Details gehören nur in geprüfte private Strukturen.
+
 ## Konventionen
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.

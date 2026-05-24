@@ -13,6 +13,10 @@ for path in \
   .github/ISSUE_TEMPLATE/config.yml \
   .github/PULL_REQUEST_TEMPLATE.md \
   .github/workflows/validate.yml \
+  .github/workflows/release-artifact.yml \
+  docs/CODEX_NEW_PROJECT_STANDARD.md \
+  docs/CI_CD.md \
+  scripts/apply-codex-project-standard.sh \
   schemas/host.schema.yaml \
   schemas/repo-mode.schema.yaml \
   scripts/common/detect-repo-mode.ps1 \

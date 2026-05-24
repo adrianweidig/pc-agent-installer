@@ -1,0 +1,71 @@
+name: Release artifact
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    name: Build repository archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build artifact metadata
+        id: meta
+        shell: bash
+        run: |
+          repo_name="${GITHUB_REPOSITORY##*/}"
+          branch_name="${GITHUB_REF_NAME//\//-}"
+          short_sha="${GITHUB_SHA::12}"
+          archive_name="${repo_name}-${branch_name}-${short_sha}.zip"
+          root_dir="${repo_name}-${short_sha}"
+          echo "archive_name=${archive_name}" >> "$GITHUB_OUTPUT"
+          echo "root_dir=${root_dir}" >> "$GITHUB_OUTPUT"
+
+      - name: Create ZIP from current commit
+        shell: bash
+        run: |
+          git archive --format=zip --output="${{ steps.meta.outputs.archive_name }}" --prefix="${{ steps.meta.outputs.root_dir }}/" HEAD
+
+      - name: Create release notes
+        shell: bash
+        run: |
+          {
+            echo "# Repository Artifact"
+            echo
+            echo "Repository: ${GITHUB_REPOSITORY}"
+            echo "Branch: ${GITHUB_REF_NAME}"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Short SHA: ${GITHUB_SHA::12}"
+            echo "Event: ${GITHUB_EVENT_NAME}"
+            echo "Actor: ${GITHUB_ACTOR}"
+            echo "UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Archive: ${{ steps.meta.outputs.archive_name }}"
+            echo
+            last_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+            if [[ -n "$last_tag" ]]; then
+              echo "## Changes since $last_tag"
+              git log --oneline "$last_tag..HEAD"
+            else
+              echo "## Recent commits"
+              git log --oneline -10
+            fi
+          } > release-notes.md
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.archive_name }}
+          path: |
+            ${{ steps.meta.outputs.archive_name }}
+            release-notes.md
