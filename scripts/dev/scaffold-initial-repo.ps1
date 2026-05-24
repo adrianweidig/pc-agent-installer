@@ -86,16 +86,21 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für `$area`.
 - Keine Klartext-Secrets erfassen oder speichern.
 - Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
 - Änderungen nur mit passender Validierung und Rollback-Pfad ausführen.
+- Betriebssystemspezifische Fähigkeiten nur über passende Vorlagen ausführen.
+- Sicherheitsmaßnahmen mit Blockade-, Installations-, Dienst-, Firewall-, DNS- oder Blocklist-Wirkung brauchen eine dokumentierte Frage-Antwort-Entscheidung.
 
 ## Ablauf
 1. Plattform- und Host-Kontext erkennen.
-2. Relevante Baseline-Dateien unter `hosts/<HOSTNAME>/baseline/` prüfen oder erzeugen.
-3. Geplante Änderung unter `hosts/<HOSTNAME>/changes/` dokumentieren.
-4. Falls ``rollback_required: true``, Rollback-Datei unter ``hosts/<HOSTNAME>/rollback/`` anlegen.
-5. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+2. Passende Vorlagen für Windows, Linux, WSL, macOS, Container oder Profile auswählen.
+3. Relevante Baseline-Dateien unter `hosts/<HOSTNAME>/baseline/` prüfen oder erzeugen.
+4. Geplante Änderung unter `hosts/<HOSTNAME>/changes/` dokumentieren.
+5. Falls ``rollback_required: true``, Rollback-Datei unter ``hosts/<HOSTNAME>/rollback/`` anlegen.
+6. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
 
 ## Erwartete Nachweise
 - Baseline- oder Reportdatei im passenden Host-Unterordner.
+- verwendete Betriebssystem- und Common-Vorlagen.
+- gestellte Fragen und Antworten, falls interaktive Sicherheitsentscheidungen betroffen waren.
 - Ausgeführte Befehle mit redigierten Ausgaben.
 - Abschlussstatus mit offener Risiko- oder Freigabeliste.
 "@
@@ -223,7 +228,7 @@ Das Projekt ist so gedacht, dass Codex generische Template-Änderungen im öffen
 ## Projektstruktur
 
 - `AGENTS.md`: verbindliche Arbeitsregeln für Codex und andere Agenten.
-- `Vorlage/`: numerisch sortierte Aufgaben-Vorlagen für Windows, Linux, WSL, Container und Hardwareprofile.
+- `Vorlage/`: numerisch sortierte Aufgaben-Vorlagen für Windows, Linux, WSL, macOS, Container und Hardwareprofile.
 - `scripts/common/`: Repo-Modus, Sichtbarkeitsprüfung, Template-Validierung und Moduswechsel.
 - `scripts/powershell/` und `scripts/bash/`: Host-Erkennung, Baseline- und Änderungsdokumentation.
 - `scripts/container/`: Container-, Compose-, Swarm-, Kubernetes-, Podman- und NVIDIA-Erkennung.
@@ -237,7 +242,7 @@ Das Projekt ist so gedacht, dass Codex generische Template-Änderungen im öffen
 
 - Git
 - PowerShell für Windows-Workflows
-- Bash für Linux-, WSL- und Unix-nahe Workflows
+- Bash für Linux-, WSL-, macOS- und Unix-nahe Workflows
 - Optional: GitHub CLI `gh`, wenn Remote-Sichtbarkeit über GitHub geprüft oder eine private Kopie erstellt werden soll
 
 Es gibt keinen Paketmanager, keine externen Laufzeitabhängigkeiten und keinen klassischen Build-Schritt.
@@ -571,7 +576,7 @@ In `template`-Repos wird `assert-private-repo` bewusst fehlschlagen, weil Hostsc
 - Repo-Modi `template`, `operational` und `local-only` modelliert.
 - Guard-Skripte für PowerShell und Bash ergänzt.
 - Plattform-, Host-, Baseline- und Container-Erkennung als erste sichere Version ergänzt.
-- Vorlagenstruktur für Windows, Linux, WSL, Container und Profile angelegt.
+- Vorlagenstruktur für Windows, Linux, WSL, macOS, Container und Profile angelegt.
 '@
     '.gitignore' = @'
 # Secrets
@@ -2302,9 +2307,14 @@ $detectPlatformSh = @'
 #!/usr/bin/env bash
 set -euo pipefail
 
+kernel_name="$(uname -s 2>/dev/null || printf unknown)"
 os="linux"
 environment="native"
-if grep -qi microsoft /proc/version 2>/dev/null; then environment="wsl"; fi
+if [[ "$kernel_name" == "Darwin" ]]; then
+  os="macos"
+elif grep -qi microsoft /proc/version 2>/dev/null; then
+  environment="wsl"
+fi
 hostname_value="$(hostname 2>/dev/null || printf unknown)"
 arch_value="$(uname -m 2>/dev/null || printf unknown)"
 kernel_value="$(uname -r 2>/dev/null || printf unknown)"
@@ -2312,8 +2322,13 @@ distribution="unknown"
 version_id=""
 family="unknown"
 pretty_name=""
+macos_product_version=""
+macos_build_version=""
 
-if [[ -f /etc/os-release ]]; then
+if [[ "$os" == "macos" ]]; then
+  macos_product_version="$(sw_vers -productVersion 2>/dev/null || printf '')"
+  macos_build_version="$(sw_vers -buildVersion 2>/dev/null || printf '')"
+elif [[ -f /etc/os-release ]]; then
   # shellcheck disable=SC1091
   . /etc/os-release
   distribution="${ID:-unknown}"
@@ -2326,8 +2341,8 @@ if [[ -f /etc/os-release ]]; then
   esac
 fi
 
-printf '{"detected_at":"%s","os":"%s","environment":"%s","hostname":"%s","architecture":"%s","kernel":"%s","linux":{"family":"%s","distribution":"%s","version_id":"%s","pretty_name":"%s"},"root":%s}\n' \
-  "$(date -Iseconds)" "$os" "$environment" "$hostname_value" "$arch_value" "$kernel_value" "$family" "$distribution" "$version_id" "$pretty_name" "$(if [[ "$(id -u)" == "0" ]]; then echo true; else echo false; fi)"
+printf '{"detected_at":"%s","os":"%s","environment":"%s","hostname":"%s","architecture":"%s","kernel":"%s","linux":{"family":"%s","distribution":"%s","version_id":"%s","pretty_name":"%s"},"macos":{"product_version":"%s","build_version":"%s"},"root":%s}\n' \
+  "$(date -Iseconds)" "$os" "$environment" "$hostname_value" "$arch_value" "$kernel_value" "$family" "$distribution" "$version_id" "$pretty_name" "$macos_product_version" "$macos_build_version" "$(if [[ "$(id -u)" == "0" ]]; then echo true; else echo false; fi)"
 '@
 Write-RepoFile -Path 'scripts/bash/detect-platform.sh' -Content $detectPlatformSh
 
@@ -2353,6 +2368,13 @@ HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT"/{baseline/raw,changes,rollback,security,container/docker,container/compose,container/swarm,container/kubernetes,container/podman,logs,state}
 NOW="$(date -Iseconds)"
 PLATFORM_JSON="$("$SCRIPT_DIR/detect-platform.sh")"
+OS_VALUE="$(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"os":"\([^"]*\)".*/\1/p')"
+ENVIRONMENT_VALUE="$(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"environment":"\([^"]*\)".*/\1/p')"
+case "$OS_VALUE:$ENVIRONMENT_VALUE" in
+  macos:*) TEMPLATE_PLATFORM_PATH="Vorlage/macos/common" ;;
+  linux:wsl) TEMPLATE_PLATFORM_PATH="Vorlage/wsl/common" ;;
+  *) TEMPLATE_PLATFORM_PATH="Vorlage/linux/common" ;;
+esac
 
 cat > "$HOST_ROOT/host.yaml" <<YAML
 host_id: $HOSTNAME_VALUE
@@ -2364,12 +2386,12 @@ repo:
   visibility_checked: true
   allowed_to_write_hosts: true
 platform:
-  os: linux
-  environment: $(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"environment":"\([^"]*\)".*/\1/p')
+  os: $OS_VALUE
+  environment: $ENVIRONMENT_VALUE
   architecture: "$(uname -m)"
 template_paths_used:
   - Vorlage/common
-  - Vorlage/linux/common
+  - $TEMPLATE_PLATFORM_PATH
 YAML
 
 cat > "$HOST_ROOT/baseline/system.md" <<MD
@@ -2382,9 +2404,17 @@ cat > "$HOST_ROOT/baseline/system.md" <<MD
 MD
 
 cp /etc/os-release "$HOST_ROOT/baseline/raw/os-release.txt" 2>/dev/null || true
+sw_vers > "$HOST_ROOT/baseline/raw/sw-vers.txt" 2>/dev/null || true
 mount > "$HOST_ROOT/baseline/filesystem.md" 2>/dev/null || true
 ip addr > "$HOST_ROOT/baseline/network.md" 2>/dev/null || true
-systemctl list-unit-files > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+if ! [[ -s "$HOST_ROOT/baseline/network.md" ]] && command -v ifconfig >/dev/null 2>&1; then
+  ifconfig > "$HOST_ROOT/baseline/network.md" 2>/dev/null || true
+fi
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl list-unit-files > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+elif command -v launchctl >/dev/null 2>&1; then
+  launchctl list > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+fi
 env | agent_redact > "$HOST_ROOT/baseline/environment.md"
 cat > "$HOST_ROOT/security/secret-references.yaml" <<'YAML'
 secrets: []
@@ -2395,9 +2425,41 @@ echo "Baseline erzeugt: $HOST_ROOT"
 Write-RepoFile -Path 'scripts/bash/collect-baseline.sh' -Content $collectBaselineSh
 
 $bashCollectors = @{
-    'scripts/bash/collect-linux-packages.sh' = 'if command -v dpkg >/dev/null 2>&1; then dpkg-query -W; elif command -v rpm >/dev/null 2>&1; then rpm -qa; elif command -v pacman >/dev/null 2>&1; then pacman -Q; else echo "Kein unterstützter Paketmanager gefunden"; fi'
-    'scripts/bash/collect-linux-firewall.sh' = 'if command -v ufw >/dev/null 2>&1; then ufw status verbose; elif command -v firewall-cmd >/dev/null 2>&1; then firewall-cmd --list-all; elif command -v nft >/dev/null 2>&1; then nft list ruleset; else echo "Keine bekannte Firewall-CLI gefunden"; fi'
-    'scripts/bash/collect-systemd.sh' = 'if command -v systemctl >/dev/null 2>&1; then systemctl list-unit-files; else echo "systemctl nicht verfügbar"; fi'
+    'scripts/bash/collect-linux-packages.sh' = @'
+if command -v dpkg >/dev/null 2>&1; then
+  dpkg-query -W
+elif command -v rpm >/dev/null 2>&1; then
+  rpm -qa
+elif command -v pacman >/dev/null 2>&1; then
+  pacman -Q
+elif command -v brew >/dev/null 2>&1; then
+  brew list --versions
+elif command -v port >/dev/null 2>&1; then
+  port installed
+elif command -v pkgutil >/dev/null 2>&1; then
+  pkgutil --pkgs
+else
+  echo "Kein unterstützter Paketmanager gefunden"
+fi
+'@
+    'scripts/bash/collect-linux-firewall.sh' = @'
+if command -v ufw >/dev/null 2>&1; then
+  ufw status verbose
+elif command -v firewall-cmd >/dev/null 2>&1; then
+  firewall-cmd --list-all
+elif command -v nft >/dev/null 2>&1; then
+  nft list ruleset
+elif [[ -x /usr/libexec/ApplicationFirewall/socketfilterfw ]]; then
+  /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+  /usr/libexec/ApplicationFirewall/socketfilterfw --listapps 2>/dev/null || true
+elif command -v pfctl >/dev/null 2>&1; then
+  pfctl -s info 2>/dev/null || true
+  pfctl -sr 2>/dev/null || true
+else
+  echo "Keine bekannte Firewall-CLI gefunden"
+fi
+'@
+    'scripts/bash/collect-systemd.sh' = 'if command -v systemctl >/dev/null 2>&1; then systemctl list-unit-files; elif command -v launchctl >/dev/null 2>&1; then launchctl list; else echo "systemctl oder launchctl nicht verfügbar"; fi'
 }
 foreach ($item in $bashCollectors.GetEnumerator()) {
     $content = @"

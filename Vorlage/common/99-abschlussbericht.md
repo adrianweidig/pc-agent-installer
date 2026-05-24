@@ -16,7 +16,7 @@ applies_to:
 # Abschlussbericht
 
 ## Zweck
-Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
+Diese Vorlage beschreibt den generischen Abschlussbericht für Agentenläufe auf Windows, Linux, WSL, macOS, Container-Umgebungen und Profilen.
 
 ## Sicherheitsregeln
 - Vor Ausführung Repo-Modus und Sichtbarkeit prüfen.
@@ -33,5 +33,10 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
 
 ## Erwartete Nachweise
 - Baseline- oder Reportdatei im passenden Host-Unterordner.
+- erkannte Plattform und verwendete Vorlagen.
+- umgesetzte, nicht umgesetzte und zurückgestellte Frage-Antwort-Entscheidungen.
+- Sicherheits-, AV-, Update-, Firewall- und Blocklistenstatus, sofern geprüft.
+- Rollback-Pfade für systemwirksame Änderungen.
+- Validierung normaler Nutzung für betroffene Betriebssysteme.
 - Ausgeführte Befehle mit redigierten Ausgaben.
 - Abschlussstatus mit offener Risiko- oder Freigabeliste.

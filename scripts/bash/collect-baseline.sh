@@ -11,6 +11,13 @@ HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT"/{baseline/raw,changes,rollback,security,container/docker,container/compose,container/swarm,container/kubernetes,container/podman,logs,state}
 NOW="$(date -Iseconds)"
 PLATFORM_JSON="$("$SCRIPT_DIR/detect-platform.sh")"
+OS_VALUE="$(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"os":"\([^"]*\)".*/\1/p')"
+ENVIRONMENT_VALUE="$(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"environment":"\([^"]*\)".*/\1/p')"
+case "$OS_VALUE:$ENVIRONMENT_VALUE" in
+  macos:*) TEMPLATE_PLATFORM_PATH="Vorlage/macos/common" ;;
+  linux:wsl) TEMPLATE_PLATFORM_PATH="Vorlage/wsl/common" ;;
+  *) TEMPLATE_PLATFORM_PATH="Vorlage/linux/common" ;;
+esac
 
 cat > "$HOST_ROOT/host.yaml" <<YAML
 host_id: $HOSTNAME_VALUE
@@ -22,12 +29,12 @@ repo:
   visibility_checked: true
   allowed_to_write_hosts: true
 platform:
-  os: linux
-  environment: $(printf '%s' "$PLATFORM_JSON" | sed -n 's/.*"environment":"\([^"]*\)".*/\1/p')
+  os: $OS_VALUE
+  environment: $ENVIRONMENT_VALUE
   architecture: "$(uname -m)"
 template_paths_used:
   - Vorlage/common
-  - Vorlage/linux/common
+  - $TEMPLATE_PLATFORM_PATH
 YAML
 
 cat > "$HOST_ROOT/baseline/system.md" <<MD
@@ -40,9 +47,17 @@ cat > "$HOST_ROOT/baseline/system.md" <<MD
 MD
 
 cp /etc/os-release "$HOST_ROOT/baseline/raw/os-release.txt" 2>/dev/null || true
+sw_vers > "$HOST_ROOT/baseline/raw/sw-vers.txt" 2>/dev/null || true
 mount > "$HOST_ROOT/baseline/filesystem.md" 2>/dev/null || true
 ip addr > "$HOST_ROOT/baseline/network.md" 2>/dev/null || true
-systemctl list-unit-files > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+if ! [[ -s "$HOST_ROOT/baseline/network.md" ]] && command -v ifconfig >/dev/null 2>&1; then
+  ifconfig > "$HOST_ROOT/baseline/network.md" 2>/dev/null || true
+fi
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl list-unit-files > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+elif command -v launchctl >/dev/null 2>&1; then
+  launchctl list > "$HOST_ROOT/baseline/services.md" 2>/dev/null || true
+fi
 env | agent_redact > "$HOST_ROOT/baseline/environment.md"
 cat > "$HOST_ROOT/security/secret-references.yaml" <<'YAML'
 secrets: []
