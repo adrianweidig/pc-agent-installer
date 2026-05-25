@@ -47,6 +47,17 @@ foreach ($path in $required) {
     if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $path))) { $missing += $path }
 }
 
+$repoMode = 'template'
+$repoModePath = Join-Path $RepoRoot 'repo-mode.yaml'
+if (Test-Path -LiteralPath $repoModePath) {
+    foreach ($line in Get-Content -LiteralPath $repoModePath) {
+        if ($line -match '^\s*repo_mode:\s*["'']?([^"''#\s]+)') {
+            $repoMode = $Matches[1]
+            break
+        }
+    }
+}
+$requiresEmptyHosts = $repoMode -eq 'template'
 $hostChildren = @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'hosts') -Force | Where-Object { $_.Name -ne '.gitkeep' })
 $templateFiles = @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'Vorlage') -Recurse -Filter '*.md')
 $badFrontmatter = @()
@@ -84,15 +95,17 @@ foreach ($file in $templateFiles) {
 }
 
 $result = [ordered]@{
+    repo_mode = $repoMode
     required_missing = $missing
-    hosts_has_only_gitkeep = ($hostChildren.Count -eq 0)
+    hosts_has_only_gitkeep = (-not $requiresEmptyHosts -or $hostChildren.Count -eq 0)
+    hosts_empty_required = $requiresEmptyHosts
     template_file_count = $templateFiles.Count
     template_frontmatter_missing = $badFrontmatter
     template_frontmatter_fields_missing = $badFrontmatterFields
     template_control_token_errors = $badControlTokens
     ok = (
         $missing.Count -eq 0 -and
-        $hostChildren.Count -eq 0 -and
+        (-not $requiresEmptyHosts -or $hostChildren.Count -eq 0) -and
         $badFrontmatter.Count -eq 0 -and
         $badFrontmatterFields.Count -eq 0 -and
         $badControlTokens.Count -eq 0

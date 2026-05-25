@@ -2,6 +2,10 @@
 set -euo pipefail
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 missing=0
+repo_mode="template"
+if [[ -f "$ROOT/repo-mode.yaml" ]]; then
+  repo_mode="$(awk -F: '/^[[:space:]]*repo_mode:/ {gsub(/[ "]/,"",$2); print $2; found=1} END {if (!found) print "template"}' "$ROOT/repo-mode.yaml")"
+fi
 for path in \
   AGENTS.md \
   README.md \
@@ -42,10 +46,11 @@ for path in \
     missing=1
   fi
 done
-if find "$ROOT/hosts" -mindepth 1 -maxdepth 1 ! -name .gitkeep | grep -q .; then
+if [[ "$repo_mode" == "template" ]] && find "$ROOT/hosts" -mindepth 1 -maxdepth 1 ! -name .gitkeep | grep -q .; then
   echo "hosts/ enthält Hostdaten; Template muss leer bleiben." >&2
   missing=1
 fi
+echo "repo_mode=$repo_mode"
 count="$(find "$ROOT/Vorlage" -type f -name '*.md' | wc -l | tr -d ' ')"
 echo "template_file_count=$count"
 while IFS= read -r file; do
