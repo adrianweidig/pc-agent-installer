@@ -35,17 +35,21 @@ Dokumentiere in einer privaten oder lokalen Operational-Struktur:
 - installierte AV-/Malware-Scanner
 - aktive DNS-Konfiguration
 - wichtige Paketquellen und Dritt-Repositories
+- Verschlüsselungs- und Mount-Status für relevante Datenbereiche
+- Scanner-, Firewall- oder Paketmanager-Ausnahmen
 - Autostart-/Systemd-Dienste mit Sicherheitsrelevanz
 
 ## Usability-first Defaults
 Empfohlen und in der Regel blockadearm:
 
 - Distribution über den offiziellen Paketmanager aktuell halten.
+- Paketquellen, Dritt-Repositories und Release-Kompatibilität prüfen.
 - Firewall aktivieren, wenn sie noch nicht aktiv ist und keine bekannten Dienste gebrochen werden.
 - Eingehende Verbindungen restriktiv behandeln; ausgehende Verbindungen nicht pauschal blockieren.
 - ClamAV als optionalen On-Demand-Scanner für Downloads, Austauschordner und Windows-Dateien anbieten.
 - FreshClam-Signaturupdates als Service oder Timer aktivieren, wenn ClamAV installiert wird.
 - Browser-Blocker und DNS-Blocklisten nur im Pilotmodus testen.
+- LUKS oder distributionsspezifische Verschlüsselung für mobile/private Systeme empfehlen, aber nicht ohne Recovery- und Backup-Plan aktivieren.
 
 ## ClamAV-Entscheidung
 Frage:
@@ -92,6 +96,8 @@ Validierung:
 - Baseline- oder Reportdatei im passenden Host-Unterordner.
 - Gestellte Sicherheitsfragen und Antworten.
 - Liste installierter oder bewusst nicht installierter Tools.
+- Paketquellen- und Release-Bewertung.
+- Verschlüsselungs- oder Backup-Entscheidung.
 - Dienststatus für FreshClam oder alternative Update-Mechanismen.
 - Firewall- und Blocklistenstatus.
 - Rollback-Pfad und Validierung normaler Nutzung.

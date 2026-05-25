@@ -81,6 +81,7 @@ Vor automatischen Massenupdates sollte ein Agent prüfen:
 - welche Pakete aktualisiert würden
 - ob kritische Arbeitsprogramme betroffen sind
 - ob Neustarts zu erwarten sind
+- ob zusätzliche Paketquellen aktiv sind und plausibel zur Installation passen
 
 Linux:
 
@@ -90,6 +91,54 @@ sudo apt upgrade
 ```
 
 oder der passende Paketmanager der Distribution. Distribution und Paketmanager müssen vorher erkannt werden.
+
+### Security-Ausnahmen
+
+Ausnahmen sind manchmal nötig, aber breite Ausnahmen schwächen den Schutz stärker als viele Nutzer erwarten.
+
+Gute Muster:
+
+- einzelne Projekt-, Cache- oder Build-Verzeichnisse gezielt begrenzen
+- Grund, Tool, Zeitraum und Validierung dokumentieren
+- Ausnahmen nach Projektabschluss erneut prüfen
+- Scanner- oder Firewall-Ausnahmen nicht mit Secret-Dumps begründen
+
+Anti-Pattern:
+
+- ganze Benutzerprofile, Systemverzeichnisse oder Programmdatenbereiche pauschal ausschließen
+- Sicherheitsprodukte deaktivieren, weil ein Build oder Container einmal langsam ist
+- Allowlisten ohne Besitzer, Ablaufdatum oder Rücknahmeweg
+
+### Verschlüsselung und Dateisystem
+
+Der Agent soll Geräteverschlüsselung für mobile oder private Rechner prüfen und empfehlen. Aktivierung bleibt freigabepflichtig, weil Recovery-Key, Backup und Wiederherstellung vorher geklärt sein müssen.
+
+Zu prüfen:
+
+- Windows: BitLocker oder Geräteverschlüsselung
+- Linux: LUKS oder distributionsspezifische Verschlüsselung
+- macOS: FileVault
+- WSL: ob wichtige Linux-Arbeitsdaten in der Distribution oder auf Windows-Mounts liegen
+- Container: ob Volumes Nutzdaten, Datenbanken oder Secrets enthalten
+
+Arbeitsverzeichnisse sollten auf einem gesunden Dateisystem liegen. Warnstatus, Reparaturbedarf, ungeeignete Wechselmedien oder Dateisysteme ohne passende Rechte- und Journaling-Eigenschaften sind keine gute Basis für dauerhafte Entwickler- oder Agenten-Workspaces.
+
+### Paketquellen
+
+Paketquellen sind Teil der Sicherheitsbaseline. Der Agent soll nicht nur Pakete zählen, sondern Quellen bewerten.
+
+Gute Muster:
+
+- offizielle Stores, Paketmanager und Herstellerquellen bevorzugen
+- Drittquellen mit Signatur, Keyring, Release-Kompatibilität und Zweck dokumentieren
+- Release-Mismatch zwischen Distribution und Drittquelle als Risiko markieren
+- zusätzliche Quellen nicht stillschweigend übernehmen
+
+Anti-Pattern:
+
+- Bundle-Portale, Driver-Updater-Portale oder SEO-Downloadseiten
+- Linux-Repositories für eine andere Distributionsversion ohne dokumentierte Begründung
+- Homebrew-Taps, PPAs, AUR-Pakete oder WinGet-Quellen ohne Herkunftsprüfung
 
 ### Konten und Anmeldung
 
@@ -148,11 +197,12 @@ Allgemeine Programmempfehlungen nach Nutzerprofil stehen in `docs/17-programm-un
 1. Repo-Modus und Sichtbarkeit prüfen.
 2. Betriebssystem, Version, Edition und Nutzerkontext erkennen.
 3. Baseline erfassen: Defender, Firewall, Updates, Browser, installierte Programme, Autostart, lokale Admins.
-4. Nur sichere Defaults direkt empfehlen.
-5. Jede störanfällige Maßnahme als optional markieren.
-6. Vor Installation oder Aktivierung prüfen, ob das Tool kostenlos, aktuell und aus offizieller Quelle verfügbar ist.
-7. Änderung mit Rollback und Validierung dokumentieren.
-8. Nach der Änderung normale Nutzung kurz gegenprüfen: Browser, Downloads, Updates, Store, häufig genutzte Apps.
+4. Paketquellen, Security-Ausnahmen, Verschlüsselung und Datenträgerzustand bewerten.
+5. Nur sichere Defaults direkt empfehlen.
+6. Jede störanfällige Maßnahme als optional markieren.
+7. Vor Installation oder Aktivierung prüfen, ob das Tool kostenlos, aktuell und aus offizieller Quelle verfügbar ist.
+8. Änderung mit Rollback und Validierung dokumentieren.
+9. Nach der Änderung normale Nutzung kurz gegenprüfen: Browser, Downloads, Updates, Store, häufig genutzte Apps.
 
 ## Frage-Antwort-Standard
 
@@ -185,6 +235,9 @@ Wenn ClamAV installiert wird, soll der Agent FreshClam-Signaturupdates über den
 | --- | --- | --- | --- | --- |
 | Baseline | Windows Security, Firewall, Updates, installierte Programme | Distribution, Paketmanager, Firewall, Dienste | WSL-Version, Distribution, Mounts, Paketmanager | Systemversion, Gatekeeper/XProtect, Firewall, Paketmanager |
 | Primärer Schutz | Microsoft Defender | Paketupdates, Firewall, Berechtigungen | Windows Defender plus Linux-Paketpflege | eingebaute Apple-Schutzmechanismen |
+| Verschlüsselung | BitLocker oder Geräteverschlüsselung prüfen | LUKS oder distributionsspezifisch prüfen | Windows- und WSL-Speicherorte getrennt prüfen | FileVault prüfen |
+| Paketquellen | Store, `winget`, Herstellerquellen | Paketmanager, Repositories, Drittquellen | Distributionsquellen plus Windows-Kontext | App Store, Homebrew, Herstellerquellen |
+| Security-Ausnahmen | Defender-Exclusions eng halten | Scanner-/Firewall-Ausnahmen begründen | Windows-Exclusions und Linux-Scanpfade getrennt | Ausnahmen, Login Items und Paketquellen prüfen |
 | Kostenloser Zusatzscanner | ClamAV optional on-demand | ClamAV optional on-demand oder daemonbasiert | ClamAV nur optional in der Distribution | ClamAV optional on-demand |
 | Signaturupdates | FreshClam-Dienst nur bei ClamAV | FreshClam-Service oder Timer | FreshClam-Service oder Timer nur bei systemd | FreshClam nach Installationsweg |
 | Blocklisten | DNS-/Host-Pilot bevorzugt | DNS-/Host-Pilot bevorzugt | meist Windows-seitig sinnvoller | DNS-/Host-Pilot bevorzugt |

@@ -207,6 +207,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Programm- und Installationsempfehlungen | [docs/17-programm-und-installationsempfehlungen.md](docs/17-programm-und-installationsempfehlungen.md) |
 | Infrastruktur-Soll-Ist-Abgleich | [docs/18-infrastruktur-soll-ist-abgleich.md](docs/18-infrastruktur-soll-ist-abgleich.md) |
 | Template-Upstream-Sync | [docs/19-template-upstream-sync.md](docs/19-template-upstream-sync.md) |
+| Allgemeine Computer-Konfiguration | [docs/20-allgemeine-computer-konfiguration.md](docs/20-allgemeine-computer-konfiguration.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

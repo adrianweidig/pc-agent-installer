@@ -30,6 +30,7 @@ Dokumentiere in einer privaten oder lokalen Operational-Struktur:
 
 - WSL-Version und Distribution
 - Paketmanager und Update-Status
+- Paketquellen und Release-Kompatibilität
 - Mounts zwischen Windows und WSL
 - Netzwerkmodus und exponierte Ports
 - installierte Sicherheits- oder Scan-Tools
@@ -41,6 +42,7 @@ Empfohlen:
 
 - Windows Defender auf der Windows-Seite als Hauptschutz berücksichtigen.
 - WSL-Pakete über den Distributionspaketmanager aktuell halten.
+- Paketquellen in WSL getrennt von Windows prüfen; Drittquellen müssen zur Distribution passen.
 - Keine harte Firewall innerhalb von WSL aktivieren, wenn Windows Firewall und WSL-Netzwerkmodus bereits die Grenze bilden.
 - ClamAV nur optional für Linux-Dateien, Downloads oder Austauschordner installieren.
 - FreshClam-Updates nur dann als Dienst oder Timer aktivieren, wenn systemd verfügbar ist und der Nutzer zustimmt.
@@ -73,6 +75,19 @@ Default: `Nein` oder `Später` für normale WSL-Entwicklungsumgebungen.
 
 IP-Firewall-Blocklisten in WSL sind nur sinnvoll, wenn die Distribution exponierte Dienste betreibt. Für normale Entwicklung können sie Paketmanager, Registries, Git, Container und KI-Tooling stören.
 
+## Paketquellen und Updates
+
+WSL ist oft ein Entwickler-Backend. Gerade deshalb sind passende Paketquellen wichtig.
+
+Anti-Pattern:
+
+- Drittquellen für eine andere Distributionsversion
+- Paketmanager-Updates ohne Prüfung laufender Entwicklerdienste
+- zweite Docker- oder Paketmanager-Welt ohne klaren Zweck
+- Secrets in Shell-History, Env-Dumps oder Container-Inspektionsausgaben
+
+Der Agent dokumentiert ausstehende Updates und Quellenrisiken, führt aber keine Massenupdates ohne Freigabe aus.
+
 ## Validierung
 Nach Änderungen prüfen:
 
@@ -81,6 +96,7 @@ Nach Änderungen prüfen:
 - Windows-Dateisystem-Mounts sind weiter erreichbar.
 - Windows-Browser und Windows-Downloads sind nicht betroffen.
 - WSL-Dienste starten weiterhin.
+- Paketquellen passen zur Distribution oder sind als bewusste Ausnahme dokumentiert.
 
 ## Erwartete Nachweise
 - WSL-Baseline im passenden Host-Unterordner.

@@ -27,12 +27,14 @@ WSL ist primär ein Linux-Backend für CLI-, Entwicklungs-, Automations-, Contai
 - Shell-Konfiguration und sichere SSH-Nutzung.
 - Docker-CLI nur passend zum gewählten Windows-/WSL-Docker-Modell.
 - CUDA-, GPU- oder KI-Tooling nur, wenn Hardware und Zielprofil dazu passen.
+- Paketquellen, Updates und Dritt-Repositories passend zur Distribution.
 
 ## Nicht sinnvoll als Default
 
 - Messenger, Social-Apps und WhatsApp in WSL.
 - Cleaner wie CCleaner oder BleachBit als Desktop-Ersatz.
 - ein zweiter Docker-Daemon, wenn Docker Desktop mit WSL-Integration bereits gewünscht oder vorhanden ist.
+- Dritt-Repositories für eine andere Distributionsversion ohne dokumentierte Kompatibilität.
 - GUI-Apps ohne ausdrücklichen Wunsch nach Linux-GUI-Anwendungen.
 
 ## Ableitung aus Nutzerbeschreibung
@@ -44,5 +46,6 @@ Bei `Ich bin Entwickler`, `KI`, `Data Science`, `Homelab` oder ähnlichen Formul
 - `wsl --list --verbose` auf Windows-Seite dokumentiert.
 - Distribution und Paketmanager in WSL erkannt.
 - Paketquelle dokumentiert.
+- ausstehende Updates und Release-Kompatibilität bewertet.
 - Windows- und WSL-Pfade werden nicht vermischt.
 - Docker-Kontext klar benannt, falls Docker beteiligt ist.

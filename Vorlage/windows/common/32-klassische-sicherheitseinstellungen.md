@@ -36,6 +36,8 @@ Dokumentiere in einer privaten oder lokalen Operational-Struktur:
 - Firewall-Status für Domain, Private und Public Profile
 - Windows-Update-Status
 - Microsoft-Store-App-Update-Status, falls prüfbar
+- BitLocker- oder Geräteverschlüsselungsstatus
+- Defender-Ausnahmen nach Breite und Zweck, ohne private Pfade öffentlich zu dokumentieren
 - lokale Administratoren
 - aktive Browser
 - installierte Security-Tools
@@ -51,6 +53,8 @@ Empfohlen und in der Regel blockadearm:
 - SmartScreen und reputation-based protection aktiv halten.
 - Windows Firewall für alle Profile aktiv halten.
 - Eingehende Verbindungen standardmäßig blockieren, sofern keine bekannte Ausnahme nötig ist.
+- Defender-Ausnahmen eng, zweckgebunden und überprüfbar halten.
+- Geräteverschlüsselung empfehlen, wenn Gerätetyp, Backup und Recovery-Key-Prozess dazu passen.
 - WinGet und Microsoft Store für aktuelle App-Versionen nutzen.
 - Passwortmanager mit kostenlosem Plan empfehlen, aber nicht ohne Nutzerentscheidung einrichten.
 - Browser-Blocker wie uBlock Origin oder uBlock Origin Lite empfehlen, aber nicht hart erzwingen.
@@ -65,6 +69,8 @@ Diese Maßnahmen nur nach ausdrücklicher Entscheidung, Pilotprüfung und Rollba
 - aggressive Exploit-Protection-Ausnahmen
 - pauschales Deaktivieren von Diensten, Telemetrie oder Skriptfunktionen
 - zusätzliche Echtzeit-Antivirus-Suiten
+- pauschale Defender-Ausnahmen für ganze Benutzer-, System- oder Programmdatenbereiche
+- Aktivierung von BitLocker ohne Recovery-Key- und Backup-Freigabe
 
 ## Kostenlose Tool-Empfehlungen
 Der Agent darf kostenlose Tools empfehlen, aber nicht blind installieren:

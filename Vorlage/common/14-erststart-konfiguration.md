@@ -99,6 +99,8 @@ Die Konfiguration soll gute allgemeine Computerkonfiguration auswählbar machen,
 - **Dienste und Autostart:** Hintergrunddienste nicht pauschal deaktivieren, sondern Nutzen, Nebenwirkung und Rollback dokumentieren.
 - **Entwickler- und Container-Kontext:** Toolchains, WSL, Docker, Podman, Ports, Volumes und Secrets getrennt erfassen.
 
+Die allgemeine Bewertungsmatrix steht in `docs/20-allgemeine-computer-konfiguration.md`. Betriebssystemspezifische Details liegen zusätzlich in den passenden Windows-, Linux-, WSL-, macOS- und Container-Vorlagen.
+
 ## Schalter-Semantik
 
 Konfigurationswerte wirken als Präferenz-Schalter:

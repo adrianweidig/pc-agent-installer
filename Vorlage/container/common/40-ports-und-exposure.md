@@ -16,22 +16,41 @@ applies_to:
 # Container Ports und Exposure erfassen
 
 ## Zweck
-Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
+Diese Vorlage beschreibt, wie veröffentlichte Container-Ports, Bind-Adressen und Netzwerk-Exposure bewertet werden.
 
 ## Sicherheitsregeln
 - Vor Ausführung Repo-Modus und Sichtbarkeit prüfen.
 - Keine Klartext-Secrets erfassen oder speichern.
-- Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
-- Änderungen nur mit passender Validierung und Rollback-Pfad ausführen.
+- Portänderungen sind systemwirksam und können Dienste unerreichbar oder öffentlich erreichbar machen.
+- `0.0.0.0` und `::` gelten als bewusst zu begründende Exposition.
+- Lokale Entwicklungsdienste sollen bevorzugt an `127.0.0.1` binden.
+
+## Bewertung
+
+Gute Muster:
+
+- lokale Dashboards, Datenbanken und Entwicklerdienste binden an `127.0.0.1`
+- LAN- oder Internet-Exposure ist mit Zweck, Nutzerkreis und Firewall-Kontext dokumentiert
+- Reverse Proxies, TLS und Authentifizierung sind bewusst geplant
+- nicht benötigte Ports sind nicht veröffentlicht
+
+Anti-Pattern:
+
+- Datenbanken, Admin-Dashboards oder Debug-Server auf `0.0.0.0`
+- Portainer, Jupyter, Datenbanken oder KI-Dienste ohne Authentifizierung im LAN
+- Ports aus alten Compose-Dateien bleiben nach Projektende aktiv
+- Host-Firewall und Container-Ports werden getrennt bewertet, obwohl sie zusammenwirken
 
 ## Ablauf
-1. Plattform- und Host-Kontext erkennen.
-2. Relevante Baseline-Dateien unter hosts/<HOSTNAME>/baseline/ prüfen oder erzeugen.
-3. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
-4. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
-5. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+
+1. Veröffentlichte Ports und Bind-Adressen aggregiert erfassen.
+2. Dienstklasse bestimmen: lokal, LAN, öffentlich, unbekannt.
+3. Für `0.0.0.0`- oder `::`-Bindings Zweck und Schutzmaßnahmen prüfen.
+4. Änderungen an Port-Mappings nur mit Freigabe und Validierung planen.
+5. Nach Änderung Erreichbarkeit und Nicht-Erreichbarkeit gezielt prüfen.
 
 ## Erwartete Nachweise
-- Baseline- oder Reportdatei im passenden Host-Unterordner.
-- Ausgeführte Befehle mit redigierten Ausgaben.
-- Abschlussstatus mit offener Risiko- oder Freigabeliste.
+- Portmatrix mit Dienstklasse.
+- Begründung für alle nicht lokalen Bindings.
+- Firewall- und Reverse-Proxy-Kontext, falls vorhanden.
+- Validierung über lokale und, wenn nötig, externe Erreichbarkeit.

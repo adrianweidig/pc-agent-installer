@@ -27,6 +27,8 @@ Diese Vorlage beschreibt sinnvolle Linux-Programme anhand von Distribution, Desk
 - openSUSE: `zypper` und Discover/GNOME Software zuerst.
 - Server und Minimalinstallationen: keine Desktop-Apps empfehlen, wenn keine GUI vorhanden ist.
 
+Drittquellen werden nur empfohlen, wenn Herkunft, Signatur, Release-Kompatibilität und Updatepfad klar sind. Ein Repository für eine andere Distributionsversion ist ein Risiko, bis der Maintainer die Kompatibilität bewusst bestätigt.
+
 ## Profilbasierte Empfehlungen
 
 | Profil | Sinnvolle Kategorien |
@@ -43,6 +45,8 @@ Messenger wie WhatsApp sollen auf Linux bevorzugt als Web-App/PWA behandelt werd
 
 Der Agent nutzt zuerst Paketmanager-Funktionen für Updates, Autoremove und Cache-Prüfung. BleachBit oder vergleichbare Cleaner sind nur optional und nur mit Vorschau sinnvoll.
 
+Vor Update- oder Cleanup-Empfehlungen prüft der Agent Paketquellen, ausstehende Updates, belegten Speicher und ob Container-, Datenbank- oder Entwickler-Caches betroffen wären.
+
 Nicht als Default:
 
 - aggressive Cache-Löschung
@@ -54,6 +58,7 @@ Nicht als Default:
 
 - Distribution und Paketmanager erkannt.
 - Paketquelle und Paketname dokumentiert.
+- Drittquellen und Release-Kompatibilität bewertet.
 - Nutzerentscheidung dokumentiert.
 - Paketmanager bleibt funktionsfähig.
 - Desktop-Apps werden nur bei vorhandenem Desktop-Profil empfohlen.

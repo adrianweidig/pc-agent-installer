@@ -16,22 +16,39 @@ applies_to:
 # Container Volumes erfassen
 
 ## Zweck
-Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
+Diese Vorlage beschreibt, wie Container-Volumes und Bind-Mounts vor Änderungen, Updates oder Cleanup bewertet werden.
 
 ## Sicherheitsregeln
 - Vor Ausführung Repo-Modus und Sichtbarkeit prüfen.
 - Keine Klartext-Secrets erfassen oder speichern.
-- Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
-- Änderungen nur mit passender Validierung und Rollback-Pfad ausführen.
+- Keine Volumes löschen, prunen oder migrieren, solange Datenklasse und Besitzer unklar sind.
+- Bind-Mount-Pfade können private Hostinformationen enthalten und werden in öffentlichen Artefakten verallgemeinert.
+- Datenbanken, Uploads, Modelle, Caches und Secret-Dateien getrennt behandeln.
+
+## Klassifikation
+
+Der Agent klassifiziert jedes Volume oder jeden Bind-Mount mindestens als:
+
+- Nutzdaten
+- Datenbank oder Index
+- Cache oder temporärer Arbeitsbereich
+- Modell-, Medien- oder Artefaktspeicher
+- Secret- oder Konfigurationspfad
+- Build-Artefakt
+- unbekannt
+
+`unbekannt` bedeutet: nicht löschen.
 
 ## Ablauf
-1. Plattform- und Host-Kontext erkennen.
-2. Relevante Baseline-Dateien unter hosts/<HOSTNAME>/baseline/ prüfen oder erzeugen.
-3. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
-4. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
-5. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+
+1. Runtime und Container erfassen.
+2. Volumes und Bind-Mounts den betroffenen Services zuordnen.
+3. Datenklasse, Backup-Relevanz und Wiederherstellbarkeit bewerten.
+4. Cleanup-Kandidaten nur mit Begründung und Freigabe markieren.
+5. Vor Migration oder Löschung Backup- oder Exportpfad dokumentieren.
 
 ## Erwartete Nachweise
-- Baseline- oder Reportdatei im passenden Host-Unterordner.
-- Ausgeführte Befehle mit redigierten Ausgaben.
-- Abschlussstatus mit offener Risiko- oder Freigabeliste.
+- Volume-Liste mit Datenklasse.
+- Zuordnung zu Service oder Compose-Projekt.
+- Backup-, Export- oder bewusste Nicht-Löschentscheidung.
+- Rollback-Grenze, falls Daten nicht vollständig wiederherstellbar sind.

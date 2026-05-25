@@ -15,6 +15,20 @@ Jede echte Installation bleibt eine systemwirksame Änderung: Der Agent muss vor
 
 Keine Downloads aus Bundle-Portalen, Treiber-Updater-Portalen oder SEO-Downloadseiten.
 
+## Quellen- und Update-Audit
+
+Programmempfehlungen beginnen mit einer Bestandsaufnahme. Der Agent prüft zuerst, was bereits installiert ist, welche Paketquellen aktiv sind und welche Updates offen sind.
+
+Der Agent soll dokumentieren:
+
+- Paketmanager und Stores pro Betriebssystem
+- zusätzliche Quellen, Repositories, Taps, PPAs, AUR-Helfer oder WinGet-Sources
+- ausstehende Updates nach Plattform getrennt
+- doppelte Laufzeitumgebungen wie mehrere Node-, Python-, Docker- oder Java-Installationen
+- Programme, die aus intransparenten Quellen stammen oder nicht mehr aktualisiert werden
+
+Updates sind ein eigener Wartungsbereich. Eine Empfehlung wie `winget upgrade --all`, `apt upgrade` oder `brew upgrade` wird erst nach Prüfung der betroffenen Pakete, Neustartrisiken und Nutzerfreigabe ausgeführt.
+
 ## Zielgruppenprofile
 
 | Profil aus Nutzerbeschreibung | Typische Ziele | Typische Kategorien |
@@ -77,6 +91,8 @@ Regeln für Cleaner:
 
 Windows bevorzugt Microsoft Store, `winget` und offizielle Herstellerseiten.
 
+Zusätzliche `winget`-Quellen sind nicht automatisch schlecht, brauchen aber eine Begründung. Der Agent prüft Name, URL, Vertrauenswürdigkeit und ob die Quelle wirklich zum Nutzerprofil passt.
+
 Sinnvolle Kategorien:
 
 - Alltag: Browser, Passwortmanager, PDF, Office, Medienplayer, 7-Zip, Messenger/Web-Apps.
@@ -113,6 +129,8 @@ WSL ist kein vollständiger Desktop-Ersatz. Der Agent soll dort bevorzugt CLI-, 
 
 Wenn Windows bereits Docker Desktop mit WSL-Unterstützung nutzt, soll der Agent keinen zweiten Docker-Daemon in WSL einrichten, ohne den Tradeoff zu erklären.
 
+WSL-Paketquellen müssen zur Distribution passen. Drittquellen für eine andere Debian-, Ubuntu- oder Fedora-Version sind ein Anti-Pattern, solange keine bewusste Kompatibilitätsentscheidung dokumentiert ist.
+
 ## macOS
 
 macOS bevorzugt App Store, Homebrew und offizielle Herstellerseiten.
@@ -125,6 +143,8 @@ Sinnvolle Kategorien:
 - Wartung: integrierte Speicherverwaltung zuerst; Cleaner nur optional, keine aggressive Systemoptimierung.
 
 Homebrew ist für Entwickler und Power-User sinnvoll. Für reine Alltagsnutzer kann der App Store oder eine Web-App einfacher und risikoärmer sein.
+
+Homebrew-Taps und Casks werden wie Drittquellen behandelt: Herkunft, Aktualität und Notwendigkeit prüfen, bevor der Agent daraus installiert.
 
 ## Server und Headless-Systeme
 

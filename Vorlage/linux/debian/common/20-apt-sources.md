@@ -16,22 +16,51 @@ applies_to:
 # APT Sources erfassen
 
 ## Zweck
-Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
+Diese Vorlage beschreibt, wie APT-Quellen auf Debian-, Ubuntu- und verwandten Systemen bewertet werden. Ziel ist ein distributionspassender, signierter und wartbarer Paketquellenzustand.
 
 ## Sicherheitsregeln
 - Vor Ausführung Repo-Modus und Sichtbarkeit prüfen.
 - Keine Klartext-Secrets erfassen oder speichern.
-- Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
-- Änderungen nur mit passender Validierung und Rollback-Pfad ausführen.
+- Quellenänderungen, Keyring-Änderungen und Paketupdates sind systemwirksam.
+- Keine Drittquelle übernehmen, deren Release nicht zur Distribution passt, ohne bewusste Kompatibilitätsentscheidung.
+- Keine Keys über unsichere Muster wie globale, unklare Trust-Stores hinzufügen.
+
+## Baseline erfassen
+
+Dokumentiere in einer privaten oder lokalen Operational-Struktur:
+
+- Distribution, Version und Codename aus `/etc/os-release`
+- Dateien unter `/etc/apt/sources.list` und `/etc/apt/sources.list.d/`, redigiert um private Mirror-Details
+- Suites und Releases pro Quelle
+- `signed-by`-Keyrings und Herkunft
+- ausstehende Updates als Anzahl und betroffene Kategorien
+
+## Bewertung
+
+Gute Muster:
+
+- Distributionsquellen passen zum erkannten Codename
+- Drittquellen nutzen dedizierte Keyrings und `signed-by`
+- Backports, Security und Updates sind nachvollziehbar getrennt
+- Quellenänderungen haben Rollback durch gesicherte Quelldateien
+
+Anti-Pattern:
+
+- Drittquelle zeigt auf `bookworm`, während das System `trixie` nutzt, oder vergleichbare Release-Mismatches
+- `stable`, `testing` oder `unstable` werden gemischt, ohne Pinning und Begründung
+- globale Keys oder alte `apt-key`-Muster ohne klare Herkunft
+- Paketupdates werden ausgeführt, bevor Quellenkonflikte bewertet sind
 
 ## Ablauf
-1. Plattform- und Host-Kontext erkennen.
-2. Relevante Baseline-Dateien unter hosts/<HOSTNAME>/baseline/ prüfen oder erzeugen.
-3. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
-4. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
-5. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+
+1. Distribution und Codename erkennen.
+2. APT-Quellen und Keyrings erfassen.
+3. Release-Kompatibilität und Drittquellen bewerten.
+4. `apt update` nur ausführen, wenn der Nutzer Paketmanager-Zugriff erlaubt hat.
+5. Korrekturen an Quellen nur mit Change-Eintrag und gesicherter Rücknahme planen.
 
 ## Erwartete Nachweise
-- Baseline- oder Reportdatei im passenden Host-Unterordner.
-- Ausgeführte Befehle mit redigierten Ausgaben.
-- Abschlussstatus mit offener Risiko- oder Freigabeliste.
+- Baseline oder Report im passenden Host-Unterordner.
+- Liste der Quellen mit Release-Bewertung.
+- dokumentierte Update- und Konfliktentscheidung.
+- Rollback-Pfad für jede Quellenänderung.

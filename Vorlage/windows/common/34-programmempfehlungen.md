@@ -34,6 +34,8 @@ winget search <Suchbegriff>
 winget show <Paket-ID>
 ```
 
+Zusätzliche `winget`-Quellen werden nur genutzt, wenn Herkunft, Zweck und Vertrauenswürdigkeit dokumentiert sind. Offene Updates werden als Wartungsvorschlag gruppiert, nicht blind mit `winget upgrade --all` ausgeführt.
+
 ## Profilbasierte Empfehlungen
 
 | Profil | Sinnvolle Kategorien |
@@ -49,6 +51,14 @@ WhatsApp soll bevorzugt als Web-App/PWA oder offizielle App empfohlen werden, je
 ## Wartung und Cleaner
 
 Windows-Speicheroptimierung, Datenträgerbereinigung, App-Deinstallation und Defender bleiben die ersten Wartungswerkzeuge.
+
+Vor Wartungsempfehlungen prüft der Agent:
+
+- ausstehende App- und Store-Updates
+- Paketquellen und Herausgeber
+- Laufwerkszustand und freien Speicher
+- breite Defender-Ausnahmen
+- Autostart- und Dienste-Kandidaten mit konkreter Begründung
 
 CCleaner oder vergleichbare Cleaner dürfen nur optional vorgeschlagen werden, wenn der Nutzer ausdrücklich eine einfache Wartungsoberfläche will. Dabei gilt:
 

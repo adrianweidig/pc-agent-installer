@@ -29,6 +29,8 @@ Bevorzugte Quellen:
 
 Homebrew ist für Entwickler sehr sinnvoll, aber nicht für jeden Alltagsnutzer zwingend nötig.
 
+Taps und Casks sind Drittquellen. Der Agent prüft Herkunft, Aktualität und Notwendigkeit, bevor er daraus installiert oder Updates vorschlägt.
+
 ## Profilbasierte Empfehlungen
 
 | Profil | Sinnvolle Kategorien |
@@ -45,6 +47,8 @@ WhatsApp soll als offizielle App oder Web-App/PWA vorgeschlagen werden, nicht al
 
 macOS-Speicherverwaltung, App-Deinstallation und Systemupdates bleiben der Default. Cleaner- oder Uninstaller-Tools dürfen nur optional empfohlen werden, wenn der Nutzer eine manuelle Oberfläche dafür will.
 
+Vor Wartungsempfehlungen prüft der Agent Softwareupdates, App-Store-Updates, Homebrew-Updates, Login Items und freien Speicher getrennt. `brew upgrade` wird nicht blind ausgeführt, wenn viele Entwicklerwerkzeuge betroffen sind.
+
 Nicht als Default:
 
 - aggressive System-Cleaner
@@ -55,6 +59,7 @@ Nicht als Default:
 ## Validierung
 
 - App Store, Homebrew oder Herstellerquelle dokumentiert.
+- Drittquellen und offene Updates bewertet.
 - Nutzerentscheidung dokumentiert.
 - App startet oder meldet Version.
 - Systemupdates und normale App-Nutzung bleiben möglich.

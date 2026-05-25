@@ -66,6 +66,15 @@ Wenn die Prüfung fehlschlägt und der Nutzer nicht gerade die Konfiguration sta
 - Host-Baseline erfassen und dokumentieren
 - usability-first Sicherheitsempfehlungen anzeigen
 - kostenlose, aktuelle Tools und Updates empfehlen
+- Betriebssystem-, App- und Paketupdates prüfen
+- Paketquellen, Stores und Dritt-Repositories auf Plausibilität prüfen
+- Datenträgerzustand, Dateisystem, Speicherplatz und Workspace-Eignung bewerten
+- Geräteverschlüsselung wie BitLocker, FileVault oder LUKS empfehlen
+- Security-Ausnahmen wie Antivirus-Exclusions, Allowlisten und Firewall-Ausnahmen prüfen
+- Autostart, Dienste und Hintergrundprozesse bewerten
+- Workspace-Hygiene, lokale Backups, Duplikate und veraltete Arbeitskopien prüfen
+- Entwickler-Toolchains, Paketmanager und parallele Laufzeitumgebungen bewerten
+- Container-Ports, Volumes, Netzwerke und Secret-Referenzen prüfen
 - optionalen kostenlosen On-Demand-Malware-Scanner anbieten
 - DNS-/Host-Blocklisten nur im Pilotmodus anbieten
 - IP-Firewall-Blocklisten als riskante Option anbieten
@@ -113,6 +122,23 @@ Beispiele:
 - `Ich spiele und streame` führt zu Vorschlägen für Spieleplattformen, Voice, OBS und GPU-Prüfung, aber nicht zu Server- oder Homelab-Tools.
 
 Die Beschreibung ist keine Installationsfreigabe. Sie steuert nur, welche Vorschläge der Agent priorisiert. Details stehen in `docs/17-programm-und-installationsempfehlungen.md`.
+
+## Allgemeine Computerkonfiguration
+
+Die Erststart-Konfiguration soll auch wiederverwendbare Muster aus echten Rechnern erfassen, ohne Hostdetails ins öffentliche Template zu schreiben. Gute Muster können als Zielzustände übernommen werden, schlechte Muster nur mit Begründung als Anti-Pattern.
+
+Der Agent bewertet insbesondere:
+
+- aktive eingebaute Schutzmechanismen
+- gesunde und geeignete Datenträger für Arbeitsdaten
+- nachvollziehbare Update- und Paketquellenpflege
+- schmale, zweckgebundene Security-Ausnahmen
+- passende Verschlüsselung mit Recovery-Key-Plan
+- klare Trennung zwischen Windows, WSL, Linux, macOS und Container-Stacks
+- lokale statt globale Container-Exposition, wenn Dienste nur lokal gebraucht werden
+- Secret-Referenzen statt roher Env-, Log- oder Credential-Dumps
+
+Die generischen Regeln stehen in `docs/20-allgemeine-computer-konfiguration.md`.
 
 ## Sicherheitsgrenzen
 

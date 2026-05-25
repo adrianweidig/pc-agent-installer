@@ -34,6 +34,7 @@ Dokumentiere in einer privaten oder lokalen Operational-Struktur:
 - Firewall-Status
 - FileVault-Status
 - Paketmanager: Homebrew, MacPorts oder keiner
+- Homebrew-Taps oder Drittquellen, wenn vorhanden
 - installierte Sicherheits- und Backup-Tools
 - Login Items mit Sicherheitsrelevanz
 
@@ -44,6 +45,8 @@ Empfohlen und in der Regel blockadearm:
 - Gatekeeper und eingebaute Schutzmechanismen aktiv lassen.
 - Firewall prüfen und nur bewusst ändern.
 - FileVault empfehlen, aber vor Aktivierung Recovery-Key- und Backup-Frage klären.
+- Homebrew- und Drittquellen auf Herkunft, Aktualität und Notwendigkeit prüfen.
+- Login Items nicht pauschal entfernen, sondern nach Nutzen und Hersteller bewerten.
 - ClamAV optional als On-Demand-Zweitscanner anbieten.
 - DNS-/Host-Blocklisten nur im Pilotmodus testen.
 
@@ -73,6 +76,15 @@ Möchtest du eine DNS- oder Host-Blockliste im Pilotmodus testen?
 Default: `Später`. Erst Browser, App Store, Paketmanager, Developer Tools, Cloud-Sync und häufig genutzte Apps prüfen.
 
 IP-Firewall-Blocklisten sind für normale macOS-Desktops kein Default.
+
+## Quellen, Ausnahmen und Login Items
+
+Anti-Pattern:
+
+- Homebrew-Taps oder Casks ohne Herkunftsprüfung
+- FileVault-Aktivierung ohne Recovery-Key-Plan
+- Login Items oder LaunchAgents blind löschen
+- Security-Ausnahmen für ganze Benutzer- oder Entwicklungsbereiche ohne Ablaufdatum
 
 ## Validierung
 Nach Änderungen prüfen:
