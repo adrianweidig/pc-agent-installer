@@ -4,6 +4,8 @@
 
 Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähigen Einrichtung dieses Rechners. Dieses Repository ist als geklonte Codex-Arbeitsbasis gedacht: Der Nutzer gibt Ziele vor, aber der Agent liest die Regeln, entscheidet den passenden Arbeitsbereich und führt die eigentliche Prüfung, Änderung und Validierung aus. In diesem Repository arbeitest du standardmäßig am generischen Template, nicht an echten Hostdaten.
 
+Das Produktziel ist eine vollständige PC- oder Server-Ersteinrichtung nach Betriebssysteminstallation. Der Agent soll einen echten Systemadministrator für die initiale Grundkonfiguration ersetzen: Paketquellen, Updates, Benutzer, Gruppen, Rechte, Firewall, Dienste, Sicherheitsrichtlinien, sinnvolle Programme, Baselines, Validierung und Rollback-Dokumentation. Der Nutzer muss vor echter Host-Arbeit klar darauf hingewiesen werden, dass diese Aufgabe absolute Systemrechte erfordert und der Agent je nach Betriebssystem als Administrator, root oder über sudo handeln kann.
+
 ## Projektüberblick
 
 - `repo-mode.yaml` steuert den Sicherheitsmodus.
@@ -16,6 +18,8 @@ Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähi
 - `schemas/` enthält YAML-Schemas.
 - `docs/`, `examples/` und `private.example/` enthalten generische Dokumentation und sichere Beispiele.
 - `hosts/` bleibt im `template`-Modus leer und enthält nur `.gitkeep`.
+- `docs/22-ersteinrichtung.md` beschreibt das Zielbild der vollständigen OS-Ersteinrichtung und die Mindestbereiche, die pro Betriebssystem umgesetzt werden müssen.
+- `docs/23-codex-root-profil.md` beschreibt, wie Codex für echte Root-/Admin-Ersteinrichtung gestartet werden muss.
 
 ## Arbeitsmodell
 
@@ -87,21 +91,25 @@ Optionen in dieser Konfiguration wirken wie Präferenz-Schalter:
 19. Nutze `pc-agent-installer` als Startpunkt, aber schreibe private oder hostbezogene Inhalte nur in eine geprüfte private Operational-Struktur.
 20. Halte README, `AGENTS.md` und Codex-Dokumentation so verständlich, dass ein neuer Nutzer erkennt: Dieses Repo wird als Basis für ein eigenes Agenten-Projekt geklont.
 21. Behalte bei Workspace-Migrationen keine dauerhaften lokalen Backups, Archive oder Duplikate; lösche alte Projektstände erst nach Git-/Remote-/Pfadvalidierung.
+22. Verwechsle Baseline-Erfassung nicht mit vollständiger Ersteinrichtung. Eine Plattform gilt erst als erstkonfiguriert, wenn der dokumentierte Sollzustand umgesetzt, geprüft und mit Rollback-Pfad versehen wurde.
 
 ## Ausführungsreihenfolge
 
 1. `Vorlage/common/00-agent-regeln.md` lesen.
-2. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
-3. Falls GitHub erreichbar ist: offene Issues prüfen und relevante Issue-Nummern in der Arbeitsnotiz oder im Commit/PR-Kontext berücksichtigen.
-4. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
-5. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
-6. Wenn die Erststart-Konfiguration fehlt oder der Nutzer die Agenten-Konfiguration starten, ändern, deaktivieren oder erneut öffnen will, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` als Werkzeug ausführen lassen.
-7. Infrastruktur-Snapshot mit `scripts/common/assert-infrastructure-snapshot.*` prüfen, bevor Installationen, Löschungen, Dienste, Firewall, DNS, Container, WSL, Paketmanager oder Cleanup betroffen sind.
-8. Wenn der Snapshot fehlt oder unvollständig ist, zuerst aktuelle Baseline mit `collect-baseline.*` erzeugen.
-9. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
-10. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
-11. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
-12. Soll-Zustand, Ist-Zustand, Duplikatprüfung, Löschrisiko, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
+2. `Vorlage/common/10-admin-und-sudo-regeln.md` lesen, sobald echte Ersteinrichtung oder systemwirksame Änderung möglich ist.
+3. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
+4. Falls GitHub erreichbar ist: offene Issues prüfen und relevante Issue-Nummern in der Arbeitsnotiz oder im Commit/PR-Kontext berücksichtigen.
+5. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
+6. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
+7. Wenn die Erststart-Konfiguration fehlt oder der Nutzer die Agenten-Konfiguration starten, ändern, deaktivieren oder erneut öffnen will, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` als Werkzeug ausführen lassen.
+8. Vor echter Ersteinrichtung prüfen, ob Codex mit dem passenden Vollzugriff-Profil läuft: Windows Administrator, Linux root/sudo, macOS Admin/sudo, WSL root/sudo plus gegebenenfalls Windows-Admin, Container root/Capabilities oder Runtime-Admin.
+9. Wenn Vollzugriff fehlt, keine systemwirksamen Änderungen ausführen und die Blockade mit konkretem Startprofil dokumentieren.
+10. Infrastruktur-Snapshot mit `scripts/common/assert-infrastructure-snapshot.*` prüfen, bevor Installationen, Löschungen, Dienste, Firewall, DNS, Container, WSL, Paketmanager oder Cleanup betroffen sind.
+11. Wenn der Snapshot fehlt oder unvollständig ist, zuerst aktuelle Baseline mit `collect-baseline.*` erzeugen.
+12. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
+13. Plattform, Host, Hardwareprofil und Container-Stacks nur erfassen, wenn Hostdaten im aktuellen Modus erlaubt sind.
+14. Host-Ordner nur in bestätigtem `operational`- oder `local-only`-Modus erzeugen.
+15. Soll-Zustand, Ist-Zustand, Duplikatprüfung, Löschrisiko, Änderung, Prüfung, Rollback und Abschlussnotiz dokumentieren.
 
 ## Standardbefehle
 
@@ -211,6 +219,8 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 - Bei normalen Nutzer-PCs gilt usability-first: Sicherheitssettings sollen kostenlose, aktuelle und seriöse Schutzmaßnahmen bevorzugen, aber normale Internet-, Download-, Store-, Game-, Entwickler- und KI-Tool-Nutzung nicht unnötig blockieren.
 - Sicherheitsmaßnahmen mit Blockade-, Installations-, Dienst-, Firewall-, DNS- oder Blocklist-Wirkung brauchen eine dokumentierte Frage-Antwort-Entscheidung nach `Vorlage/common/13-interaktive-sicherheitsentscheidungen.md`.
 - Vollzugriff ist keine Freigabe zum Blindflug. Vor jeder systemwirksamen Aktion gelten `Vorlage/common/16-infrastruktur-soll-ist-abgleich.md` und `docs/18-infrastruktur-soll-ist-abgleich.md`.
+- Vollzugriff ist für echte Ersteinrichtung eine Voraussetzung. Der Agent muss dem Nutzer vorab klar sagen, dass Admin-, root- oder sudo-Rechte erforderlich sind, wenn Firewall, Paketmanager, Dienste, Benutzer, Gruppen oder Sicherheitsrichtlinien eingerichtet werden sollen.
+- Für echte Ersteinrichtung muss Codex mit einem passenden Root-/Admin-Profil oder in einer als root gestarteten isolierten Umgebung laufen; sonst ist nur Analyse oder Vorbereitung erlaubt.
 - Jede zukünftige Template-Änderung, die Installationen, Löschungen, Dienste, Paketmanager, Container, WSL, Firewall, DNS, Blocklisten, Security-Tools oder Cleanup betrifft, muss die Infrastruktur-Soll-Ist-Regel erhalten oder ausdrücklich referenzieren.
 
 ## Windows-, WSL- und Container-Optionen

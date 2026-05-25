@@ -29,12 +29,16 @@
 
 PC Agent Installer is an agent workspace. A user clones this template, starts Codex in the repository, and lets the agent inspect, document, and validate the machine setup based on `AGENTS.md`, templates, and guard scripts.
 
+The target model is an agent that replaces a real system administrator for the first setup of a freshly installed PC or server. For that job Codex must be started with a deliberately chosen full-access profile. Without Administrator, root, sudo, or matching runtime-admin rights, the installer can only analyze or prepare work and must not report a complete setup.
+
 The project intentionally separates two worlds:
 
 - **public template:** generic templates, scripts, schemas, examples, documentation, and safety rules
 - **private operational work:** real host data, baselines, rollbacks, local infrastructure information, and secret references
 
 The repository is not primarily a manual admin tool. The normal flow is agent-first: read rules, detect repository mode, check visibility, decide public/private scope, then make small and reviewable changes.
+
+Full access is the intended operating mode for real first-run setup, but it is not permission to act blindly. The agent must still document current state, target state, risk, rollback path, validation, and explicit user approval before system-impacting changes.
 
 ## What This Template Provides
 
@@ -64,6 +68,8 @@ cd pc-agent-installer
 ```
 
 Start Codex or a comparable local agent in this directory and give it a natural task, for example:
+
+For analysis, a normal profile is enough. For real OS setup, start the agent with the target platform's full-access profile first; see [docs/23-codex-root-profil.md](docs/23-codex-root-profil.md).
 
 ```text
 Codex, read this repository and start the agent configuration for my PC.

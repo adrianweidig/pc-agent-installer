@@ -6,7 +6,7 @@ source "$SCRIPT_DIR/agent-installer-common.sh"
 ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
 HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
 agent_assert_host_write_allowed "$ROOT" >/dev/null
-"$SCRIPT_DIR/../common/first-run-config.sh" "$ROOT"
+bash "$SCRIPT_DIR/../common/first-run-config.sh" "$ROOT"
 
 HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT"/{baseline/raw,changes,rollback,security,container/docker,container/compose,container/swarm,container/kubernetes,container/podman,logs,state}

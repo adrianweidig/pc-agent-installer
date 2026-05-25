@@ -1,0 +1,5 @@
+.git
+.pytest_cache
+tests/debian-firstconfig/artifacts
+tests/debian-firstconfig/reports
+**/__pycache__

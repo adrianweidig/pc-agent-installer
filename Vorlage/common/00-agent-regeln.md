@@ -21,6 +21,8 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
 ## Sicherheitsregeln
 - Vor Ausführung Repo-Modus und Sichtbarkeit prüfen.
 - Keine Klartext-Secrets erfassen oder speichern.
+- Vor echter Ersteinrichtung prüfen, ob Codex im passenden Vollzugriff-Profil gestartet wurde.
+- Ohne Administrator-, root-, sudo- oder Runtime-Adminrechte nur Analyse, Baseline und Blockadebericht ausführen.
 - Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
 - Vor systemwirksamen Änderungen aktuellen Infrastruktur-Snapshot prüfen oder erzeugen.
 - Vor systemwirksamen Änderungen Soll-Ist-Abgleich, Duplikatprüfung und Löschrisiko dokumentieren.
@@ -30,16 +32,19 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
 
 ## Ablauf
 1. Plattform- und Host-Kontext erkennen.
-2. Passende Vorlagen auswählen: `Vorlage/windows`, `Vorlage/linux`, `Vorlage/wsl` oder `Vorlage/macos`.
-3. Aktuellen Infrastruktur-Snapshot mit `assert-infrastructure-snapshot.*` prüfen.
-4. Relevante Baseline-Dateien unter hosts/<HOSTNAME>/baseline/ prüfen oder erzeugen.
-5. Soll-Zustand, Ist-Zustand, Duplikate und Löschrisiko bewerten.
-6. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
-7. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
-8. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+2. Prüfen, ob die Nutzeraufgabe echte Ersteinrichtung oder nur Analyse ist.
+3. Für echte Ersteinrichtung Vollzugriff-Profil nach `Vorlage/common/10-admin-und-sudo-regeln.md` und `docs/23-codex-root-profil.md` bestätigen.
+4. Passende Vorlagen auswählen: `Vorlage/windows`, `Vorlage/linux`, `Vorlage/wsl`, `Vorlage/macos` oder `Vorlage/container`.
+5. Aktuellen Infrastruktur-Snapshot mit `assert-infrastructure-snapshot.*` prüfen.
+6. Relevante Baseline-Dateien unter hosts/<HOSTNAME>/baseline/ prüfen oder erzeugen.
+7. Soll-Zustand, Ist-Zustand, Duplikate und Löschrisiko bewerten.
+8. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
+9. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
+10. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
 
 ## Erwartete Nachweise
 - Baseline- oder Reportdatei im passenden Host-Unterordner.
+- dokumentierter Startkontext: Analyseprofil oder Vollzugriff-Profil.
 - verwendete Betriebssystem- und Common-Vorlagen.
 - dokumentierter Soll-Ist-Abgleich mit Duplikat- und Löschrisikoprüfung.
 - gestellte Fragen und Antworten, falls interaktive Sicherheitsentscheidungen betroffen waren.

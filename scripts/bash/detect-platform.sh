@@ -6,6 +6,8 @@ os="linux"
 environment="native"
 if [[ "$kernel_name" == "Darwin" ]]; then
   os="macos"
+elif [[ -f /.dockerenv || -f /run/.containerenv ]] || grep -qaE '(docker|containerd|kubepods|podman)' /proc/1/cgroup /proc/self/cgroup 2>/dev/null; then
+  environment="container"
 elif grep -qi microsoft /proc/version 2>/dev/null; then
   environment="wsl"
 fi

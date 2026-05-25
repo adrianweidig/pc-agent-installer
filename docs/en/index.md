@@ -41,6 +41,8 @@ This is the English documentation entry point. German is the default and canonic
 - [Template upstream sync](../19-template-upstream-sync.md)
 - [General computer configuration](../20-allgemeine-computer-konfiguration.md)
 - [Product components i18n](product-components.md)
+- [Complete first-run setup](../22-ersteinrichtung.md)
+- [Codex root profile](../23-codex-root-profil.md)
 
 ## Community Files
 

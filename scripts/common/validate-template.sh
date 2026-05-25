@@ -30,6 +30,8 @@ for path in \
   docs/en/index.md \
   docs/en/I18N.md \
   docs/21-produktkomponenten-i18n.md \
+  docs/22-ersteinrichtung.md \
+  docs/23-codex-root-profil.md \
   docs/en/product-components.md \
   docs/CI_CD.md \
   docs/19-template-upstream-sync.md \
@@ -60,6 +62,7 @@ for path in \
   scripts/common/sync-template-upstream.sh \
   scripts/powershell/collect-baseline.ps1 \
   scripts/bash/collect-baseline.sh \
+  scripts/bash/apply-debian-firstconfig.sh \
   scripts/container/detect-container-stack.ps1 \
   scripts/container/detect-container-stack.sh \
   hosts/.gitkeep; do
