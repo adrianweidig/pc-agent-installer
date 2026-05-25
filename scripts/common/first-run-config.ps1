@@ -19,6 +19,15 @@ $defaults = [ordered]@{
     allow_baseline = $true
     allow_security_recommendations = $true
     allow_package_recommendations = $true
+    allow_update_maintenance = $true
+    allow_package_source_audit = $true
+    allow_disk_health_review = $true
+    allow_encryption_recommendations = $true
+    allow_security_exception_review = $true
+    allow_startup_service_review = $true
+    allow_workspace_hygiene_review = $true
+    allow_developer_toolchain_review = $true
+    allow_container_exposure_review = $true
     allow_optional_av = $false
     allow_blocklist_pilot = $false
     allow_firewall_ip_blocklists = $false
@@ -103,7 +112,8 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form = [System.Windows.Forms.Form]::new()
         $form.Text = 'PC Agent Installer - Agenten-Konfiguration'
         $form.Width = 760
-        $form.Height = 760
+        $form.Height = 900
+        $form.AutoScroll = $true
         $form.StartPosition = 'CenterScreen'
         $form.TopMost = $true
 
@@ -138,6 +148,15 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
             allow_baseline = 'Host-Baseline erfassen und dokumentieren'
             allow_security_recommendations = 'Usability-first Sicherheitsempfehlungen anzeigen'
             allow_package_recommendations = 'Kostenlose, aktuelle Tools und Updates empfehlen'
+            allow_update_maintenance = 'Betriebssystem-, App- und Paketupdates prüfen'
+            allow_package_source_audit = 'Paketquellen, Stores und Dritt-Repositories prüfen'
+            allow_disk_health_review = 'Datenträgerzustand, Dateisystem und Speicherplatz prüfen'
+            allow_encryption_recommendations = 'Geräteverschlüsselung prüfen und empfehlen'
+            allow_security_exception_review = 'Security-Ausnahmen wie AV-Exclusions prüfen'
+            allow_startup_service_review = 'Autostart, Dienste und Hintergrundprozesse bewerten'
+            allow_workspace_hygiene_review = 'Workspace-Hygiene, Backups und Duplikate prüfen'
+            allow_developer_toolchain_review = 'Entwickler-Toolchains und Paketmanager bewerten'
+            allow_container_exposure_review = 'Container-Ports, Volumes und Secrets prüfen'
             allow_optional_av = 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten'
             allow_blocklist_pilot = 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten'
             allow_firewall_ip_blocklists = 'IP-Firewall-Blocklisten als riskante Option anbieten'
@@ -227,6 +246,15 @@ if ($values.Count -eq 0) {
     $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default ([bool]$defaults['allow_baseline'])
     $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default ([bool]$defaults['allow_security_recommendations'])
     $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default ([bool]$defaults['allow_package_recommendations'])
+    $values['allow_update_maintenance'] = Read-AgentYesNo -Prompt 'Betriebssystem-, App- und Paketupdates prüfen?' -Default ([bool]$defaults['allow_update_maintenance'])
+    $values['allow_package_source_audit'] = Read-AgentYesNo -Prompt 'Paketquellen, Stores und Dritt-Repositories prüfen?' -Default ([bool]$defaults['allow_package_source_audit'])
+    $values['allow_disk_health_review'] = Read-AgentYesNo -Prompt 'Datenträgerzustand, Dateisystem und Speicherplatz prüfen?' -Default ([bool]$defaults['allow_disk_health_review'])
+    $values['allow_encryption_recommendations'] = Read-AgentYesNo -Prompt 'Geräteverschlüsselung prüfen und empfehlen?' -Default ([bool]$defaults['allow_encryption_recommendations'])
+    $values['allow_security_exception_review'] = Read-AgentYesNo -Prompt 'Security-Ausnahmen wie AV-Exclusions prüfen?' -Default ([bool]$defaults['allow_security_exception_review'])
+    $values['allow_startup_service_review'] = Read-AgentYesNo -Prompt 'Autostart, Dienste und Hintergrundprozesse bewerten?' -Default ([bool]$defaults['allow_startup_service_review'])
+    $values['allow_workspace_hygiene_review'] = Read-AgentYesNo -Prompt 'Workspace-Hygiene, Backups und Duplikate prüfen?' -Default ([bool]$defaults['allow_workspace_hygiene_review'])
+    $values['allow_developer_toolchain_review'] = Read-AgentYesNo -Prompt 'Entwickler-Toolchains und Paketmanager bewerten?' -Default ([bool]$defaults['allow_developer_toolchain_review'])
+    $values['allow_container_exposure_review'] = Read-AgentYesNo -Prompt 'Container-Ports, Volumes und Secrets prüfen?' -Default ([bool]$defaults['allow_container_exposure_review'])
     $values['allow_optional_av'] = Read-AgentYesNo -Prompt 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' -Default ([bool]$defaults['allow_optional_av'])
     $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' -Default ([bool]$defaults['allow_blocklist_pilot'])
     $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt 'IP-Firewall-Blocklisten als riskante Option anbieten?' -Default ([bool]$defaults['allow_firewall_ip_blocklists'])
@@ -277,6 +305,15 @@ preferences:
   allow_baseline: $($values.allow_baseline.ToString().ToLowerInvariant())
   allow_security_recommendations: $($values.allow_security_recommendations.ToString().ToLowerInvariant())
   allow_package_recommendations: $($values.allow_package_recommendations.ToString().ToLowerInvariant())
+  allow_update_maintenance: $($values.allow_update_maintenance.ToString().ToLowerInvariant())
+  allow_package_source_audit: $($values.allow_package_source_audit.ToString().ToLowerInvariant())
+  allow_disk_health_review: $($values.allow_disk_health_review.ToString().ToLowerInvariant())
+  allow_encryption_recommendations: $($values.allow_encryption_recommendations.ToString().ToLowerInvariant())
+  allow_security_exception_review: $($values.allow_security_exception_review.ToString().ToLowerInvariant())
+  allow_startup_service_review: $($values.allow_startup_service_review.ToString().ToLowerInvariant())
+  allow_workspace_hygiene_review: $($values.allow_workspace_hygiene_review.ToString().ToLowerInvariant())
+  allow_developer_toolchain_review: $($values.allow_developer_toolchain_review.ToString().ToLowerInvariant())
+  allow_container_exposure_review: $($values.allow_container_exposure_review.ToString().ToLowerInvariant())
   allow_optional_av: $($values.allow_optional_av.ToString().ToLowerInvariant())
   allow_blocklist_pilot: $($values.allow_blocklist_pilot.ToString().ToLowerInvariant())
   allow_firewall_ip_blocklists: $($values.allow_firewall_ip_blocklists.ToString().ToLowerInvariant())

@@ -137,6 +137,14 @@ Danach kann in einer sicheren Operational-Umgebung eine Host-Baseline erzeugt we
 ./scripts/powershell/collect-baseline.ps1
 ```
 
+Private Operational-Repositories können den aktuellen Stand des öffentlichen Templates dauerhaft über einen eigenen `template`-Remote ziehen:
+
+```powershell
+./scripts/common/sync-template-upstream.ps1
+```
+
+Details und Konfliktregeln stehen in [docs/19-template-upstream-sync.md](docs/19-template-upstream-sync.md).
+
 ## Projektstruktur
 
 ```text
@@ -198,6 +206,7 @@ Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skrip
 | Erststart-Konfiguration | [docs/16-erststart-konfiguration.md](docs/16-erststart-konfiguration.md) |
 | Programm- und Installationsempfehlungen | [docs/17-programm-und-installationsempfehlungen.md](docs/17-programm-und-installationsempfehlungen.md) |
 | Infrastruktur-Soll-Ist-Abgleich | [docs/18-infrastruktur-soll-ist-abgleich.md](docs/18-infrastruktur-soll-ist-abgleich.md) |
+| Template-Upstream-Sync | [docs/19-template-upstream-sync.md](docs/19-template-upstream-sync.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

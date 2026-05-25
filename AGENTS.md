@@ -27,6 +27,8 @@ Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 
 Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffentliche Template bleibt die Quelle für generische Änderungen, der private oder lokale Operational-Workspace bleibt die Quelle für Hostzustand und Tests. Die konkrete Codex-Aufgabe oder lokale Testabsicht wird nicht als Prompt, Notiz oder Projektauftrag im öffentlichen Repository abgelegt.
 
+Private Operational-Repositories sollen das öffentliche Template als separaten `template`-Remote führen. Der aktuelle Template-Stand wird im privaten Repository mit `scripts/common/sync-template-upstream.*` geholt und gemergt. Dabei bleiben `repo-mode.yaml`, `hosts/` und Secret-Referenzen privat; Hostdaten fließen nie zurück ins öffentliche Template. Details stehen in `docs/19-template-upstream-sync.md`.
+
 Vor jeder Aufgabe muss Codex explizit entscheiden:
 
 - Gehört die Änderung als generische, offizielle Verbesserung in das öffentliche Template?

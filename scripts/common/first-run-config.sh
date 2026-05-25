@@ -78,6 +78,15 @@ person_description="$(ask_text 'Beschreibe dich kurz fuer sinnvolle Programmempf
 allow_baseline="$(ask_yes_no 'Host-Baseline erfassen und dokumentieren?' "$(yaml_bool_default allow_baseline true)")"
 allow_security_recommendations="$(ask_yes_no 'Usability-first Sicherheitsempfehlungen anzeigen?' "$(yaml_bool_default allow_security_recommendations true)")"
 allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Updates empfehlen?' "$(yaml_bool_default allow_package_recommendations true)")"
+allow_update_maintenance="$(ask_yes_no 'Betriebssystem-, App- und Paketupdates pruefen?' "$(yaml_bool_default allow_update_maintenance true)")"
+allow_package_source_audit="$(ask_yes_no 'Paketquellen, Stores und Dritt-Repositories pruefen?' "$(yaml_bool_default allow_package_source_audit true)")"
+allow_disk_health_review="$(ask_yes_no 'Datentraegerzustand, Dateisystem und Speicherplatz pruefen?' "$(yaml_bool_default allow_disk_health_review true)")"
+allow_encryption_recommendations="$(ask_yes_no 'Geraeteverschluesselung pruefen und empfehlen?' "$(yaml_bool_default allow_encryption_recommendations true)")"
+allow_security_exception_review="$(ask_yes_no 'Security-Ausnahmen wie AV-Exclusions pruefen?' "$(yaml_bool_default allow_security_exception_review true)")"
+allow_startup_service_review="$(ask_yes_no 'Autostart, Dienste und Hintergrundprozesse bewerten?' "$(yaml_bool_default allow_startup_service_review true)")"
+allow_workspace_hygiene_review="$(ask_yes_no 'Workspace-Hygiene, Backups und Duplikate pruefen?' "$(yaml_bool_default allow_workspace_hygiene_review true)")"
+allow_developer_toolchain_review="$(ask_yes_no 'Entwickler-Toolchains und Paketmanager bewerten?' "$(yaml_bool_default allow_developer_toolchain_review true)")"
+allow_container_exposure_review="$(ask_yes_no 'Container-Ports, Volumes und Secrets pruefen?' "$(yaml_bool_default allow_container_exposure_review true)")"
 allow_optional_av="$(ask_yes_no 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' "$(yaml_bool_default allow_optional_av false)")"
 allow_blocklist_pilot="$(ask_yes_no 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' "$(yaml_bool_default allow_blocklist_pilot false)")"
 allow_firewall_ip_blocklists="$(ask_yes_no 'IP-Firewall-Blocklisten als riskante Option anbieten?' "$(yaml_bool_default allow_firewall_ip_blocklists false)")"
@@ -119,6 +128,15 @@ preferences:
   allow_baseline: $allow_baseline
   allow_security_recommendations: $allow_security_recommendations
   allow_package_recommendations: $allow_package_recommendations
+  allow_update_maintenance: $allow_update_maintenance
+  allow_package_source_audit: $allow_package_source_audit
+  allow_disk_health_review: $allow_disk_health_review
+  allow_encryption_recommendations: $allow_encryption_recommendations
+  allow_security_exception_review: $allow_security_exception_review
+  allow_startup_service_review: $allow_startup_service_review
+  allow_workspace_hygiene_review: $allow_workspace_hygiene_review
+  allow_developer_toolchain_review: $allow_developer_toolchain_review
+  allow_container_exposure_review: $allow_container_exposure_review
   allow_optional_av: $allow_optional_av
   allow_blocklist_pilot: $allow_blocklist_pilot
   allow_firewall_ip_blocklists: $allow_firewall_ip_blocklists

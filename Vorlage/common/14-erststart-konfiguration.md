@@ -61,6 +61,15 @@ Die Erststart-Konfiguration fragt mindestens:
 - Darf der Agent eine Host-Baseline erfassen?
 - Darf der Agent usability-first Sicherheitsempfehlungen anzeigen?
 - Darf der Agent kostenlose, aktuelle Tools und Updates empfehlen?
+- Darf der Agent Betriebssystem-, App- und Paketupdates prüfen?
+- Darf der Agent Paketquellen, Stores und Dritt-Repositories auf Plausibilität prüfen?
+- Darf der Agent Datenträgerzustand, Dateisystem und Speicherplatz bewerten?
+- Darf der Agent Geräteverschlüsselung wie BitLocker, FileVault oder LUKS empfehlen?
+- Darf der Agent Security-Ausnahmen wie Antivirus-Exclusions oder Allowlisten prüfen?
+- Darf der Agent Autostart, Dienste und Hintergrundprozesse bewerten?
+- Darf der Agent Workspace-Hygiene, lokale Backups, Duplikate und veraltete Arbeitskopien prüfen?
+- Darf der Agent Entwickler-Toolchains, Paketmanager und parallele Laufzeitumgebungen bewerten?
+- Darf der Agent Container-Ports, Volumes und Secret-Referenzen prüfen?
 - Darf der Agent optionale AV-/Malware-Scanner anbieten?
 - Darf der Agent DNS-/Host-Blocklisten im Pilotmodus anbieten?
 - Darf der Agent IP-Firewall-Blocklisten als riskante Option anbieten?
@@ -77,6 +86,18 @@ Bei erneuter Ausführung nutzt der Agent vorhandene Werte als Defaults. Dadurch 
 Wenn WSL gewählt wurde, muss der Agent zusätzlich die WSL-Vorlagen berücksichtigen. Wenn Docker oder Portainer gewählt wurde, muss der Agent zusätzlich die Container-Vorlagen berücksichtigen. Docker und Portainer dürfen nicht unabhängig von WSL als Pflichtkomponenten behandelt werden.
 
 Die Nutzerbeschreibung ist ein Hinweis für Empfehlungen, keine automatische Installationsfreigabe. Der Agent muss daraus Profile ableiten und Programmvorschläge nach `Vorlage/common/15-programm-und-installationsempfehlungen.md` vorbereiten.
+
+## Bewertungsbereiche
+
+Die Konfiguration soll gute allgemeine Computerkonfiguration auswählbar machen, ohne sie blind umzusetzen:
+
+- **Update-Wartung:** Paketmanager, Stores und Apps auf ausstehende Updates prüfen; keine Massenupdates ohne Freigabe.
+- **Paketquellen-Audit:** Drittquellen, Repository-Releases, Signaturen und Herkunft prüfen; keine unpassenden Quellen übernehmen.
+- **Datenträger und Workspace:** Laufwerksgesundheit, Dateisystem, Speicherplatz, Backup-Relevanz und Git-Workspace-Hygiene bewerten.
+- **Verschlüsselung:** Geräteverschlüsselung empfehlen, aber Recovery-Key, Backup und Nutzerfreigabe vor Aktivierung klären.
+- **Security-Ausnahmen:** Antivirus-, Firewall-, DNS- und Allowlist-Ausnahmen auf Breite und Notwendigkeit prüfen.
+- **Dienste und Autostart:** Hintergrunddienste nicht pauschal deaktivieren, sondern Nutzen, Nebenwirkung und Rollback dokumentieren.
+- **Entwickler- und Container-Kontext:** Toolchains, WSL, Docker, Podman, Ports, Volumes und Secrets getrennt erfassen.
 
 ## Schalter-Semantik
 

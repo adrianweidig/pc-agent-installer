@@ -16,6 +16,7 @@ for path in \
   .github/workflows/release-artifact.yml \
   docs/CODEX_NEW_PROJECT_STANDARD.md \
   docs/CI_CD.md \
+  docs/19-template-upstream-sync.md \
   scripts/apply-codex-project-standard.sh \
   schemas/host.schema.yaml \
   schemas/repo-mode.schema.yaml \
@@ -29,6 +30,8 @@ for path in \
   scripts/common/assert-infrastructure-snapshot.sh \
   scripts/common/verify-template.ps1 \
   scripts/common/verify-template.sh \
+  scripts/common/sync-template-upstream.ps1 \
+  scripts/common/sync-template-upstream.sh \
   scripts/powershell/collect-baseline.ps1 \
   scripts/bash/collect-baseline.sh \
   scripts/container/detect-container-stack.ps1 \
