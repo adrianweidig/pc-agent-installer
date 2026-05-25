@@ -21,6 +21,7 @@ Er prüft:
 - Template-Struktur
 - YAML-Frontmatter der Vorlagen
 - PowerShell- und Bash-Syntax
+- Produktkomponenten-i18n
 - Encoding-Regeln
 - typische Secret-Pattern
 - Git-Diff-Whitespace

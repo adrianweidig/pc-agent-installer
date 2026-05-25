@@ -8,6 +8,7 @@ This is the English documentation entry point. German is the default and canonic
 
 - [README in English](../../README.en.md)
 - [Internationalization](I18N.md)
+- [Product components i18n](product-components.md)
 - [Architecture overview in German](../ARCHITECTURE.md)
 - [CI/CD in German](../CI_CD.md)
 - [Release process in German](../RELEASE_PROCESS.md)
@@ -39,6 +40,7 @@ This is the English documentation entry point. German is the default and canonic
 - [Infrastructure target/current-state comparison](../18-infrastruktur-soll-ist-abgleich.md)
 - [Template upstream sync](../19-template-upstream-sync.md)
 - [General computer configuration](../20-allgemeine-computer-konfiguration.md)
+- [Product components i18n](product-components.md)
 
 ## Community Files
 

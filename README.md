@@ -49,6 +49,7 @@ Vor echter Host-Arbeit gibt es eine nutzerfreundliche Erststart-Konfiguration. D
 | Validierung | Struktur, Frontmatter, Skript-Syntax, Encoding, Secret-Pattern und Git-Diff prüfen |
 | Dokumentation | Agenten-first-Ablauf, Sicherheitsmodell, Rollback-Konzept und Workspace-Hygiene beschreiben |
 | Internationalisierung | Deutsch als Standardsprache, Englisch als Alternativsprache und UTF-8-/Unicode-Prüfung bereitstellen |
+| Produktkomponenten-i18n | Produktnahe Modulnamen und Kurzbeschreibungen in zwölf Sprachen zentral bereitstellen |
 
 ## Grenzen
 
@@ -93,6 +94,7 @@ Diese Befehle sind Anker für Agenten und für manuelle Diagnose. Der normale Ei
 | Host-Schreibrechte prüfen | `./scripts/common/assert-private-repo.ps1` | `bash ./scripts/common/assert-private-repo.sh` |
 | Agenten-Konfiguration starten oder erneut öffnen | `./scripts/common/first-run-config.ps1` | `bash ./scripts/common/first-run-config.sh` |
 | Host-Arbeitsbereitschaft prüfen | `./scripts/common/assert-first-run-config.ps1` und `./scripts/common/assert-infrastructure-snapshot.ps1` | `bash ./scripts/common/assert-first-run-config.sh` und `bash ./scripts/common/assert-infrastructure-snapshot.sh` |
+| Produktkomponenten je Sprache anzeigen | `./scripts/common/list-product-components.ps1 -Language es` | `bash ./scripts/common/list-product-components.sh es` |
 
 `assert-private-repo.*` darf im öffentlichen `template`-Modus absichtlich fehlschlagen. Das ist eine Sicherheitsgrenze und schützt vor versehentlichem Schreiben von Hostdaten.
 
@@ -134,6 +136,8 @@ Deutsch ist die Standardsprache dieses Projekts. Englisch ist die gepflegte Alte
 
 Die interaktive Erststart-Konfiguration unterstützt eine gespeicherte Spracheinstellung in `hosts/<HOSTNAME>/state/first-run-config.yaml`. Die Erkennung folgt dieser Reihenfolge: expliziter Skriptparameter, gespeicherte Projektkonfiguration, `PC_AGENT_LANG`, danach Deutsch als stabiler Fallback. UTF-8 bleibt durchgehend erhalten; die Template-Validierung prüft deutsche Umlaute und die i18n-Hilfen für PowerShell und Bash.
 
+Produktkomponenten wie Repo-Guards, Erststart-Konfiguration, Infrastruktur-Snapshot, Validierungssuite und Template-Upstream-Sync sind zusätzlich zentral in zwölf Sprachen lokalisiert: `de`, `en`, `es`, `fr`, `it`, `pt`, `nl`, `pl`, `tr`, `ru`, `zh-Hans` und `ja`. Der Katalog liegt unter `i18n/product-components.tsv` und wird durch `validate-product-i18n.*` geprüft.
+
 Details stehen in [docs/I18N.md](docs/I18N.md). Die englische Fassung steht unter [docs/en/I18N.md](docs/en/I18N.md).
 
 ## Private Nutzung
@@ -174,6 +178,7 @@ scripts/powershell/    Windows-Host-, Baseline- und Change-Hilfen
 scripts/bash/          Linux-, WSL-, macOS- und Unix-nahe Hilfen
 scripts/container/     Container-, Compose-, Swarm-, Kubernetes-, Podman- und NVIDIA-Erkennung
 schemas/               YAML-Schemas für Host-, Baseline-, Change-, Rollback- und Repo-Modus-Daten
+i18n/                  Produktkomponenten-Katalog und Sprachliste
 docs/                  Konzept-, Sicherheits-, Betriebs- und Validierungsdokumentation
 examples/              sichere Beispielartefakte ohne echte Hostdaten
 private.example/       Beispiele für private Konfigurationen und Secret-Referenzen
@@ -209,7 +214,7 @@ bash ./scripts/common/detect-repo-mode.sh
 bash ./scripts/common/verify-template.sh
 ```
 
-Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skripte, Template-Struktur, YAML-Frontmatter, PowerShell-/Bash-Syntax, Encoding, Secret-Scan und Git-Diff-Prüfung.
+Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skripte, Template-Struktur, YAML-Frontmatter, PowerShell-/Bash-Syntax, Produktkomponenten-i18n, Encoding, Secret-Scan und Git-Diff-Prüfung.
 
 ## Dokumentation
 
@@ -229,6 +234,7 @@ Sprach-Einstiege: [Deutsch](docs/de/index.md) | [English](docs/en/index.md)
 | Infrastruktur-Soll-Ist-Abgleich | [docs/18-infrastruktur-soll-ist-abgleich.md](docs/18-infrastruktur-soll-ist-abgleich.md) |
 | Template-Upstream-Sync | [docs/19-template-upstream-sync.md](docs/19-template-upstream-sync.md) |
 | Allgemeine Computer-Konfiguration | [docs/20-allgemeine-computer-konfiguration.md](docs/20-allgemeine-computer-konfiguration.md) |
+| Produktkomponenten-i18n | [docs/21-produktkomponenten-i18n.md](docs/21-produktkomponenten-i18n.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

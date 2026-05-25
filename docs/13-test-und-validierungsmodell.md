@@ -1,6 +1,6 @@
 # Test- und Validierungsmodell
 
-Dieses Repository ist ein skriptbasiertes Template ohne Paketmanager, Build-Artefakte oder klassische Unit-Test-Suite. Die Testbarkeit besteht aus Guard-, Struktur-, Syntax-, Encoding-, Secret- und Git-Hygieneprüfungen.
+Dieses Repository ist ein skriptbasiertes Template ohne Paketmanager, Build-Artefakte oder klassische Unit-Test-Suite. Die Testbarkeit besteht aus Guard-, Struktur-, Syntax-, i18n-, Encoding-, Secret- und Git-Hygieneprüfungen.
 
 ## Standardprüfung
 
@@ -42,6 +42,16 @@ Template-Struktur validieren:
 bash ./scripts/common/validate-template.sh
 ```
 
+Produktkomponenten-i18n validieren:
+
+```powershell
+./scripts/common/validate-product-i18n.ps1
+```
+
+```bash
+bash ./scripts/common/validate-product-i18n.sh
+```
+
 Whitespace im Git-Diff prüfen:
 
 ```powershell
@@ -60,6 +70,8 @@ gh issue list --state open --limit 20
 - leerer `hosts/`-Ordner im `template`-Modus
 - Anzahl und Frontmatter-Pflichtfelder der Vorlagen
 - beschädigte Steuerzeichen in Template-Feldern
+- Produktkomponenten-Katalog mit mindestens zehn Sprachen
+- vollständige Produktnamen und Kurzbeschreibungen je Sprache
 - PowerShell-Syntax und PowerShell-Encoding
 - Bash-Syntax
 - typische Secret-Pattern
