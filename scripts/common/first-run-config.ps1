@@ -2,6 +2,7 @@
 param(
     [string]$RepoRoot,
     [string]$HostName = $env:COMPUTERNAME,
+    [string]$Language,
     [switch]$ConsoleOnly
 )
 
@@ -10,6 +11,7 @@ if (-not $RepoRoot) {
 }
 
 . (Join-Path $PSScriptRoot '..\powershell\AgentInstaller.Common.ps1')
+. (Join-Path $PSScriptRoot 'i18n.ps1')
 $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
 $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
@@ -36,6 +38,7 @@ $defaults = [ordered]@{
     windows_portainer_ui = $false
     windows_wsl_recommendations = $false
     require_confirmation_for_system_changes = $true
+    language = 'de'
 }
 $isWindowsHost = $env:OS -eq 'Windows_NT'
 $isWindowsVariable = Get-Variable -Name IsWindows -ErrorAction SilentlyContinue
@@ -69,6 +72,8 @@ function Merge-AgentExistingFirstRunConfig {
             $values['person_description'] = ConvertFrom-AgentConfigScalar -Value $Matches[1]
         } elseif ($line -match '^\s*note:\s*"(.*)"\s*$') {
             $values['note'] = ConvertFrom-AgentConfigScalar -Value $Matches[1]
+        } elseif ($line -match '^\s*language:\s*"?([a-zA-Z_-]+)"?\s*$') {
+            $values['language'] = ConvertFrom-AgentConfigScalar -Value $Matches[1]
         }
     }
 
@@ -77,6 +82,12 @@ function Merge-AgentExistingFirstRunConfig {
 
 $configurationMode = if (Test-Path -LiteralPath $configPath) { 'reconfigure' } else { 'first-run' }
 $defaults = Merge-AgentExistingFirstRunConfig -Path $configPath -Fallback $defaults
+$agentLanguage = Resolve-AgentLanguage -ExplicitLanguage $Language -ConfigLanguage ([string]$defaults['language'])
+
+function T {
+    param([Parameter(Mandatory = $true)][string]$Key)
+    return Get-AgentText -Key $Key -Language $agentLanguage
+}
 
 function Read-AgentYesNo {
     param([string]$Prompt, [bool]$Default)
@@ -88,7 +99,7 @@ function Read-AgentYesNo {
             '^(j|ja|y|yes)$' { return $true }
             '^(n|nein|no)$' { return $false }
         }
-        Write-Host 'Bitte mit Ja oder Nein antworten.'
+        Write-Host (T 'answer_yes_no')
     }
 }
 
@@ -110,7 +121,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         Add-Type -AssemblyName System.Windows.Forms
         Add-Type -AssemblyName System.Drawing
         $form = [System.Windows.Forms.Form]::new()
-        $form.Text = 'PC Agent Installer - Agenten-Konfiguration'
+        $form.Text = T 'form_title'
         $form.Width = 760
         $form.Height = 900
         $form.AutoScroll = $true
@@ -118,7 +129,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form.TopMost = $true
 
         $intro = [System.Windows.Forms.Label]::new()
-        $intro.Text = 'Lege fest, was der Agent auf diesem PC vorbereiten darf. Bestehende Optionen koennen hier erneut aktiviert oder deaktiviert werden.'
+        $intro.Text = T 'form_intro'
         $intro.AutoSize = $false
         $intro.Width = 700
         $intro.Height = 50
@@ -127,7 +138,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form.Controls.Add($intro)
 
         $profileLabel = [System.Windows.Forms.Label]::new()
-        $profileLabel.Text = 'Beschreibe dich kurz, damit der Agent sinnvolle Programme und Einstellungen ableiten kann. Beispiel: "Ich bin Entwickler und nutze KI-Tools."'
+        $profileLabel.Text = T 'form_profile'
         $profileLabel.AutoSize = $false
         $profileLabel.Width = 700
         $profileLabel.Height = 40
@@ -144,29 +155,47 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $profile.Text = [string]$defaults['person_description']
         $form.Controls.Add($profile)
 
+        $languageLabel = [System.Windows.Forms.Label]::new()
+        $languageLabel.Text = T 'language_label'
+        $languageLabel.AutoSize = $false
+        $languageLabel.Width = 260
+        $languageLabel.Height = 25
+        $languageLabel.Left = 25
+        $languageLabel.Top = 165
+        $form.Controls.Add($languageLabel)
+
+        $languageBox = [System.Windows.Forms.ComboBox]::new()
+        $languageBox.Left = 300
+        $languageBox.Top = 162
+        $languageBox.Width = 120
+        [void]$languageBox.Items.Add('de')
+        [void]$languageBox.Items.Add('en')
+        $languageBox.SelectedItem = $agentLanguage
+        $form.Controls.Add($languageBox)
+
         $items = [ordered]@{
-            allow_baseline = 'Host-Baseline erfassen und dokumentieren'
-            allow_security_recommendations = 'Usability-first Sicherheitsempfehlungen anzeigen'
-            allow_package_recommendations = 'Kostenlose, aktuelle Tools und Updates empfehlen'
-            allow_update_maintenance = 'Betriebssystem-, App- und Paketupdates prüfen'
-            allow_package_source_audit = 'Paketquellen, Stores und Dritt-Repositories prüfen'
-            allow_disk_health_review = 'Datenträgerzustand, Dateisystem und Speicherplatz prüfen'
-            allow_encryption_recommendations = 'Geräteverschlüsselung prüfen und empfehlen'
-            allow_security_exception_review = 'Security-Ausnahmen wie AV-Exclusions prüfen'
-            allow_startup_service_review = 'Autostart, Dienste und Hintergrundprozesse bewerten'
-            allow_workspace_hygiene_review = 'Workspace-Hygiene, Backups und Duplikate prüfen'
-            allow_developer_toolchain_review = 'Entwickler-Toolchains und Paketmanager bewerten'
-            allow_container_exposure_review = 'Container-Ports, Volumes und Secrets prüfen'
-            allow_optional_av = 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten'
-            allow_blocklist_pilot = 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten'
-            allow_firewall_ip_blocklists = 'IP-Firewall-Blocklisten als riskante Option anbieten'
-            windows_wsl_backend = 'Windows: WSL-Backend fuer Linux-Tools vorbereiten'
-            windows_wsl_with_docker = 'Windows: Docker mit WSL-Unterstuetzung einplanen'
-            windows_portainer_ui = 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen'
-            require_confirmation_for_system_changes = 'Vor systemwirksamen Aenderungen immer bestaetigen lassen'
+            allow_baseline = T 'allow_baseline'
+            allow_security_recommendations = T 'allow_security_recommendations'
+            allow_package_recommendations = T 'allow_package_recommendations'
+            allow_update_maintenance = T 'allow_update_maintenance'
+            allow_package_source_audit = T 'allow_package_source_audit'
+            allow_disk_health_review = T 'allow_disk_health_review'
+            allow_encryption_recommendations = T 'allow_encryption_recommendations'
+            allow_security_exception_review = T 'allow_security_exception_review'
+            allow_startup_service_review = T 'allow_startup_service_review'
+            allow_workspace_hygiene_review = T 'allow_workspace_hygiene_review'
+            allow_developer_toolchain_review = T 'allow_developer_toolchain_review'
+            allow_container_exposure_review = T 'allow_container_exposure_review'
+            allow_optional_av = T 'allow_optional_av'
+            allow_blocklist_pilot = T 'allow_blocklist_pilot'
+            allow_firewall_ip_blocklists = T 'allow_firewall_ip_blocklists'
+            windows_wsl_backend = T 'windows_wsl_backend'
+            windows_wsl_with_docker = T 'windows_wsl_with_docker'
+            windows_portainer_ui = T 'windows_portainer_ui'
+            require_confirmation_for_system_changes = T 'require_confirmation_for_system_changes'
         }
         $checks = @{}
-        $top = 175
+        $top = 205
         foreach ($key in $items.Keys) {
             $box = [System.Windows.Forms.CheckBox]::new()
             $box.Text = $items[$key]
@@ -214,7 +243,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $form.Controls.Add($note)
 
         $ok = [System.Windows.Forms.Button]::new()
-        $ok.Text = 'Konfiguration speichern'
+        $ok.Text = T 'form_save'
         $ok.Width = 180
         $ok.Left = 535
         $ok.Top = $top + 110
@@ -227,42 +256,45 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
             $values['windows_wsl_recommendations'] = [bool]$values.windows_wsl_backend
             $values['person_description'] = $profile.Text
             $values['note'] = $note.Text
+            $values['language'] = Resolve-AgentLanguage -ExplicitLanguage ([string]$languageBox.SelectedItem)
             $usedUi = 'powershell-windows-forms'
         } else {
-            throw 'Erststart-Konfiguration wurde abgebrochen.'
+            throw (T 'form_cancelled')
         }
     } catch {
-        Write-Warning "GUI-Konfiguration nicht verfuegbar: $($_.Exception.Message)"
+        Write-Warning ((T 'gui_unavailable') -f $_.Exception.Message)
     }
 }
 
 if ($values.Count -eq 0) {
     if ($configurationMode -eq 'reconfigure') {
-        Write-Host 'Agenten-Konfiguration wird erneut geoeffnet. Leere Antworten behalten vorhandene Werte bei.'
+        Write-Host (T 'config_reopened')
     } else {
-        Write-Host 'Agenten-Konfiguration wird gestartet.'
+        Write-Host (T 'config_started')
     }
-    $values['person_description'] = Read-AgentText -Prompt 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler"' -Default ([string]$defaults['person_description'])
-    $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default ([bool]$defaults['allow_baseline'])
-    $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default ([bool]$defaults['allow_security_recommendations'])
-    $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default ([bool]$defaults['allow_package_recommendations'])
-    $values['allow_update_maintenance'] = Read-AgentYesNo -Prompt 'Betriebssystem-, App- und Paketupdates prüfen?' -Default ([bool]$defaults['allow_update_maintenance'])
-    $values['allow_package_source_audit'] = Read-AgentYesNo -Prompt 'Paketquellen, Stores und Dritt-Repositories prüfen?' -Default ([bool]$defaults['allow_package_source_audit'])
-    $values['allow_disk_health_review'] = Read-AgentYesNo -Prompt 'Datenträgerzustand, Dateisystem und Speicherplatz prüfen?' -Default ([bool]$defaults['allow_disk_health_review'])
-    $values['allow_encryption_recommendations'] = Read-AgentYesNo -Prompt 'Geräteverschlüsselung prüfen und empfehlen?' -Default ([bool]$defaults['allow_encryption_recommendations'])
-    $values['allow_security_exception_review'] = Read-AgentYesNo -Prompt 'Security-Ausnahmen wie AV-Exclusions prüfen?' -Default ([bool]$defaults['allow_security_exception_review'])
-    $values['allow_startup_service_review'] = Read-AgentYesNo -Prompt 'Autostart, Dienste und Hintergrundprozesse bewerten?' -Default ([bool]$defaults['allow_startup_service_review'])
-    $values['allow_workspace_hygiene_review'] = Read-AgentYesNo -Prompt 'Workspace-Hygiene, Backups und Duplikate prüfen?' -Default ([bool]$defaults['allow_workspace_hygiene_review'])
-    $values['allow_developer_toolchain_review'] = Read-AgentYesNo -Prompt 'Entwickler-Toolchains und Paketmanager bewerten?' -Default ([bool]$defaults['allow_developer_toolchain_review'])
-    $values['allow_container_exposure_review'] = Read-AgentYesNo -Prompt 'Container-Ports, Volumes und Secrets prüfen?' -Default ([bool]$defaults['allow_container_exposure_review'])
-    $values['allow_optional_av'] = Read-AgentYesNo -Prompt 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' -Default ([bool]$defaults['allow_optional_av'])
-    $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' -Default ([bool]$defaults['allow_blocklist_pilot'])
-    $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt 'IP-Firewall-Blocklisten als riskante Option anbieten?' -Default ([bool]$defaults['allow_firewall_ip_blocklists'])
-    $values['windows_wsl_backend'] = Read-AgentYesNo -Prompt 'Windows: WSL-Backend fuer Linux-Tools vorbereiten?' -Default ([bool]$defaults['windows_wsl_backend'])
+    $agentLanguage = Resolve-AgentLanguage -ExplicitLanguage (Read-AgentText -Prompt (T 'language_prompt') -Default $agentLanguage)
+    $values['language'] = $agentLanguage
+    $values['person_description'] = Read-AgentText -Prompt (T 'profile_prompt') -Default ([string]$defaults['person_description'])
+    $values['allow_baseline'] = Read-AgentYesNo -Prompt (T 'allow_baseline') -Default ([bool]$defaults['allow_baseline'])
+    $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt (T 'allow_security_recommendations') -Default ([bool]$defaults['allow_security_recommendations'])
+    $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt (T 'allow_package_recommendations') -Default ([bool]$defaults['allow_package_recommendations'])
+    $values['allow_update_maintenance'] = Read-AgentYesNo -Prompt (T 'allow_update_maintenance') -Default ([bool]$defaults['allow_update_maintenance'])
+    $values['allow_package_source_audit'] = Read-AgentYesNo -Prompt (T 'allow_package_source_audit') -Default ([bool]$defaults['allow_package_source_audit'])
+    $values['allow_disk_health_review'] = Read-AgentYesNo -Prompt (T 'allow_disk_health_review') -Default ([bool]$defaults['allow_disk_health_review'])
+    $values['allow_encryption_recommendations'] = Read-AgentYesNo -Prompt (T 'allow_encryption_recommendations') -Default ([bool]$defaults['allow_encryption_recommendations'])
+    $values['allow_security_exception_review'] = Read-AgentYesNo -Prompt (T 'allow_security_exception_review') -Default ([bool]$defaults['allow_security_exception_review'])
+    $values['allow_startup_service_review'] = Read-AgentYesNo -Prompt (T 'allow_startup_service_review') -Default ([bool]$defaults['allow_startup_service_review'])
+    $values['allow_workspace_hygiene_review'] = Read-AgentYesNo -Prompt (T 'allow_workspace_hygiene_review') -Default ([bool]$defaults['allow_workspace_hygiene_review'])
+    $values['allow_developer_toolchain_review'] = Read-AgentYesNo -Prompt (T 'allow_developer_toolchain_review') -Default ([bool]$defaults['allow_developer_toolchain_review'])
+    $values['allow_container_exposure_review'] = Read-AgentYesNo -Prompt (T 'allow_container_exposure_review') -Default ([bool]$defaults['allow_container_exposure_review'])
+    $values['allow_optional_av'] = Read-AgentYesNo -Prompt (T 'allow_optional_av') -Default ([bool]$defaults['allow_optional_av'])
+    $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt (T 'allow_blocklist_pilot') -Default ([bool]$defaults['allow_blocklist_pilot'])
+    $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt (T 'allow_firewall_ip_blocklists') -Default ([bool]$defaults['allow_firewall_ip_blocklists'])
+    $values['windows_wsl_backend'] = Read-AgentYesNo -Prompt (T 'windows_wsl_backend') -Default ([bool]$defaults['windows_wsl_backend'])
     if ($values.windows_wsl_backend) {
-        $values['windows_wsl_with_docker'] = Read-AgentYesNo -Prompt 'Windows: Docker mit WSL-Unterstuetzung einplanen?' -Default ([bool]$defaults['windows_wsl_with_docker'])
+        $values['windows_wsl_with_docker'] = Read-AgentYesNo -Prompt (T 'windows_wsl_with_docker') -Default ([bool]$defaults['windows_wsl_with_docker'])
         if ($values.windows_wsl_with_docker) {
-            $values['windows_portainer_ui'] = Read-AgentYesNo -Prompt 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' -Default ([bool]$defaults['windows_portainer_ui'])
+            $values['windows_portainer_ui'] = Read-AgentYesNo -Prompt (T 'windows_portainer_ui') -Default ([bool]$defaults['windows_portainer_ui'])
         } else {
             $values['windows_portainer_ui'] = $false
         }
@@ -272,8 +304,8 @@ if ($values.Count -eq 0) {
         $values['windows_portainer_ui'] = $false
         $values['windows_wsl_recommendations'] = $false
     }
-    $values['require_confirmation_for_system_changes'] = Read-AgentYesNo -Prompt 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' -Default ([bool]$defaults['require_confirmation_for_system_changes'])
-    $values['note'] = Read-AgentText -Prompt 'Optionale Notiz fuer den Agenten' -Default ([string]$defaults['note'])
+    $values['require_confirmation_for_system_changes'] = Read-AgentYesNo -Prompt (T 'require_confirmation_for_system_changes') -Default ([bool]$defaults['require_confirmation_for_system_changes'])
+    $values['note'] = Read-AgentText -Prompt (T 'note_prompt') -Default ([string]$defaults['note'])
 }
 
 if (-not $values.windows_wsl_backend) {
@@ -290,6 +322,7 @@ if (-not $values.windows_wsl_backend) {
 $now = (Get-Date).ToString('o')
 $safePersonDescription = (Protect-AgentSecretText -Text ([string]$values.person_description)).Replace("`r", ' ').Replace("`n", ' ').Replace('"', '\"')
 $safeNote = (Protect-AgentSecretText -Text ([string]$values.note)).Replace("`r", ' ').Replace("`n", ' ').Replace('"', '\"')
+$safeLanguage = Resolve-AgentLanguage -ExplicitLanguage ([string]$values.language)
 $yaml = @"
 completed: true
 configured_at: "$now"
@@ -299,6 +332,7 @@ ui: "$usedUi"
 repo_mode: "$($guard.repo_mode)"
 visibility: "$($guard.visibility)"
 host: "$HostName"
+language: "$safeLanguage"
 user_context:
   person_description: "$safePersonDescription"
 preferences:
@@ -326,4 +360,5 @@ note: "$safeNote"
 "@
 
 Write-AgentUtf8 -Path $configPath -Content $yaml
-Write-Host "Erststart-Konfiguration gespeichert: $configPath"
+$agentLanguage = $safeLanguage
+Write-Host ((T 'config_saved') -f $configPath)

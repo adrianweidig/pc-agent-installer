@@ -44,11 +44,17 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 
+[*.ps1]
+charset = utf-8-bom
+end_of_line = crlf
+indent_size = 4
+
 [*.md]
 trim_trailing_whitespace = false"
 
 write_if_missing ".gitattributes" "* text=auto eol=lf
 *.sh text eol=lf
+*.ps1 text eol=crlf
 *.md text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf"
@@ -77,6 +83,7 @@ write_if_missing "AGENTS.md" "# AGENTS.md
 - Bestehende Inhalte und Nutzeränderungen bewahren.
 - Keine Secrets, Tokens, privaten Schlüssel oder vertraulichen Daten erzeugen oder offenlegen.
 - Keine öffentlichen APIs, Dateiformate oder Standardwerte ohne fachlichen Grund ändern.
+- Textdateien als UTF-8 schreiben; deutsche Fließtexte nutzen echte Umlaute statt ASCII-Umschreibungen mit `ue`, `oe` oder `ae`.
 - GitHub Actions, Release-Artefakte und Docker/GHCR bei passenden Projektänderungen mitdenken.
 - Nach Änderungen passende Tests, Lints, Builds oder Smoke-Checks ausführen."
 

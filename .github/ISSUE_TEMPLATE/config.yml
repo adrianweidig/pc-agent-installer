@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Sicherheitsproblem melden
     url: https://github.com/adrianweidig/pc-agent-installer/security
-    about: Bitte keine vertraulichen Schwachstellendetails in öffentlichen Issues posten. Hinweise stehen in SECURITY.md.
+    about: Bitte keine vertraulichen Schwachstellendetails in öffentlichen Issues posten. English guidance is in SECURITY.en.md.
   - name: Support-Hinweise lesen
     url: https://github.com/adrianweidig/pc-agent-installer/blob/main/SUPPORT.md
-    about: Welche Informationen in öffentliche Issues gehören und welche nicht.
+    about: Welche Informationen in öffentliche Issues gehören und welche nicht. English guidance is in SUPPORT.en.md.

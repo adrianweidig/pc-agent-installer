@@ -10,12 +10,12 @@ NO_COMMIT="${NO_COMMIT:-false}"
 
 mode="$(bash "$SCRIPT_DIR/detect-repo-mode.sh" "$ROOT" | sed -n 's/.*"repo_mode":"\([^"]*\)".*/\1/p')"
 if [[ "$mode" == "template" ]]; then
-  echo "Dieses Skript ist fuer private operational- oder local-only-Klone gedacht. Im Template-Repo normales git pull origin main verwenden." >&2
+  echo "Dieses Skript ist für private operational- oder local-only-Klone gedacht. Im Template-Repo normales git pull origin main verwenden." >&2
   exit 10
 fi
 
 if [[ -n "$(git -C "$ROOT" status --porcelain)" ]]; then
-  echo "Arbeitsbaum ist nicht sauber. Bitte zuerst private Aenderungen committen oder bewusst beiseitelegen." >&2
+  echo "Arbeitsbaum ist nicht sauber. Bitte zuerst private Änderungen committen oder bewusst beiseitelegen." >&2
   exit 11
 fi
 
@@ -48,18 +48,18 @@ set -e
 if [[ -n "$protected_repo_mode" && -f "$repo_mode_path" && "$(cat "$repo_mode_path")" != "$protected_repo_mode" ]]; then
   printf '%s\n' "$protected_repo_mode" > "$repo_mode_path"
   git -C "$ROOT" add repo-mode.yaml
-  echo "repo-mode.yaml wurde auf den privaten Operational-Modus zurueckgesetzt."
+  echo "repo-mode.yaml wurde auf den privaten Operational-Modus zurückgesetzt."
 fi
 
 unmerged="$(git -C "$ROOT" diff --name-only --diff-filter=U)"
 if [[ "$merge_exit" != "0" || -n "$unmerged" ]]; then
   cat >&2 <<'MESSAGE'
-Template-Merge braucht manuelle Konfliktloesung.
+Template-Merge braucht manuelle Konfliktlösung.
 
 Regeln:
 - repo-mode.yaml muss operational oder local-only bleiben.
-- hosts/ und private Secret-Referenzen nicht aus dem Template ueberschreiben.
-- Nach der Konfliktloesung: git add <dateien> und git commit.
+- hosts/ und private Secret-Referenzen nicht aus dem Template überschreiben.
+- Nach der Konfliktlösung: git add <dateien> und git commit.
 MESSAGE
   exit 20
 fi
@@ -70,7 +70,7 @@ if [[ "$NO_COMMIT" == "true" ]]; then
 fi
 
 if [[ -z "$(git -C "$ROOT" diff --cached --name-only)" ]]; then
-  echo "Keine Template-Aenderungen zu committen."
+  echo "Keine Template-Änderungen zu committen."
   exit 0
 fi
 

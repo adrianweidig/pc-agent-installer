@@ -1,5 +1,7 @@
 # PC Agent Installer
 
+🌐 Sprachen: [Deutsch](README.md) | [English](README.en.md)
+
 ![PC Agent Installer Hero](docs/assets/pc-agent-installer-hero.png)
 
 <p align="center">
@@ -16,6 +18,7 @@
 <p align="center">
   <a href="#schnellstart">Schnellstart</a> ·
   <a href="#arbeitsmodell">Arbeitsmodell</a> ·
+  <a href="#internationalisierung">Internationalisierung</a> ·
   <a href="#validierung">Validierung</a> ·
   <a href="docs/ARCHITECTURE.md">Architektur</a> ·
   <a href="CONTRIBUTING.md">Mitwirken</a> ·
@@ -45,6 +48,7 @@ Vor echter Host-Arbeit gibt es eine nutzerfreundliche Erststart-Konfiguration. D
 | Baseline- und Change-Hilfen | Hostzustände in privaten oder lokalen Operational-Repositories dokumentieren |
 | Validierung | Struktur, Frontmatter, Skript-Syntax, Encoding, Secret-Pattern und Git-Diff prüfen |
 | Dokumentation | Agenten-first-Ablauf, Sicherheitsmodell, Rollback-Konzept und Workspace-Hygiene beschreiben |
+| Internationalisierung | Deutsch als Standardsprache, Englisch als Alternativsprache und UTF-8-/Unicode-Prüfung bereitstellen |
 
 ## Grenzen
 
@@ -116,6 +120,21 @@ Offizielle Template-Änderungen bleiben im öffentlichen Repository. Reale Rechn
 | `local-only` | lokaler Arbeitsklon ohne Remote | erlaubt, ohne Klartext-Secrets | kein Remote |
 
 Der aktuelle Modus steht in `repo-mode.yaml`.
+
+## Internationalisierung
+
+Deutsch ist die Standardsprache dieses Projekts. Englisch ist die gepflegte Alternativsprache für internationale Nutzer. GitHub übersetzt die normale Repository-Ansicht nicht automatisch nach Besuchersprache; deshalb nutzt dieses Repository sichtbare Sprachlinks und separate Dateien:
+
+- `README.md` ist die deutsche Standard-README.
+- `README.en.md` ist die englische README.
+- `docs/` bleibt die deutsche Standarddokumentation.
+- `docs/de/index.md` ist der deutsche Dokumentationseinstieg.
+- `docs/en/index.md` ist der englische Dokumentationseinstieg.
+- Community-Dateien haben deutsche Standardversionen und englische Alternativen, sofern der Inhalt international relevant ist.
+
+Die interaktive Erststart-Konfiguration unterstützt eine gespeicherte Spracheinstellung in `hosts/<HOSTNAME>/state/first-run-config.yaml`. Die Erkennung folgt dieser Reihenfolge: expliziter Skriptparameter, gespeicherte Projektkonfiguration, `PC_AGENT_LANG`, danach Deutsch als stabiler Fallback. UTF-8 bleibt durchgehend erhalten; die Template-Validierung prüft deutsche Umlaute und die i18n-Hilfen für PowerShell und Bash.
+
+Details stehen in [docs/I18N.md](docs/I18N.md). Die englische Fassung steht unter [docs/en/I18N.md](docs/en/I18N.md).
 
 ## Private Nutzung
 
@@ -193,6 +212,8 @@ bash ./scripts/common/verify-template.sh
 Die relevanten Projektchecks sind in `verify-template.*` gebündelt: Guard-Skripte, Template-Struktur, YAML-Frontmatter, PowerShell-/Bash-Syntax, Encoding, Secret-Scan und Git-Diff-Prüfung.
 
 ## Dokumentation
+
+Sprach-Einstiege: [Deutsch](docs/de/index.md) | [English](docs/en/index.md)
 
 | Thema | Dokument |
 | --- | --- |

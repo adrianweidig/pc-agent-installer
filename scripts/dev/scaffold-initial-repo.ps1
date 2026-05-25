@@ -191,7 +191,8 @@ bash ./scripts/common/validate-template.sh
 
 ## Konventionen
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
-- Deutsche Fließtexte verwenden echte UTF-8-Umlaute; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
+- Alle neuen oder geänderten Textdateien werden als UTF-8 geschrieben.
+- Deutsche Fließtexte verwenden echte UTF-8-Umlaute wie `für`, `prüfen`, `Änderung`, `zurück` und `vollständig`; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
 - PowerShell-Skripte müssen ohne expliziten `-RepoRoot` aus dem Repository heraus laufen.
 - Guard-Skripte müssen nicht destruktiv und idempotent bleiben.
 - Neue Vorlagen brauchen gültiges YAML-Frontmatter und eine eindeutige numerische Position.
@@ -627,7 +628,7 @@ hosts/**/baseline/raw/*token*
 hosts/**/baseline/raw/*credential*
 '@
     '.gitattributes' = @'
-* text=auto
+* text=auto eol=lf
 *.sh text eol=lf
 *.ps1 text eol=crlf
 *.md text eol=lf
@@ -1974,7 +1975,7 @@ if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $confi
     Write-Host "Erststart-Konfiguration vorhanden: $configPath"
     exit 0
 }
-Write-Error "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration fuer meinen PC."
+Write-Error "Die Konfiguration für den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration für meinen PC."
 exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.ps1' -Content $assertFirstRunPs
@@ -2574,7 +2575,7 @@ if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[
   echo "Erststart-Konfiguration vorhanden: $CONFIG_PATH"
   exit 0
 fi
-echo "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration fuer meinen PC." >&2
+echo "Die Konfiguration für den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration für meinen PC." >&2
 exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.sh' -Content $assertFirstRunSh

@@ -14,12 +14,12 @@ if (-not $RepoRoot) {
 $detectScript = Join-Path $PSScriptRoot 'detect-repo-mode.ps1'
 $guard = & $detectScript -RepoRoot $RepoRoot | ConvertFrom-Json
 if ($guard.repo_mode -eq 'template') {
-    throw 'Dieses Skript ist fuer private operational- oder local-only-Klone gedacht. Im Template-Repo normales git pull origin main verwenden.'
+    throw 'Dieses Skript ist für private operational- oder local-only-Klone gedacht. Im Template-Repo normales git pull origin main verwenden.'
 }
 
 $status = @(git -C $RepoRoot status --porcelain)
 if ($status.Count -gt 0) {
-    throw 'Arbeitsbaum ist nicht sauber. Bitte zuerst private Aenderungen committen oder bewusst beiseitelegen.'
+    throw 'Arbeitsbaum ist nicht sauber. Bitte zuerst private Änderungen committen oder bewusst beiseitelegen.'
 }
 
 $repoModePath = Join-Path $RepoRoot 'repo-mode.yaml'
@@ -55,19 +55,19 @@ if ($protectedRepoMode -and (Test-Path -LiteralPath $repoModePath)) {
     if ($currentRepoMode -ne $protectedRepoMode) {
         [System.IO.File]::WriteAllText($repoModePath, $protectedRepoMode, [System.Text.UTF8Encoding]::new($false))
         git -C $RepoRoot add repo-mode.yaml
-        Write-Host 'repo-mode.yaml wurde auf den privaten Operational-Modus zurueckgesetzt.'
+        Write-Host 'repo-mode.yaml wurde auf den privaten Operational-Modus zurückgesetzt.'
     }
 }
 
 $unmerged = @(git -C $RepoRoot diff --name-only --diff-filter=U)
 if ($mergeExit -ne 0 -or $unmerged.Count -gt 0) {
     $message = @"
-Template-Merge braucht manuelle Konfliktloesung.
+Template-Merge braucht manuelle Konfliktlösung.
 
 Regeln:
 - repo-mode.yaml muss operational oder local-only bleiben.
-- hosts/ und private Secret-Referenzen nicht aus dem Template ueberschreiben.
-- Nach der Konfliktloesung: git add <dateien> und git commit.
+- hosts/ und private Secret-Referenzen nicht aus dem Template überschreiben.
+- Nach der Konfliktlösung: git add <dateien> und git commit.
 "@
     Write-Error $message
     exit 20
@@ -80,7 +80,7 @@ if ($NoCommit) {
 
 $pending = @(git -C $RepoRoot diff --cached --name-only)
 if ($pending.Count -eq 0) {
-    Write-Host 'Keine Template-Aenderungen zu committen.'
+    Write-Host 'Keine Template-Änderungen zu committen.'
     exit 0
 }
 
