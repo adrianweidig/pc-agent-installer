@@ -31,6 +31,8 @@ Dies ist der deutsche Einstieg in die Dokumentation. Deutsch ist die Standardspr
 - [Template-Upstream-Sync](../19-template-upstream-sync.md)
 - [Allgemeine Computer-Konfiguration](../20-allgemeine-computer-konfiguration.md)
 - [Produktkomponenten-i18n](../21-produktkomponenten-i18n.md)
+- [Vollständige Ersteinrichtung](../22-ersteinrichtung.md)
+- [Codex-Root-Profil](../23-codex-root-profil.md)
 
 ## Projektpflege
 

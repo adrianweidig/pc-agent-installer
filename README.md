@@ -29,6 +29,10 @@
 
 PC Agent Installer ist eine Agenten-Arbeitsbasis: Ein Nutzer klont dieses Template, startet Codex im Repository und lässt den Agenten anhand von `AGENTS.md`, Vorlagen und Guard-Skripten prüfen, dokumentieren und validieren.
 
+Das Zielbild ist ein Agent als Ersatz für einen echten Systemadministrator bei der Ersteinrichtung eines frisch installierten PCs oder Servers. Der Nutzer installiert nur das Betriebssystem und startet danach den Agenten. Der Agent soll dann, nach klarer Vollzugriff-Warnung und Freigabe, die komplette Grundkonfiguration übernehmen: Paketquellen, Updates, Benutzer, Gruppen, Rechte, Firewall, Dienste, Sicherheitsrichtlinien, Entwickler- oder Alltagswerkzeuge, Baseline, Validierung und Rollback-Dokumentation.
+
+**Wichtig:** Für diese Aufgabe muss Codex mit einem bewusst gewählten Vollzugriff-Profil gestartet werden. Das ist kein optionaler Komfortmodus, sondern die technische Voraussetzung des Produkts. Ohne Administrator-, root-, sudo- oder passende Runtime-Rechte kann der Installer keine vollständige Ersteinrichtung leisten und darf den Lauf nicht als abgeschlossen bewerten.
+
 Das Projekt trennt bewusst zwei Welten:
 
 - **öffentliches Template:** generische Vorlagen, Skripte, Schemas, Beispiele, Dokumentation und Sicherheitsregeln
@@ -37,6 +41,17 @@ Das Projekt trennt bewusst zwei Welten:
 Das Repository ist nicht primär als manuell bedientes Admin-Tool gedacht. Der normale Ablauf ist agentenorientiert: Regeln lesen, Repo-Modus prüfen, Sichtbarkeit bewerten, Public/Private-Einordnung treffen, dann klein und nachvollziehbar arbeiten.
 
 Vor echter Host-Arbeit gibt es eine nutzerfreundliche Erststart-Konfiguration. Der Agent muss sie öffnen oder darauf hinweisen, dass sie noch nicht abgeschlossen ist. Erst danach darf er Baselines erfassen, Sicherheitsoptionen empfehlen oder systemwirksame Schritte vorbereiten.
+
+Der Nutzer muss vor jeder echten Ersteinrichtung verstehen, dass der Agent für diese Aufgabe mit absoluten Systemrechten arbeitet und je nach Betriebssystem als Administrator, root, über sudo oder mit Runtime-Adminrechten handelt. Ohne diese Rechte kann der Agent Firewall, Paketmanager, Dienste, Benutzer, Gruppen, Sicherheitsrichtlinien und Systempakete nicht vollständig einrichten. Vollzugriff ist dabei die vorgesehene Betriebsart, aber keine Freigabe zum Blindflug: Der Agent muss vorher Ist-Zustand, Soll-Zustand, Risiken, Rückbau und Nutzerfreigabe dokumentieren.
+
+| Plattform | Erforderlicher Startkontext für echte Ersteinrichtung |
+| --- | --- |
+| Windows | Codex/Agent in erhöhter Administrator-Sitzung, wenn UAC, Windows Features, Dienste, Firewall, Registry oder winget systemweit geändert werden sollen |
+| Linux | Agent als root oder mit bewusst freigegebenem sudo-Kontext, wenn Paketmanager, systemd, Firewall, Benutzer, Gruppen oder Sicherheitsrichtlinien betroffen sind |
+| Debian/Ubuntu | root/sudo plus explizite Freigabe über den OS-Apply-Flow, etwa `PC_AGENT_ALLOW_SYSTEM_CHANGES=true` |
+| macOS | Administrator-Konto mit gezielten `sudo`-Aktionen für Paketmanager, Firewall, FileVault-/Gatekeeper-nahe Einstellungen oder LaunchServices |
+| WSL | root/sudo innerhalb der Distribution und getrennte Bewertung, ob Änderungen nur die Distribution oder auch Windows/WSL-Integration betreffen |
+| Container | root oder passende Runtime-Rechte innerhalb der Zielumgebung; Host-Mounts, Ports, Volumes und Daemon-Änderungen bleiben gesondert freigabepflichtig |
 
 ## Was dieses Template leistet
 
@@ -50,6 +65,7 @@ Vor echter Host-Arbeit gibt es eine nutzerfreundliche Erststart-Konfiguration. D
 | Dokumentation | Agenten-first-Ablauf, Sicherheitsmodell, Rollback-Konzept und Workspace-Hygiene beschreiben |
 | Internationalisierung | Deutsch als Standardsprache, Englisch als Alternativsprache und UTF-8-/Unicode-Prüfung bereitstellen |
 | Produktkomponenten-i18n | Produktnahe Modulnamen und Kurzbeschreibungen in zwölf Sprachen zentral bereitstellen |
+| Vollständige Ersteinrichtung | OS-spezifische Zielzustände für Pakete, Benutzer, Dienste, Firewall und Sicherheitsrichtlinien agentisch umsetzen |
 
 ## Grenzen
 
@@ -65,7 +81,9 @@ git clone https://github.com/adrianweidig/pc-agent-installer.git
 cd pc-agent-installer
 ```
 
-Starte danach Codex oder einen vergleichbaren lokalen Agenten in diesem Verzeichnis und gib ihm eine natürliche Arbeitsaufforderung. Geeignete Startsignale sind zum Beispiel:
+Starte danach Codex oder einen vergleichbaren lokalen Agenten in diesem Verzeichnis. Für reine Analyse reicht ein normales Profil. Für echte Ersteinrichtung muss der Agent mit dem passenden Vollzugriff-Profil des Zielsystems gestartet werden; Details stehen in [docs/23-codex-root-profil.md](docs/23-codex-root-profil.md).
+
+Geeignete Startsignale sind zum Beispiel:
 
 ```text
 Codex, lies dieses Repository und starte die Agenten-Konfiguration für meinen PC.
@@ -235,6 +253,8 @@ Sprach-Einstiege: [Deutsch](docs/de/index.md) | [English](docs/en/index.md)
 | Template-Upstream-Sync | [docs/19-template-upstream-sync.md](docs/19-template-upstream-sync.md) |
 | Allgemeine Computer-Konfiguration | [docs/20-allgemeine-computer-konfiguration.md](docs/20-allgemeine-computer-konfiguration.md) |
 | Produktkomponenten-i18n | [docs/21-produktkomponenten-i18n.md](docs/21-produktkomponenten-i18n.md) |
+| Vollständige Ersteinrichtung | [docs/22-ersteinrichtung.md](docs/22-ersteinrichtung.md) |
+| Codex-Root-Profil | [docs/23-codex-root-profil.md](docs/23-codex-root-profil.md) |
 | Rollback-Konzept | [docs/08-rollback-konzept.md](docs/08-rollback-konzept.md) |
 | Architektur | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | CI/CD | [docs/CI_CD.md](docs/CI_CD.md) |

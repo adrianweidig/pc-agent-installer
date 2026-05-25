@@ -1,0 +1,5 @@
+__pycache__/
+artifacts/*
+!artifacts/.gitkeep
+reports/*
+!reports/.gitkeep
