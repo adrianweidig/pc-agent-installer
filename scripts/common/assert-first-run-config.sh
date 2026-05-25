@@ -21,6 +21,9 @@ Der Agent darf noch keine Host-Baseline, Sicherheitsänderung, Installation oder
 Bitte zuerst ausführen:
   bash ./scripts/common/first-run-config.sh
 
+Agentischer Startsatz:
+  Codex, starte die Agenten-Konfiguration fuer meinen PC.
+
 Danach diesen Schritt erneut starten.
 EOF
 exit 12

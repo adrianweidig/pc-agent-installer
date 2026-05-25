@@ -8,6 +8,16 @@ Dieses Repository ist das öffentliche Template für generische Codex- und Agent
 
 Das Repository soll beim ersten Kontakt klar als Basis für ein eigenes Codex- oder Agenten-Projekt wirken. Der Nutzer klont das Template nicht, um alle Schritte manuell abzuarbeiten, sondern um einen lokalen Agenten in einer vorbereiteten, geprüften Struktur arbeiten zu lassen.
 
+Der erwartete Einstieg ist eine natürliche Agentenaufforderung, zum Beispiel:
+
+```text
+Codex, lies dieses Repository und starte die Agenten-Konfiguration für meinen PC.
+Codex, in diesem Verzeichnis: starte die Erstkonfiguration.
+Codex, öffne die Agenten-Konfiguration erneut und deaktiviere WSL- oder Docker-Empfehlungen.
+```
+
+Der Agent darf daraus direkt den passenden Ablauf ableiten. Die Skripte sind dabei entdeckbare Werkzeuge, nicht die Benutzeroberfläche des Projekts.
+
 Der erwartete Ablauf ist:
 
 1. Template klonen oder daraus ein eigenes Repository erstellen.
@@ -15,9 +25,33 @@ Der erwartete Ablauf ist:
 3. `AGENTS.md` als verbindliche Projektanweisung lesen.
 4. Repo-Modus, Sichtbarkeit, offene Issues und Git-Status prüfen.
 5. Aufgabe in Public-Template-Anteil und private Operational-Anteile trennen.
-6. Änderungen klein ausführen, prüfen, dokumentieren und nur den passenden Anteil committen oder pushen.
+6. Wenn eine PC-Konfiguration gewünscht ist, eine sichere private Operational-Kopie oder einen `local-only`-Klon nutzen, bevor Hostdaten entstehen.
+7. Die Agenten-Konfiguration starten oder erneut öffnen und vorhandene Präferenzen als Vorbelegung behandeln.
+8. Änderungen klein ausführen, prüfen, dokumentieren und nur den passenden Anteil committen oder pushen.
 
 Die öffentliche Dokumentation muss diesen Ablauf erhalten. Neue Hinweise, Vorlagen und Tests sollen deshalb immer erklären, wie ein Agent sie wiederholbar nutzt.
+
+## Agenten-Konfiguration statt Skriptmodus
+
+Dieses Repository soll nicht als Sammlung manuell abzuarbeitender Skripte wirken. Ein Agent muss die Markdown-Regeln lesen und entscheiden, welche Werkzeuge für den nächsten Schritt notwendig sind.
+
+Der Werkzeugpfad ist bewusst klein:
+
+- `detect-repo-mode.*` erkennt Modus, Sichtbarkeit und Schreibgrenzen.
+- `assert-private-repo.*` schützt Hostdaten vor öffentlichen oder ungeprüften Repositories.
+- `first-run-config.*` startet oder aktualisiert die Agenten-Konfiguration.
+- `assert-first-run-config.*` und `assert-infrastructure-snapshot.*` sind harte Gates vor Host-Arbeit.
+- `verify-template.*` prüft das öffentliche Template nach Änderungen.
+
+Alle weiteren Skripte sind Hilfen für konkrete, vom Agenten begründete Schritte. Sie dürfen nicht als blinde Kette gestartet werden.
+
+## Folgekonfiguration und Schalter
+
+Die Agenten-Konfiguration kann jederzeit erneut geöffnet werden. Vorhandene Werte aus `hosts/<HOSTNAME>/state/first-run-config.yaml` dienen als Defaults.
+
+Aktivierte Optionen erlauben Empfehlungen und spätere freigegebene Arbeiten in diesem Bereich. Deaktivierte Optionen sperren künftige Empfehlungen oder Vorbereitungen. Wenn eine deaktivierte Option bereits zu einer tatsächlichen Systemänderung geführt hat, muss der Agent zuerst Change-Einträge, Rollback-Dateien, Baseline und Soll-Ist-Abgleich prüfen. Ein Rückbau wird nur nach konkreter Risiko- und Nutzdatenprüfung vorgeschlagen oder ausgeführt.
+
+Persistentes Agenten-Memory darf die natürliche Startphrase mit diesem Repository verknüpfen. Es ersetzt aber niemals die aktuelle Repo-Modus-, Sichtbarkeits- und Git-Status-Prüfung.
 
 ## Zwei Arbeitsbereiche
 

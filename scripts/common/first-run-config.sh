@@ -11,10 +11,35 @@ agent_assert_host_write_allowed "$ROOT" >/dev/null
 HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT/state"
 CONFIG_PATH="$HOST_ROOT/state/first-run-config.yaml"
-if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH"; then
-  echo "Erststart-Konfiguration ist bereits abgeschlossen: $CONFIG_PATH"
-  exit 0
+configuration_mode="first-run"
+if [[ -f "$CONFIG_PATH" ]]; then
+  configuration_mode="reconfigure"
 fi
+
+yaml_bool_default() {
+  local key="$1" default="$2" value
+  value=""
+  if [[ -f "$CONFIG_PATH" ]]; then
+    value="$(grep -E "^[[:space:]]+${key}:[[:space:]]*(true|false)[[:space:]]*$" "$CONFIG_PATH" | tail -n 1 | sed -E 's/.*:[[:space:]]*//; s/[[:space:]]*$//' || true)"
+  fi
+  case "$value" in
+    true|false) printf '%s\n' "$value" ;;
+    *) printf '%s\n' "$default" ;;
+  esac
+}
+
+yaml_string_default() {
+  local key="$1" default="$2" value
+  value=""
+  if [[ -f "$CONFIG_PATH" ]]; then
+    value="$(sed -n -E "s/^[[:space:]]*${key}:[[:space:]]*\"(.*)\"[[:space:]]*$/\1/p" "$CONFIG_PATH" | tail -n 1 || true)"
+  fi
+  if [[ -n "$value" ]]; then
+    printf '%s\n' "$value" | sed 's/\\"/"/g'
+  else
+    printf '%s\n' "$default"
+  fi
+}
 
 ask_yes_no() {
   local prompt="$1" default="$2" answer suffix
@@ -31,34 +56,53 @@ ask_yes_no() {
   done
 }
 
-echo "ERSTSTART-KONFIGURATION"
-echo "Vor Abschluss dieser Konfiguration fuehrt der Agent keine Host-Arbeit aus."
+ask_text() {
+  local prompt="$1" default="$2" answer
+  if [[ -n "$default" ]]; then
+    printf '%s [%s] ' "$prompt" "$default" >&2
+  else
+    printf '%s ' "$prompt" >&2
+  fi
+  read -r answer || answer=""
+  if [[ -z "$answer" ]]; then printf '%s\n' "$default"; else printf '%s\n' "$answer"; fi
+}
 
-printf 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler": ' >&2
-read -r person_description || person_description=""
-allow_baseline="$(ask_yes_no 'Host-Baseline erfassen und dokumentieren?' true)"
-allow_security_recommendations="$(ask_yes_no 'Usability-first Sicherheitsempfehlungen anzeigen?' true)"
-allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Updates empfehlen?' true)"
-allow_optional_av="$(ask_yes_no 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' false)"
-allow_blocklist_pilot="$(ask_yes_no 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' false)"
-allow_firewall_ip_blocklists="$(ask_yes_no 'IP-Firewall-Blocklisten als riskante Option anbieten?' false)"
-windows_wsl_backend=false
-windows_wsl_with_docker=false
-windows_portainer_ui=false
-windows_wsl_recommendations=false
+echo "AGENTEN-KONFIGURATION"
+if [[ "$configuration_mode" == "reconfigure" ]]; then
+  echo "Bestehende Werte werden als Defaults genutzt. Leere Antworten behalten sie bei."
+else
+  echo "Vor Abschluss dieser Konfiguration fuehrt der Agent keine Host-Arbeit aus."
+fi
+
+person_description="$(ask_text 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler":' "$(yaml_string_default person_description '')")"
+allow_baseline="$(ask_yes_no 'Host-Baseline erfassen und dokumentieren?' "$(yaml_bool_default allow_baseline true)")"
+allow_security_recommendations="$(ask_yes_no 'Usability-first Sicherheitsempfehlungen anzeigen?' "$(yaml_bool_default allow_security_recommendations true)")"
+allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Updates empfehlen?' "$(yaml_bool_default allow_package_recommendations true)")"
+allow_optional_av="$(ask_yes_no 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' "$(yaml_bool_default allow_optional_av false)")"
+allow_blocklist_pilot="$(ask_yes_no 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' "$(yaml_bool_default allow_blocklist_pilot false)")"
+allow_firewall_ip_blocklists="$(ask_yes_no 'IP-Firewall-Blocklisten als riskante Option anbieten?' "$(yaml_bool_default allow_firewall_ip_blocklists false)")"
+windows_wsl_backend="$(yaml_bool_default windows_wsl_backend false)"
+windows_wsl_with_docker="$(yaml_bool_default windows_wsl_with_docker false)"
+windows_portainer_ui="$(yaml_bool_default windows_portainer_ui false)"
+windows_wsl_recommendations="$(yaml_bool_default windows_wsl_recommendations false)"
 if [[ "${OS:-}" == "Windows_NT" ]] || grep -qi microsoft /proc/version 2>/dev/null; then
-  windows_wsl_backend="$(ask_yes_no 'Windows/WSL: WSL-Backend fuer Linux-Tools vorbereiten oder beruecksichtigen?' false)"
+  windows_wsl_backend="$(ask_yes_no 'Windows/WSL: WSL-Backend fuer Linux-Tools vorbereiten oder beruecksichtigen?' "$windows_wsl_backend")"
   if [[ "$windows_wsl_backend" == "true" ]]; then
-    windows_wsl_with_docker="$(ask_yes_no 'Windows/WSL: Docker mit WSL-Unterstuetzung einplanen?' false)"
+    windows_wsl_with_docker="$(ask_yes_no 'Windows/WSL: Docker mit WSL-Unterstuetzung einplanen?' "$windows_wsl_with_docker")"
     if [[ "$windows_wsl_with_docker" == "true" ]]; then
-      windows_portainer_ui="$(ask_yes_no 'Windows/WSL: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' false)"
+      windows_portainer_ui="$(ask_yes_no 'Windows/WSL: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' "$windows_portainer_ui")"
+    else
+      windows_portainer_ui=false
     fi
     windows_wsl_recommendations=true
+  else
+    windows_wsl_with_docker=false
+    windows_portainer_ui=false
+    windows_wsl_recommendations=false
   fi
 fi
-require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' true)"
-printf 'Optionale Notiz fuer den Agenten: ' >&2
-read -r note || note=""
+require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' "$(yaml_bool_default require_confirmation_for_system_changes true)")"
+note="$(ask_text 'Optionale Notiz fuer den Agenten:' "$(yaml_string_default note '')")"
 person_description="$(printf '%s' "$person_description" | agent_redact | sed 's/"/\\"/g')"
 note="$(printf '%s' "$note" | agent_redact | sed 's/"/\\"/g')"
 
@@ -66,6 +110,7 @@ cat > "$CONFIG_PATH" <<YAML
 completed: true
 configured_at: "$(date -Iseconds)"
 configured_by: "first-run-config.sh"
+configuration_mode: "$configuration_mode"
 ui: "shell"
 host: "$HOSTNAME_VALUE"
 user_context:

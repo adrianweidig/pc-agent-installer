@@ -60,67 +60,39 @@ git clone https://github.com/adrianweidig/pc-agent-installer.git
 cd pc-agent-installer
 ```
 
-Danach Codex oder einen vergleichbaren lokalen Agenten im geklonten Repository starten und zuerst `AGENTS.md` lesen lassen.
+Starte danach Codex oder einen vergleichbaren lokalen Agenten in diesem Verzeichnis und gib ihm eine natürliche Arbeitsaufforderung. Geeignete Startsignale sind zum Beispiel:
 
-Repo-Modus prüfen:
-
-```powershell
-./scripts/common/detect-repo-mode.ps1
+```text
+Codex, lies dieses Repository und starte die Agenten-Konfiguration für meinen PC.
+Codex, in diesem Verzeichnis: starte die Erstkonfiguration.
+Codex, öffne die Agenten-Konfiguration erneut und deaktiviere Docker-Empfehlungen.
 ```
 
-```bash
-bash ./scripts/common/detect-repo-mode.sh
-```
+Der Agent soll daraus selbst den passenden Ablauf ableiten. Er liest zuerst `AGENTS.md` und `Vorlage/common/00-agent-regeln.md`, prüft Git-Status, Repo-Modus, Sichtbarkeit und offene Issues, entscheidet zwischen öffentlichem Template und privater Operational-Arbeit und startet erst dann die passende Konfigurationsumgebung.
 
-Template validieren:
+Im öffentlichen `template`-Modus darf der Agent keine Hostdaten schreiben. Wenn die Anfrage echte PC-Konfiguration betrifft, muss er zuerst in eine sichere private Operational-Kopie oder einen `local-only`-Klon wechseln. Die Skripte in `scripts/` sind dafür Werkzeuge, keine manuelle Pflichtliste.
 
-```powershell
-./scripts/common/verify-template.ps1
-```
+### Wiederaufnehmbare Konfiguration
 
-```bash
-bash ./scripts/common/verify-template.sh
-```
+Die Agenten-Konfiguration kann jederzeit erneut gestartet werden. Eine bestehende Datei unter `hosts/<HOSTNAME>/state/first-run-config.yaml` wird als Vorbelegung genutzt; Optionen können dadurch wie Schalter aktiviert oder deaktiviert werden.
 
-Host-Schreibrechte prüfen:
+Eine deaktivierte Option bedeutet: Der Agent darf diese Fähigkeit künftig nicht mehr vorbereiten oder empfehlen. Wenn dazu bereits systemwirksame Änderungen ausgeführt wurden, entscheidet der Agent nicht blind, sondern prüft Change-Einträge, Rollback-Dateien, Baseline und Soll-Ist-Abgleich und schlägt dann einen sicheren Rückbau oder eine bewusste Beibehaltung vor.
 
-```powershell
-./scripts/common/assert-private-repo.ps1
-```
+### Entdeckbare Werkzeuge
 
-```bash
-bash ./scripts/common/assert-private-repo.sh
-```
+Diese Befehle sind Anker für Agenten und für manuelle Diagnose. Der normale Einstieg bleibt die natürliche Aufforderung oben.
 
-Im öffentlichen `template`-Modus schlägt `assert-private-repo` absichtlich fehl. Das ist eine Sicherheitsgrenze und schützt vor versehentlichem Schreiben von Hostdaten.
+| Zweck | PowerShell | Bash |
+| --- | --- | --- |
+| Repo-Modus erkennen | `./scripts/common/detect-repo-mode.ps1` | `bash ./scripts/common/detect-repo-mode.sh` |
+| Template prüfen | `./scripts/common/verify-template.ps1` | `bash ./scripts/common/verify-template.sh` |
+| Host-Schreibrechte prüfen | `./scripts/common/assert-private-repo.ps1` | `bash ./scripts/common/assert-private-repo.sh` |
+| Agenten-Konfiguration starten oder erneut öffnen | `./scripts/common/first-run-config.ps1` | `bash ./scripts/common/first-run-config.sh` |
+| Host-Arbeitsbereitschaft prüfen | `./scripts/common/assert-first-run-config.ps1` und `./scripts/common/assert-infrastructure-snapshot.ps1` | `bash ./scripts/common/assert-first-run-config.sh` und `bash ./scripts/common/assert-infrastructure-snapshot.sh` |
 
-Erststart-Konfiguration in einer privaten oder lokalen Operational-Kopie starten:
+`assert-private-repo.*` darf im öffentlichen `template`-Modus absichtlich fehlschlagen. Das ist eine Sicherheitsgrenze und schützt vor versehentlichem Schreiben von Hostdaten.
 
-```powershell
-./scripts/common/first-run-config.ps1
-```
-
-```bash
-bash ./scripts/common/first-run-config.sh
-```
-
-Auf Windows enthält die Erststart-Konfiguration zusätzlich optionale Fragen zu WSL, Docker mit WSL-Unterstützung und Portainer CE. Wenn WSL gewählt wird, muss der Agent WSL-Vorlagen berücksichtigen; wenn Docker oder Portainer gewählt wird, müssen zusätzlich die Container-Vorlagen berücksichtigt werden. Die Auswahl bereitet nur Empfehlungen und spätere freigegebene Schritte vor, sie installiert nichts automatisch.
-
-Die Erststart-Konfiguration fragt außerdem nach einer kurzen Nutzerbeschreibung, etwa `Ich bin Entwickler` oder `Ich nutze den PC für Büro, WhatsApp und Fotos`. Daraus leitet der Agent passende Programm- und Umgebungsempfehlungen ab, ohne Programme automatisch zu installieren.
-
-Pflichtprüfung vor Host-Arbeit:
-
-```powershell
-./scripts/common/assert-first-run-config.ps1
-./scripts/common/assert-infrastructure-snapshot.ps1
-```
-
-```bash
-bash ./scripts/common/assert-first-run-config.sh
-bash ./scripts/common/assert-infrastructure-snapshot.sh
-```
-
-Der Infrastruktur-Snapshot ist die Vollzugriff-Sicherheitsgrenze: bevor der Agent installiert, löscht, Dienste ändert, Container anfasst oder Paketmanager nutzt, muss er Ist-Zustand und Soll-Zustand vergleichen und Duplikate sowie Löschrisiken dokumentieren.
+Der Infrastruktur-Snapshot bleibt die Vollzugriff-Sicherheitsgrenze: bevor der Agent installiert, löscht, Dienste ändert, Container anfasst oder Paketmanager nutzt, muss er Ist-Zustand und Soll-Zustand vergleichen und Duplikate sowie Löschrisiken dokumentieren.
 
 ## Arbeitsmodell
 

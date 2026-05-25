@@ -14,10 +14,6 @@ $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
 $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $configPath = Join-Path $hostRoot 'state/first-run-config.yaml'
-if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $configPath -Pattern '^\s*completed:\s*true\s*$' -Quiet)) {
-    Write-Host "Erststart-Konfiguration ist bereits abgeschlossen: $configPath"
-    exit 0
-}
 
 $defaults = [ordered]@{
     allow_baseline = $true
@@ -32,7 +28,46 @@ $defaults = [ordered]@{
     windows_wsl_recommendations = $false
     require_confirmation_for_system_changes = $true
 }
-$isWindowsHost = $IsWindows -or $env:OS -eq 'Windows_NT'
+$isWindowsHost = $env:OS -eq 'Windows_NT'
+$isWindowsVariable = Get-Variable -Name IsWindows -ErrorAction SilentlyContinue
+if (-not $isWindowsHost -and $isWindowsVariable) {
+    $isWindowsHost = [bool]$isWindowsVariable.Value
+}
+
+function ConvertFrom-AgentConfigScalar {
+    param([string]$Value)
+    if ($null -eq $Value) { return '' }
+    return $Value.Replace('\"', '"')
+}
+
+function Merge-AgentExistingFirstRunConfig {
+    param(
+        [string]$Path,
+        [System.Collections.Specialized.OrderedDictionary]$Fallback
+    )
+
+    $values = [ordered]@{}
+    foreach ($key in $Fallback.Keys) { $values[$key] = $Fallback[$key] }
+    $values['person_description'] = ''
+    $values['note'] = ''
+
+    if (-not (Test-Path -LiteralPath $Path)) { return $values }
+
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        if ($line -match '^\s+([a-z0-9_]+):\s*(true|false)\s*$') {
+            $values[$Matches[1]] = ($Matches[2] -eq 'true')
+        } elseif ($line -match '^\s+person_description:\s*"(.*)"\s*$') {
+            $values['person_description'] = ConvertFrom-AgentConfigScalar -Value $Matches[1]
+        } elseif ($line -match '^\s*note:\s*"(.*)"\s*$') {
+            $values['note'] = ConvertFrom-AgentConfigScalar -Value $Matches[1]
+        }
+    }
+
+    return $values
+}
+
+$configurationMode = if (Test-Path -LiteralPath $configPath) { 'reconfigure' } else { 'first-run' }
+$defaults = Merge-AgentExistingFirstRunConfig -Path $configPath -Fallback $defaults
 
 function Read-AgentYesNo {
     param([string]$Prompt, [bool]$Default)
@@ -48,6 +83,16 @@ function Read-AgentYesNo {
     }
 }
 
+function Read-AgentText {
+    param([string]$Prompt, [string]$Default = '')
+    if ([string]::IsNullOrWhiteSpace($Default)) {
+        return (Read-Host $Prompt)
+    }
+    $answer = Read-Host "$Prompt [$Default]"
+    if ([string]::IsNullOrWhiteSpace($answer)) { return $Default }
+    return $answer
+}
+
 $values = [ordered]@{}
 $usedUi = 'console'
 
@@ -56,14 +101,14 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         Add-Type -AssemblyName System.Windows.Forms
         Add-Type -AssemblyName System.Drawing
         $form = [System.Windows.Forms.Form]::new()
-        $form.Text = 'PC Agent Installer - Erststart-Konfiguration'
+        $form.Text = 'PC Agent Installer - Agenten-Konfiguration'
         $form.Width = 760
         $form.Height = 760
         $form.StartPosition = 'CenterScreen'
         $form.TopMost = $true
 
         $intro = [System.Windows.Forms.Label]::new()
-        $intro.Text = 'Bitte lege fest, was der Agent auf diesem PC grundsaetzlich vorbereiten darf. Vor Abschluss dieser Konfiguration fuehrt der Agent keine Host-Arbeit aus.'
+        $intro.Text = 'Lege fest, was der Agent auf diesem PC vorbereiten darf. Bestehende Optionen koennen hier erneut aktiviert oder deaktiviert werden.'
         $intro.AutoSize = $false
         $intro.Width = 700
         $intro.Height = 50
@@ -86,7 +131,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $profile.Width = 690
         $profile.Height = 45
         $profile.Multiline = $true
-        $profile.Text = ''
+        $profile.Text = [string]$defaults['person_description']
         $form.Controls.Add($profile)
 
         $items = [ordered]@{
@@ -146,7 +191,7 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
         $note.Width = 690
         $note.Height = 80
         $note.Multiline = $true
-        $note.Text = 'Notiz fuer den Agenten, z. B. bevorzugte Tools, Dinge die nicht veraendert werden sollen, oder spaeter zu klaerende Punkte.'
+        $note.Text = [string]$defaults['note']
         $form.Controls.Add($note)
 
         $ok = [System.Windows.Forms.Button]::new()
@@ -173,19 +218,23 @@ if (-not $ConsoleOnly -and $isWindowsHost) {
 }
 
 if ($values.Count -eq 0) {
-    Write-Host 'Erststart-Konfiguration ist noch nicht abgeschlossen.'
-    $values['person_description'] = Read-Host 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler"'
-    $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default $true
-    $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default $true
-    $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default $true
-    $values['allow_optional_av'] = Read-AgentYesNo -Prompt 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' -Default $false
-    $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' -Default $false
-    $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt 'IP-Firewall-Blocklisten als riskante Option anbieten?' -Default $false
-    $values['windows_wsl_backend'] = Read-AgentYesNo -Prompt 'Windows: WSL-Backend fuer Linux-Tools vorbereiten?' -Default $false
+    if ($configurationMode -eq 'reconfigure') {
+        Write-Host 'Agenten-Konfiguration wird erneut geoeffnet. Leere Antworten behalten vorhandene Werte bei.'
+    } else {
+        Write-Host 'Agenten-Konfiguration wird gestartet.'
+    }
+    $values['person_description'] = Read-AgentText -Prompt 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler"' -Default ([string]$defaults['person_description'])
+    $values['allow_baseline'] = Read-AgentYesNo -Prompt 'Host-Baseline erfassen und dokumentieren?' -Default ([bool]$defaults['allow_baseline'])
+    $values['allow_security_recommendations'] = Read-AgentYesNo -Prompt 'Usability-first Sicherheitsempfehlungen anzeigen?' -Default ([bool]$defaults['allow_security_recommendations'])
+    $values['allow_package_recommendations'] = Read-AgentYesNo -Prompt 'Kostenlose, aktuelle Tools und Updates empfehlen?' -Default ([bool]$defaults['allow_package_recommendations'])
+    $values['allow_optional_av'] = Read-AgentYesNo -Prompt 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' -Default ([bool]$defaults['allow_optional_av'])
+    $values['allow_blocklist_pilot'] = Read-AgentYesNo -Prompt 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' -Default ([bool]$defaults['allow_blocklist_pilot'])
+    $values['allow_firewall_ip_blocklists'] = Read-AgentYesNo -Prompt 'IP-Firewall-Blocklisten als riskante Option anbieten?' -Default ([bool]$defaults['allow_firewall_ip_blocklists'])
+    $values['windows_wsl_backend'] = Read-AgentYesNo -Prompt 'Windows: WSL-Backend fuer Linux-Tools vorbereiten?' -Default ([bool]$defaults['windows_wsl_backend'])
     if ($values.windows_wsl_backend) {
-        $values['windows_wsl_with_docker'] = Read-AgentYesNo -Prompt 'Windows: Docker mit WSL-Unterstuetzung einplanen?' -Default $false
+        $values['windows_wsl_with_docker'] = Read-AgentYesNo -Prompt 'Windows: Docker mit WSL-Unterstuetzung einplanen?' -Default ([bool]$defaults['windows_wsl_with_docker'])
         if ($values.windows_wsl_with_docker) {
-            $values['windows_portainer_ui'] = Read-AgentYesNo -Prompt 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' -Default $false
+            $values['windows_portainer_ui'] = Read-AgentYesNo -Prompt 'Windows: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' -Default ([bool]$defaults['windows_portainer_ui'])
         } else {
             $values['windows_portainer_ui'] = $false
         }
@@ -195,8 +244,8 @@ if ($values.Count -eq 0) {
         $values['windows_portainer_ui'] = $false
         $values['windows_wsl_recommendations'] = $false
     }
-    $values['require_confirmation_for_system_changes'] = Read-AgentYesNo -Prompt 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' -Default $true
-    $values['note'] = Read-Host 'Optionale Notiz fuer den Agenten'
+    $values['require_confirmation_for_system_changes'] = Read-AgentYesNo -Prompt 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' -Default ([bool]$defaults['require_confirmation_for_system_changes'])
+    $values['note'] = Read-AgentText -Prompt 'Optionale Notiz fuer den Agenten' -Default ([string]$defaults['note'])
 }
 
 if (-not $values.windows_wsl_backend) {
@@ -217,6 +266,7 @@ $yaml = @"
 completed: true
 configured_at: "$now"
 configured_by: "first-run-config.ps1"
+configuration_mode: "$configurationMode"
 ui: "$usedUi"
 repo_mode: "$($guard.repo_mode)"
 visibility: "$($guard.visibility)"

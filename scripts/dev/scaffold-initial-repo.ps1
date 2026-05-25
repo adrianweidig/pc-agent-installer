@@ -132,6 +132,13 @@ Dieses Projekt trennt dauerhaft zwei Arbeitsbereiche:
 
 Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffentliche Template bleibt die Quelle für generische Änderungen, der private oder lokale Operational-Workspace bleibt die Quelle für Hostzustand und Tests. Die konkrete Codex-Aufgabe oder lokale Testabsicht wird nicht als Prompt, Notiz oder Projektauftrag im öffentlichen Repository abgelegt.
 
+## Natürliche Startsignale
+Wenn der Nutzer `starte die Erstkonfiguration`, `starte die Agenten-Konfiguration für meinen PC`, `konfiguriere diesen PC` oder sinngemäß Ähnliches schreibt, ist das ein direkter Auftrag zur Konfigurationsumgebung. Der Agent liest die Regeln, prüft Repo-Modus, Sichtbarkeit und Git-Status, stellt bei Hostdaten zuerst einen sicheren Operational-Kontext her und startet dann `first-run-config.*` als Werkzeug.
+
+Eine vorhandene Konfiguration unter `hosts/<HOSTNAME>/state/first-run-config.yaml` ist kein Abbruchgrund. Sie dient als Vorbelegung für eine Folgekonfiguration, in der Optionen aktiviert oder deaktiviert werden können. Deaktivieren ist kein automatischer Rollback; der Agent prüft dafür Change-Einträge, Rollback, Baseline und Soll-Ist-Abgleich.
+
+Die Skripte in `scripts/` sind Werkzeuge. Der Agent entscheidet anhand von `AGENTS.md`, `docs/` und `Vorlage/`, welche davon für den nächsten Schritt nötig sind.
+
 ## Harte Regeln
 1. Prüfe zuerst den Repo-Modus und die Sichtbarkeit.
 2. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
@@ -154,7 +161,7 @@ Ein lokaler Codex-Lauf darf beide Bereiche parallel berücksichtigen: Das öffen
 2. Repo-Modus mit `scripts/common/detect-repo-mode.*` erkennen.
 3. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
 4. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
-5. Wenn die Erststart-Konfiguration fehlt, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` ausführen lassen.
+5. Wenn die Erststart-Konfiguration fehlt oder der Nutzer die Agenten-Konfiguration starten, ändern, deaktivieren oder erneut öffnen will, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` als Werkzeug ausführen lassen.
 6. Infrastruktur-Snapshot mit `scripts/common/assert-infrastructure-snapshot.*` prüfen, bevor Installationen, Löschungen, Dienste, Firewall, DNS, Container, WSL, Paketmanager oder Cleanup betroffen sind.
 7. Wenn der Snapshot fehlt oder unvollständig ist, zuerst aktuelle Baseline mit `collect-baseline.*` erzeugen.
 8. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.
@@ -261,35 +268,23 @@ Es gibt keinen Paketmanager, keine externen Laufzeitabhängigkeiten und keinen k
 
 ## Schnellstart
 
-Repo-Modus prüfen:
+Starte Codex oder einen vergleichbaren lokalen Agenten im Repository und nutze eine natürliche Aufforderung:
 
-```powershell
-./scripts/common/detect-repo-mode.ps1
+```text
+Codex, lies dieses Repository und starte die Agenten-Konfiguration für meinen PC.
+Codex, in diesem Verzeichnis: starte die Erstkonfiguration.
+Codex, öffne die Agenten-Konfiguration erneut und deaktiviere Docker-Empfehlungen.
 ```
 
-```bash
-./scripts/common/detect-repo-mode.sh
-```
+Der Agent liest `AGENTS.md`, prüft Git-Status, Repo-Modus und Sichtbarkeit, trennt öffentliches Template von privater Operational-Arbeit und startet erst dann die passende Konfigurationsumgebung. Im öffentlichen `template`-Modus werden keine Hostdaten geschrieben.
 
-Template validieren:
+Die Skripte sind entdeckbare Werkzeuge für den Agenten:
 
-```powershell
-./scripts/common/validate-template.ps1
-```
-
-```bash
-./scripts/common/validate-template.sh
-```
-
-Host-Schreibrechte prüfen:
-
-```powershell
-./scripts/common/assert-private-repo.ps1
-```
-
-```bash
-./scripts/common/assert-private-repo.sh
-```
+- Repo-Modus: `scripts/common/detect-repo-mode.*`
+- Template-Prüfung: `scripts/common/validate-template.*`
+- Host-Schreibrechte: `scripts/common/assert-private-repo.*`
+- Agenten-Konfiguration: `scripts/common/first-run-config.*`
+- Host-Arbeitsbereitschaft: `scripts/common/assert-first-run-config.*` und `scripts/common/assert-infrastructure-snapshot.*`
 
 Im `template`-Modus schlägt `assert-private-repo` absichtlich fehl. Das schützt vor versehentlichem Schreiben von Hostdaten in ein öffentliches oder ungeprüftes Repository.
 
@@ -928,9 +923,19 @@ Kostenlose Tools dürfen empfohlen, aber nicht blind installiert werden:
 Controlled Folder Access, DNS-Filter, harte ausgehende Firewall-Regeln, WDAC, AppLocker, aggressive Exploit-Protection-Ausnahmen und zusätzliche Echtzeit-Antivirus-Suiten sind keine Defaults. Sie brauchen Nutzerentscheidung, Pilotprüfung, Validierung und Rollback.
 '@
     'docs/16-erststart-konfiguration.md' = @'
-# Erststart-Konfiguration
+# Erststart- und Agenten-Konfiguration
 
-Vor echter Host-Arbeit muss der Agent eine nutzerfreundliche Erststart-Konfiguration öffnen oder klar melden, dass diese Konfiguration noch nicht abgeschlossen ist.
+Vor echter Host-Arbeit muss der Agent eine nutzerfreundliche Agenten-Konfiguration öffnen oder klar melden, dass diese Konfiguration noch nicht abgeschlossen ist.
+
+Der Nutzer soll keine Skriptliste auswendig kennen. Diese Aufforderungen reichen:
+
+```text
+Codex, in diesem Verzeichnis starte die Erstkonfiguration.
+Codex, starte die Agenten-Konfiguration für meinen PC.
+Codex, öffne die Agenten-Konfiguration erneut und deaktiviere Portainer.
+```
+
+Der Agent prüft zuerst `AGENTS.md`, Repo-Modus, Sichtbarkeit und Git-Status. In einem öffentlichen oder ungeprüften Template schreibt er keine Hostdaten, sondern stellt zuerst eine private Operational-Kopie oder einen `local-only`-Klon her.
 
 Windows:
 
@@ -955,6 +960,8 @@ bash ./scripts/common/assert-first-run-config.sh
 ```
 
 Die gespeicherten Präferenzen liegen unter `hosts/<HOSTNAME>/state/first-run-config.yaml` und enthalten keine Klartext-Secrets.
+
+Wenn die Datei bereits existiert, wird sie als Vorbelegung genutzt. Optionen können dadurch erneut aktiviert oder deaktiviert werden. Deaktivierung ist kein automatischer Rollback; der Agent prüft dafür Change-Einträge, Rollback-Dateien, Baseline und Soll-Ist-Abgleich.
 
 Windows fragt zusätzlich, ob WSL als Backend vorbereitet werden soll. Docker wird nur auf dieser Basis eingeplant; Portainer CE wird nur empfohlen, wenn Docker gewählt wurde. Bei WSL-Auswahl müssen WSL-Vorlagen berücksichtigt werden, bei Docker oder Portainer zusätzlich Container-Vorlagen.
 
@@ -1904,34 +1911,50 @@ $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
 $hostRoot = New-AgentHostTree -RepoRoot $RepoRoot -HostName $HostName
 $configPath = Join-Path $hostRoot 'state/first-run-config.yaml'
-if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $configPath -Pattern '^\s*completed:\s*true\s*$' -Quiet)) {
-    Write-Host "Erststart-Konfiguration ist bereits abgeschlossen: $configPath"
-    exit 0
+function Get-ExistingBool {
+    param([string]$Key, [bool]$Default)
+    if (Test-Path -LiteralPath $configPath) {
+        $line = Get-Content -LiteralPath $configPath | Where-Object { $_ -match "^\s+$Key\s*:\s*(true|false)\s*$" } | Select-Object -Last 1
+        if ($line -match ':\s*(true|false)\s*$') { return ($Matches[1] -eq 'true') }
+    }
+    return $Default
 }
+function Get-ExistingText {
+    param([string]$Key)
+    if (Test-Path -LiteralPath $configPath) {
+        $line = Get-Content -LiteralPath $configPath | Where-Object { $_ -match "^\s*$Key\s*:" } | Select-Object -Last 1
+        if ($line -match ':\s*"(.*)"\s*$') { return $Matches[1].Replace('\"', '"') }
+    }
+    return ''
+}
+$configurationMode = if (Test-Path -LiteralPath $configPath) { 'reconfigure' } else { 'first-run' }
 $now = (Get-Date).ToString('o')
+$personDescription = (Get-ExistingText -Key 'person_description').Replace('"', '\"')
+$note = (Get-ExistingText -Key 'note').Replace('"', '\"')
 $content = @"
 completed: true
 configured_at: "$now"
 configured_by: "first-run-config.ps1"
+configuration_mode: "$configurationMode"
 ui: "powershell"
 repo_mode: "$($guard.repo_mode)"
 visibility: "$($guard.visibility)"
 host: "$HostName"
 user_context:
-  person_description: ""
+  person_description: "$personDescription"
 preferences:
-  allow_baseline: true
-  allow_security_recommendations: true
-  allow_package_recommendations: true
-  allow_optional_av: false
-  allow_blocklist_pilot: false
-  allow_firewall_ip_blocklists: false
-  windows_wsl_backend: false
-  windows_wsl_with_docker: false
-  windows_portainer_ui: false
-  windows_wsl_recommendations: false
-  require_confirmation_for_system_changes: true
-note: ""
+  allow_baseline: $((Get-ExistingBool -Key 'allow_baseline' -Default $true).ToString().ToLowerInvariant())
+  allow_security_recommendations: $((Get-ExistingBool -Key 'allow_security_recommendations' -Default $true).ToString().ToLowerInvariant())
+  allow_package_recommendations: $((Get-ExistingBool -Key 'allow_package_recommendations' -Default $true).ToString().ToLowerInvariant())
+  allow_optional_av: $((Get-ExistingBool -Key 'allow_optional_av' -Default $false).ToString().ToLowerInvariant())
+  allow_blocklist_pilot: $((Get-ExistingBool -Key 'allow_blocklist_pilot' -Default $false).ToString().ToLowerInvariant())
+  allow_firewall_ip_blocklists: $((Get-ExistingBool -Key 'allow_firewall_ip_blocklists' -Default $false).ToString().ToLowerInvariant())
+  windows_wsl_backend: $((Get-ExistingBool -Key 'windows_wsl_backend' -Default $false).ToString().ToLowerInvariant())
+  windows_wsl_with_docker: $((Get-ExistingBool -Key 'windows_wsl_with_docker' -Default $false).ToString().ToLowerInvariant())
+  windows_portainer_ui: $((Get-ExistingBool -Key 'windows_portainer_ui' -Default $false).ToString().ToLowerInvariant())
+  windows_wsl_recommendations: $((Get-ExistingBool -Key 'windows_wsl_recommendations' -Default $false).ToString().ToLowerInvariant())
+  require_confirmation_for_system_changes: $((Get-ExistingBool -Key 'require_confirmation_for_system_changes' -Default $true).ToString().ToLowerInvariant())
+note: "$note"
 "@
 Write-AgentUtf8 -Path $configPath -Content $content
 Write-Host "Erststart-Konfiguration gespeichert: $configPath"
@@ -1951,7 +1974,7 @@ if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $confi
     Write-Host "Erststart-Konfiguration vorhanden: $configPath"
     exit 0
 }
-Write-Error "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Bitte zuerst ./scripts/common/first-run-config.ps1 ausfuehren."
+Write-Error "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration fuer meinen PC."
 exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.ps1' -Content $assertFirstRunPs
@@ -2491,31 +2514,48 @@ agent_assert_host_write_allowed "$ROOT" >/dev/null
 HOST_ROOT="$ROOT/hosts/$HOSTNAME_VALUE"
 mkdir -p "$HOST_ROOT/state"
 CONFIG_PATH="$HOST_ROOT/state/first-run-config.yaml"
-if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH"; then
-  echo "Erststart-Konfiguration ist bereits abgeschlossen: $CONFIG_PATH"
-  exit 0
-fi
+configuration_mode="first-run"
+if [[ -f "$CONFIG_PATH" ]]; then configuration_mode="reconfigure"; fi
+yaml_bool_default() {
+  local key="$1" default="$2" value
+  value=""
+  if [[ -f "$CONFIG_PATH" ]]; then
+    value="$(grep -E "^[[:space:]]+${key}:[[:space:]]*(true|false)[[:space:]]*$" "$CONFIG_PATH" | tail -n 1 | sed -E 's/.*:[[:space:]]*//; s/[[:space:]]*$//' || true)"
+  fi
+  case "$value" in true|false) printf '%s\n' "$value" ;; *) printf '%s\n' "$default" ;; esac
+}
+yaml_string_default() {
+  local key="$1" value
+  value=""
+  if [[ -f "$CONFIG_PATH" ]]; then
+    value="$(sed -n -E "s/^[[:space:]]*${key}:[[:space:]]*\"(.*)\"[[:space:]]*$/\1/p" "$CONFIG_PATH" | tail -n 1 || true)"
+  fi
+  printf '%s\n' "$value" | sed 's/\\"/"/g'
+}
+person_description="$(yaml_string_default person_description | sed 's/"/\\"/g')"
+note="$(yaml_string_default note | sed 's/"/\\"/g')"
 cat > "$CONFIG_PATH" <<YAML
 completed: true
 configured_at: "$(date -Iseconds)"
 configured_by: "first-run-config.sh"
+configuration_mode: "$configuration_mode"
 ui: "shell"
 host: "$HOSTNAME_VALUE"
 user_context:
-  person_description: ""
+  person_description: "$person_description"
 preferences:
-  allow_baseline: true
-  allow_security_recommendations: true
-  allow_package_recommendations: true
-  allow_optional_av: false
-  allow_blocklist_pilot: false
-  allow_firewall_ip_blocklists: false
-  windows_wsl_backend: false
-  windows_wsl_with_docker: false
-  windows_portainer_ui: false
-  windows_wsl_recommendations: false
-  require_confirmation_for_system_changes: true
-note: ""
+  allow_baseline: $(yaml_bool_default allow_baseline true)
+  allow_security_recommendations: $(yaml_bool_default allow_security_recommendations true)
+  allow_package_recommendations: $(yaml_bool_default allow_package_recommendations true)
+  allow_optional_av: $(yaml_bool_default allow_optional_av false)
+  allow_blocklist_pilot: $(yaml_bool_default allow_blocklist_pilot false)
+  allow_firewall_ip_blocklists: $(yaml_bool_default allow_firewall_ip_blocklists false)
+  windows_wsl_backend: $(yaml_bool_default windows_wsl_backend false)
+  windows_wsl_with_docker: $(yaml_bool_default windows_wsl_with_docker false)
+  windows_portainer_ui: $(yaml_bool_default windows_portainer_ui false)
+  windows_wsl_recommendations: $(yaml_bool_default windows_wsl_recommendations false)
+  require_confirmation_for_system_changes: $(yaml_bool_default require_confirmation_for_system_changes true)
+note: "$note"
 YAML
 echo "Erststart-Konfiguration gespeichert: $CONFIG_PATH"
 '@
@@ -2534,7 +2574,7 @@ if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[
   echo "Erststart-Konfiguration vorhanden: $CONFIG_PATH"
   exit 0
 fi
-echo "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Bitte zuerst bash ./scripts/common/first-run-config.sh ausfuehren." >&2
+echo "Die Konfiguration fuer den Erststart ist noch nicht abgeschlossen. Agentischer Startsatz: Codex, starte die Agenten-Konfiguration fuer meinen PC." >&2
 exit 12
 '@
 Write-RepoFile -Path 'scripts/common/assert-first-run-config.sh' -Content $assertFirstRunSh

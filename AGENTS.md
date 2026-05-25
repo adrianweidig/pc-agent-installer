@@ -33,13 +33,40 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 - Gehört sie als Host-, Test-, Infrastruktur- oder Betriebszustand in ein privates Operational-Repository oder einen `local-only`-Klon?
 - Muss in beiden Arbeitsbereichen gearbeitet werden, wobei nur der generische Anteil ins öffentliche Repository übernommen wird?
 
+## Natürliche Startsignale
+
+Wenn der Nutzer Formulierungen wie `starte die Erstkonfiguration`, `starte die Agenten-Konfiguration für meinen PC`, `konfiguriere diesen PC`, `öffne die PC-Agent-Konfiguration erneut` oder sinngemäß ähnliche Aufforderungen verwendet, ist das ein direkter Auftrag zur Konfigurationsumgebung.
+
+Codex muss dann nicht auf eine Skriptliste warten. Der Agent leitet selbst den passenden Ablauf ein:
+
+1. `AGENTS.md` und `Vorlage/common/00-agent-regeln.md` als verbindliche Regeln anwenden.
+2. Arbeitsbaum, Repo-Modus, Sichtbarkeit und offene Issues prüfen.
+3. Entscheiden, ob Hostdaten im aktuellen Arbeitsbereich geschrieben werden dürfen.
+4. Falls der aktuelle Arbeitsbereich öffentlich oder ungeprüft ist, keine Hostdaten schreiben und zuerst eine sichere private Operational-Kopie oder einen `local-only`-Klon herstellen oder anfordern.
+5. In einem erlaubten Operational-Kontext `first-run-config.*` als Werkzeug starten oder erneut öffnen.
+6. Danach anhand der gespeicherten Präferenzen, Vorlagen und aktuellen Baseline entscheiden, welche nächsten Schritte sinnvoll und freigabepflichtig sind.
+
+Wenn ein Agent persistentes Memory unterstützt, darf er sich merken, dass `Agenten-Konfiguration für meinen PC` auf dieses Repository und diese Regeln verweist. Trotzdem muss jeder Lauf Repo-Modus, Sichtbarkeit, Git-Status und Host-Schreibrechte neu prüfen.
+
+Die Skripte in `scripts/` sind Werkzeuge zur Prüfung, Erfassung und Validierung. Sie ersetzen nicht die Entscheidung des Agenten. Der Agent wählt sie anhand von `AGENTS.md`, `docs/` und `Vorlage/` gezielt aus und startet keine breite Skriptkette ohne konkreten Anlass.
+
+## Wiederholbare Konfiguration
+
+Die Erststart- beziehungsweise Agenten-Konfiguration ist wiederaufnehmbar. Eine vorhandene Datei `hosts/<HOSTNAME>/state/first-run-config.yaml` ist kein Abbruchgrund, sondern Vorbelegung für eine Folgekonfiguration.
+
+Optionen in dieser Konfiguration wirken wie Präferenz-Schalter:
+
+- Aktivieren erlaubt dem Agenten, passende Empfehlungen, Prüfungen oder freigegebene Schritte vorzubereiten.
+- Deaktivieren verbietet künftige Empfehlungen oder Vorbereitungen in diesem Bereich.
+- Wenn bereits eine systemwirksame Änderung umgesetzt wurde, ist Deaktivieren kein automatischer Rollback. Codex muss Change-Einträge, Rollback-Dateien, Baseline, Soll-Ist-Abgleich und Nutzdatenrisiko prüfen und danach einen sicheren Rückbau vorschlagen oder begründet davon abraten.
+
 ## Harte Regeln
 
 1. Prüfe zuerst den Repo-Modus und die Sichtbarkeit.
 2. Prüfe offene GitHub-Issues, wenn ein Remote vorhanden und GitHub erreichbar ist.
 3. Schreibe keine Hostdaten in ein öffentliches oder ungeprüftes Repository.
 4. Speichere niemals Klartext-Secrets im Repository.
-5. Vor Host-Arbeit muss die Erststart-Konfiguration abgeschlossen sein. Wenn sie fehlt, abbrechen und melden: `Die Konfiguration für den Erststart ist noch nicht abgeschlossen.`
+5. Vor Host-Arbeit muss die Erststart-Konfiguration abgeschlossen sein. Wenn sie fehlt und der Nutzer nicht gerade die Konfiguration starten will, abbrechen und melden: `Die Konfiguration für den Erststart ist noch nicht abgeschlossen.`
 6. Vor jeder systemwirksamen Änderung muss ein aktueller Infrastruktur-Snapshot geprüft oder erzeugt werden.
 7. Vor jeder systemwirksamen Änderung muss ein Soll-Ist-Abgleich dokumentiert werden.
 8. Installiere nichts doppelt, wenn eine gleichwertige funktionsfähige Komponente bereits existiert.
@@ -64,7 +91,7 @@ Vor jeder Aufgabe muss Codex explizit entscheiden:
 3. Falls GitHub erreichbar ist: offene Issues prüfen und relevante Issue-Nummern in der Arbeitsnotiz oder im Commit/PR-Kontext berücksichtigen.
 4. Repo-Sichtbarkeit mit `scripts/common/assert-private-repo.*` prüfen, wenn Hostdaten geschrieben werden sollen.
 5. Erststart-Konfiguration mit `scripts/common/assert-first-run-config.*` prüfen, wenn Hostdaten oder Systemänderungen betroffen sind.
-6. Wenn die Erststart-Konfiguration fehlt, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` ausführen lassen.
+6. Wenn die Erststart-Konfiguration fehlt oder der Nutzer die Agenten-Konfiguration starten, ändern, deaktivieren oder erneut öffnen will, `scripts/common/first-run-config.ps1` oder `scripts/common/first-run-config.sh` als Werkzeug ausführen lassen.
 7. Infrastruktur-Snapshot mit `scripts/common/assert-infrastructure-snapshot.*` prüfen, bevor Installationen, Löschungen, Dienste, Firewall, DNS, Container, WSL, Paketmanager oder Cleanup betroffen sind.
 8. Wenn der Snapshot fehlt oder unvollständig ist, zuerst aktuelle Baseline mit `collect-baseline.*` erzeugen.
 9. Bei öffentlichem oder ungeprüftem Repo keine Hostdaten schreiben.

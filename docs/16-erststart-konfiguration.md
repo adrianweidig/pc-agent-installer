@@ -1,29 +1,42 @@
-# Erststart-Konfiguration
+# Erststart- und Agenten-Konfiguration
 
 ## Ziel
 
-Der PC Agent Installer soll für sehr unterschiedliche Nutzer funktionieren: normale Nutzer, Power-User und Entwickler. Deshalb muss der Agent vor echter Host-Arbeit zuerst eine verständliche Erststart-Konfiguration öffnen.
+Der PC Agent Installer soll für sehr unterschiedliche Nutzer funktionieren: normale Nutzer, Power-User und Entwickler. Deshalb muss der Agent vor echter Host-Arbeit zuerst eine verständliche Agenten-Konfiguration öffnen.
 
 Ohne abgeschlossene Erststart-Konfiguration darf der Agent keine Host-Baseline, Installation, Sicherheitsänderung, Firewall-Regel, Blockliste oder andere systemwirksame Arbeit starten.
 
 ## Nutzerfluss
 
-1. Nutzer erstellt eine private oder lokale Operational-Kopie.
-2. Nutzer startet die Erststart-Konfiguration.
-3. Der Agent zeigt ein Fenster oder einen Terminal-Dialog.
-4. Der Nutzer wählt aus, was der Agent grundsätzlich darf.
-5. Die Auswahl wird unter `hosts/<HOSTNAME>/state/first-run-config.yaml` gespeichert.
-6. Erst danach darf der Agent Host-Arbeit ausführen.
+Der Nutzer soll keine Skriptliste auswendig kennen. Diese Aufforderungen reichen als Startsignal:
+
+```text
+Codex, in diesem Verzeichnis starte die Erstkonfiguration.
+Codex, starte die Agenten-Konfiguration für meinen PC.
+Codex, öffne die Agenten-Konfiguration erneut und deaktiviere Portainer.
+```
+
+Der Agent muss dann:
+
+1. `AGENTS.md` und `Vorlage/common/00-agent-regeln.md` lesen.
+2. Repo-Modus, Sichtbarkeit und Git-Status prüfen.
+3. Bei öffentlichem oder ungeprüftem Template keine Hostdaten schreiben.
+4. Falls Hostdaten nötig sind, eine private Operational-Kopie oder einen `local-only`-Klon nutzen.
+5. Die Agenten-Konfiguration per passendem Werkzeug öffnen.
+6. Die Auswahl unter `hosts/<HOSTNAME>/state/first-run-config.yaml` speichern.
+7. Danach anhand der gespeicherten Präferenzen, Baseline und Vorlagen entscheiden, welche Schritte sinnvoll und freigabepflichtig sind.
+
+Wenn die Datei bereits existiert, wird sie als Vorbelegung genutzt. Die Konfiguration ist damit nicht nur Erststart, sondern auch Folgekonfiguration.
 
 ## Windows
 
-Windows nutzt bevorzugt einen PowerShell-Dialog:
+Windows nutzt bevorzugt einen PowerShell-Dialog. Der Agent startet ihn, wenn die Regeln und der Repo-Modus Host-Schreibzugriff erlauben:
 
 ```powershell
 ./scripts/common/first-run-config.ps1
 ```
 
-Wenn kein GUI-Fenster verfügbar ist, fällt das Skript auf Terminal-Fragen zurück.
+Wenn kein GUI-Fenster verfügbar ist, fällt das Werkzeug auf Terminal-Fragen zurück.
 
 ## Linux, WSL und macOS
 
@@ -45,7 +58,7 @@ Vor Host-Arbeit muss der Agent prüfen:
 bash ./scripts/common/assert-first-run-config.sh
 ```
 
-Wenn die Prüfung fehlschlägt, muss der Agent abbrechen und melden, dass die Konfiguration für den Erststart noch nicht abgeschlossen ist.
+Wenn die Prüfung fehlschlägt und der Nutzer nicht gerade die Konfiguration starten will, muss der Agent abbrechen und melden, dass die Konfiguration für den Erststart noch nicht abgeschlossen ist. Wenn der Nutzer die Konfiguration starten oder ändern will, ist `first-run-config.*` der nächste sinnvolle Schritt.
 
 ## Abgefragte Entscheidungen
 
@@ -60,6 +73,22 @@ Wenn die Prüfung fehlschlägt, muss der Agent abbrechen und melden, dass die Ko
 - Windows: Docker mit WSL-Unterstützung einplanen
 - Windows: Portainer CE als Docker-Verwaltungsoberfläche empfehlen
 - vor systemwirksamen Änderungen immer bestätigen lassen
+
+## Schalter und Rücknahme
+
+Alle Entscheidungen sind Präferenz-Schalter für den Agenten:
+
+- `true` erlaubt Empfehlungen, Prüfungen oder später freigegebene Arbeiten in diesem Bereich.
+- `false` deaktiviert künftige Empfehlungen oder Vorbereitungen in diesem Bereich.
+- Eine Deaktivierung rollt vorhandene Änderungen nicht automatisch zurück.
+
+Wenn der Nutzer eine Option deaktiviert, deren Wirkung bereits umgesetzt wurde, muss der Agent den tatsächlichen Zustand prüfen. Dafür nutzt er vorhandene Change-Einträge, Rollback-Dateien, Baseline-Daten, Paketmanager-, Dienst-, Container- oder Firewall-Zustand und den Soll-Ist-Abgleich. Erst danach darf er einen Rückbau planen oder ausführen.
+
+Beispiele:
+
+- Docker-Empfehlungen deaktivieren bedeutet zunächst: keine neuen Docker-Schritte vorbereiten.
+- Wenn Docker bereits installiert oder Container vorhanden sind, muss der Agent Volumes, Daten, Dienste und Abhängigkeiten prüfen, bevor er eine Entfernung vorschlägt.
+- WSL wieder aktivieren bedeutet: WSL-Vorlagen erneut berücksichtigen, aber nichts ohne Baseline, Freigabe und Rollback installieren.
 
 ## Windows-Zusatzkomponenten
 
@@ -91,3 +120,4 @@ Die Beschreibung ist keine Installationsfreigabe. Sie steuert nur, welche Vorsch
 - Hostdaten werden nur in bestätigtem `operational`- oder `local-only`-Modus geschrieben.
 - Das öffentliche Template bleibt frei von Hostdaten.
 - Die gespeicherten Präferenzen sind kein Freifahrtschein für destruktive Änderungen; systemwirksame Änderungen brauchen weiterhin Baseline, Rollback und Validierung.
+- Persistentes Agenten-Memory darf auf diese Konfigurationsumgebung verweisen, ersetzt aber keine aktuelle Repo-, Sichtbarkeits- und Host-Schreibrechteprüfung.

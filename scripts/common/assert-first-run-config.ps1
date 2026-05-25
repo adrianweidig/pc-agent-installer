@@ -23,6 +23,9 @@ Der Agent darf noch keine Host-Baseline, Sicherheitsänderung, Installation oder
 Bitte zuerst ausführen:
   ./scripts/common/first-run-config.ps1
 
+Agentischer Startsatz:
+  Codex, starte die Agenten-Konfiguration für meinen PC.
+
 Danach diesen Schritt erneut starten.
 "@
 Write-Error $message
