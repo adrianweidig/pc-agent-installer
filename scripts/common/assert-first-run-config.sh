@@ -3,27 +3,29 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../bash/agent-installer-common.sh
 source "$SCRIPT_DIR/../bash/agent-installer-common.sh"
+# shellcheck source=i18n.sh
+source "$SCRIPT_DIR/i18n.sh"
 
 ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
 HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
 CONFIG_PATH="$ROOT/hosts/$HOSTNAME_VALUE/state/first-run-config.yaml"
 
 if [[ -f "$CONFIG_PATH" ]] && grep -Eq '^[[:space:]]*completed:[[:space:]]*true[[:space:]]*$' "$CONFIG_PATH"; then
-  echo "Erststart-Konfiguration vorhanden: $CONFIG_PATH"
+  printf "$(agent_msg first_run_present)\n" "$CONFIG_PATH"
   exit 0
 fi
 
 cat >&2 <<EOF
-ERSTSTART-KONFIGURATION NICHT ABGESCHLOSSEN
+$(agent_msg first_run_missing_title)
 
-Der Agent darf noch keine Host-Baseline, Sicherheitsänderung, Installation oder Systemänderung ausführen.
+$(agent_msg first_run_missing_body)
 
-Bitte zuerst ausführen:
+$(agent_msg first_run_missing_run)
   bash ./scripts/common/first-run-config.sh
 
-Agentischer Startsatz:
+$(agent_msg first_run_missing_prompt)
   Codex, starte die Agenten-Konfiguration für meinen PC.
 
-Danach diesen Schritt erneut starten.
+$(agent_msg first_run_missing_retry)
 EOF
 exit 12

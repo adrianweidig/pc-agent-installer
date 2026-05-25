@@ -1,5 +1,5 @@
-name: Fehlerbericht
-description: Einen reproduzierbaren Fehler im öffentlichen Template melden.
+name: Fehlerbericht / Bug report
+description: Einen reproduzierbaren Fehler im öffentlichen Template melden. Report a reproducible public-template bug.
 title: "[Bug] "
 labels:
   - bug
@@ -8,25 +8,27 @@ body:
     attributes:
       value: |
         Danke für den Bericht. Bitte keine Secrets, echten Hostnamen, privaten Pfade oder unredigierten Logs einfügen.
+
+        English is welcome. Do not include secrets, real host names, private paths, or unredacted logs.
   - type: textarea
     id: current
     attributes:
-      label: Ist-Zustand
-      description: Was passiert aktuell?
+      label: Ist-Zustand / Current state
+      description: Was passiert aktuell? What happens now?
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Erwartetes Verhalten
-      description: Was sollte stattdessen passieren?
+      label: Erwartetes Verhalten / Expected behavior
+      description: Was sollte stattdessen passieren? What should happen instead?
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
-      label: Reproduktion oder Fundstelle
-      description: Schritte, Befehl oder konkrete Datei.
+      label: Reproduktion oder Fundstelle / Reproduction or location
+      description: Schritte, Befehl oder konkrete Datei. Steps, command, or concrete file.
       placeholder: |
         1. ...
         2. ...
@@ -36,20 +38,20 @@ body:
   - type: input
     id: files
     attributes:
-      label: Betroffene Dateien oder Vorlagen
+      label: Betroffene Dateien oder Vorlagen / Affected files or templates
       placeholder: scripts/common/verify-template.ps1, Vorlage/common/...
   - type: textarea
     id: checks
     attributes:
-      label: Ausgeführte Checks
-      description: Welche lokalen Prüfungen liefen bereits?
+      label: Ausgeführte Checks / Checks run
+      description: Welche lokalen Prüfungen liefen bereits? Which local checks have already run?
       placeholder: |
         ./scripts/common/verify-template.ps1
         bash ./scripts/common/verify-template.sh
   - type: dropdown
     id: repo_mode
     attributes:
-      label: Repo-Modus
+      label: Repo-Modus / Repository mode
       options:
         - template
         - operational
@@ -60,10 +62,10 @@ body:
   - type: textarea
     id: impact
     attributes:
-      label: Risiko und Auswirkung
-      description: Warum ist das relevant?
+      label: Risiko und Auswirkung / Risk and impact
+      description: Warum ist das relevant? Why does this matter?
   - type: textarea
     id: context
     attributes:
-      label: Zusätzlicher Kontext
-      description: Redigierte Hinweise, Screenshots oder Links.
+      label: Zusätzlicher Kontext / Additional context
+      description: Redigierte Hinweise, Screenshots oder Links. Redacted notes, screenshots, or links.

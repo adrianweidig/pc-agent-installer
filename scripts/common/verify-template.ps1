@@ -43,6 +43,10 @@ Invoke-Check 'PowerShell-Skripte parsen' {
     if ($parseErrors.Count -gt 0) { throw ($parseErrors -join "`n") }
 }
 
+Invoke-Check 'PowerShell-i18n testen' {
+    & (Join-Path $RepoRoot 'scripts/common/test-i18n.ps1') | Out-Host
+}
+
 Invoke-Check 'PowerShell-Encoding prüfen' {
     $missingBom = New-Object System.Collections.Generic.List[string]
     Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'scripts') -Recurse -File -Filter '*.ps1' | ForEach-Object {

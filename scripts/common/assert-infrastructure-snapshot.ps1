@@ -9,6 +9,8 @@ if (-not $RepoRoot) {
 }
 
 . (Join-Path $PSScriptRoot '..\powershell\AgentInstaller.Common.ps1')
+. (Join-Path $PSScriptRoot 'i18n.ps1')
+$agentLanguage = Resolve-AgentLanguage
 $guard = Assert-AgentHostWriteAllowed -RepoRoot $RepoRoot
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
 
@@ -44,20 +46,14 @@ $result = [ordered]@{
     baseline_file_count = $baselineFiles.Count
     missing = @($missing)
     required_next_step = if ($missing.Count -eq 0) {
-        'Soll-Ist-Abgleich im Change-Eintrag dokumentieren, dann Änderung nur mit Freigabe ausführen.'
+        Get-AgentText -Key 'snapshot_ok_next' -Language $agentLanguage
     } else {
-        'Erststart-Konfiguration und aktuelle Baseline ausführen, danach Soll-Ist-Abgleich dokumentieren.'
+        Get-AgentText -Key 'snapshot_missing_next' -Language $agentLanguage
     }
 }
 
 $result | ConvertTo-Json -Depth 4
 if (-not $result.ok) {
-    Write-Error @"
-Aktueller Infrastruktur-Snapshot fehlt oder ist unvollständig.
-Der Agent darf im Vollzugriff keine Installation, Löschung, Dienst-, Firewall-, Container- oder Paketmanager-Änderung ausführen, bevor die aktuelle Umgebung geprüft und ein Soll-Ist-Abgleich dokumentiert wurde.
-
-Empfohlener nächster Schritt:
-  ./scripts/powershell/collect-baseline.ps1
-"@
+    Write-Error (Get-AgentText -Key 'snapshot_missing_error' -Language $agentLanguage)
     exit 20
 }

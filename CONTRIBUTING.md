@@ -1,4 +1,6 @@
-# Contributing
+# Mitwirken
+
+🌐 Sprachen: [Deutsch](CONTRIBUTING.md) | [English](CONTRIBUTING.en.md)
 
 Danke für dein Interesse an PC Agent Installer. Dieses Repository ist ein öffentliches Template; Beiträge müssen deshalb generisch, reproduzierbar und frei von Hostdaten bleiben.
 
@@ -94,7 +96,7 @@ Ein guter Pull Request enthält:
 - offene Risiken oder bewusste Grenzen
 - Link auf relevante Issues, falls vorhanden
 
-Nutze die Vorlage in `.github/PULL_REQUEST_TEMPLATE.md`.
+Nutze die Vorlage in `.github/PULL_REQUEST_TEMPLATE.md`. Die Vorlage ist bewusst zweisprachig, weil GitHub Pull-Request-Templates nicht automatisch nach Nutzersprache umschaltet.
 
 ## Issues
 

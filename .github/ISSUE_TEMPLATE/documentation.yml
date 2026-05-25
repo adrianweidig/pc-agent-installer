@@ -1,5 +1,5 @@
-name: Dokumentationshinweis
-description: Unklare, fehlende oder widersprüchliche Dokumentation melden.
+name: Dokumentationshinweis / Documentation note
+description: Unklare, fehlende oder widersprüchliche Dokumentation melden. Report unclear, missing, or conflicting documentation.
 title: "[Docs] "
 labels:
   - documentation
@@ -7,8 +7,8 @@ body:
   - type: textarea
     id: location
     attributes:
-      label: Fundstelle
-      description: Welche Datei, Überschrift oder welcher Link ist betroffen?
+      label: Fundstelle / Location
+      description: Welche Datei, Überschrift oder welcher Link ist betroffen? Which file, heading, or link is affected?
       placeholder: README.md, docs/05-secrets-policy.md, ...
     validations:
       required: true
@@ -16,18 +16,18 @@ body:
     id: problem
     attributes:
       label: Problem
-      description: Was ist unklar, falsch oder fehlt?
+      description: Was ist unklar, falsch oder fehlt? What is unclear, wrong, or missing?
     validations:
       required: true
   - type: textarea
     id: suggestion
     attributes:
-      label: Vorschlag
-      description: Welche konkrete Verbesserung wäre hilfreich?
+      label: Vorschlag / Suggestion
+      description: Welche konkrete Verbesserung wäre hilfreich? Which concrete improvement would help?
   - type: checkboxes
     id: safety
     attributes:
-      label: Sicherheitscheck
+      label: Sicherheitscheck / Safety check
       options:
-        - label: Der Hinweis enthält keine Secrets, echten Hostnamen, privaten Pfade oder vertraulichen Infrastrukturdetails.
+        - label: Der Hinweis enthält keine Secrets, echten Hostnamen, privaten Pfade oder vertraulichen Infrastrukturdetails. The note contains no secrets, real host names, private paths, or confidential infrastructure details.
           required: true

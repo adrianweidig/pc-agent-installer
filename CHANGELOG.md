@@ -1,7 +1,10 @@
 # Changelog
 
+🌐 Sprachen: [Deutsch](CHANGELOG.md) | [English](CHANGELOG.en.md)
+
 ## Unreleased
 
+- Internationalisierung mit Deutsch als Standardsprache, englischer README, mehrsprachigen Doku-Einstiegen, Community-Dateien und i18n-Tests für PowerShell/Bash ergänzt.
 - Automatischen GitHub-Release-Workflow nach erfolgreicher `main`-Validierung ergänzt, inklusive ZIP-Asset und vollständiger `release-notes.md` mit Commit-Historie.
 - GitHub-Security-Alerts analysiert und sicherheitsrelevante `Invoke-Expression`-Nutzung in der Docker-Baseline-Erfassung entfernt.
 - Globalen Codex-New-Project-Standard als wiederverwendbare Dokumentation und Bootstrap-Skript ins Template übernommen.

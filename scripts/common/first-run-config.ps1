@@ -360,4 +360,5 @@ note: "$safeNote"
 "@
 
 Write-AgentUtf8 -Path $configPath -Content $yaml
+$agentLanguage = $safeLanguage
 Write-Host ((T 'config_saved') -f $configPath)

@@ -1,4 +1,6 @@
-# Security Policy
+# Sicherheitsrichtlinie
+
+🌐 Sprachen: [Deutsch](SECURITY.md) | [English](SECURITY.en.md)
 
 ## Grundsatz
 

@@ -14,6 +14,9 @@ while IFS= read -r file; do
   bash -n "$file"
 done < <(find "$ROOT/scripts" -type f -name '*.sh')
 
+echo "==> Bash-i18n testen"
+bash "$ROOT/scripts/common/test-i18n.sh"
+
 echo "==> Deutsche UTF-8-Umlaute prüfen"
 umlaut_pattern='(^|[^[:alnum:]_])(fuer|Fuer|fuehrt|Fuehrt|pruefen|Pruefen|prueft|Prueft|pruefung|Pruefung|geprueft|Geprueft|Aenderung|Aenderungen|aendern|aendert|bestaetigen|Bestaetigen|bestaetigt|Bestaetigt|beruecksichtigen|Beruecksichtigen|beruecksichtigt|Beruecksichtigt|zuruecksetzen|Zuruecksetzen|zurueckgesetzt|Zurueckgesetzt|ueberschreiben|Ueberschreiben|ueberschreibt|Ueberschreibt|koennen|Koennen|moeglich|Moeglich|ermoeglichen|Ermoeglichen|ermoeglicht|Ermoeglicht|vollstaendig|Vollstaendig|vollstaendige|Vollstaendige|geloescht|Geloescht|loeschen|Loeschen|loeschung|Loeschung|Datentraeger|Geraeteverschluesselung|Verschluesselung|Schluessel|Unterstuetzung|Oberflaeche|Konfliktloesung)([^[:alnum:]_]|$)'
 if command -v rg >/dev/null 2>&1; then

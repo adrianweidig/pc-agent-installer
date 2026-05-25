@@ -9,7 +9,13 @@ fi
 for path in \
   AGENTS.md \
   README.md \
+  README.en.md \
+  CHANGELOG.en.md \
+  CODE_OF_CONDUCT.en.md \
+  CONTRIBUTING.en.md \
   LICENSE \
+  SECURITY.en.md \
+  SUPPORT.en.md \
   repo-mode.yaml \
   .github/ISSUE_TEMPLATE/bug_report.yml \
   .github/ISSUE_TEMPLATE/feature_request.yml \
@@ -19,6 +25,10 @@ for path in \
   .github/workflows/validate.yml \
   .github/workflows/release-artifact.yml \
   docs/CODEX_NEW_PROJECT_STANDARD.md \
+  docs/I18N.md \
+  docs/de/index.md \
+  docs/en/index.md \
+  docs/en/I18N.md \
   docs/CI_CD.md \
   docs/19-template-upstream-sync.md \
   scripts/apply-codex-project-standard.sh \
@@ -26,6 +36,10 @@ for path in \
   schemas/repo-mode.schema.yaml \
   scripts/common/detect-repo-mode.ps1 \
   scripts/common/detect-repo-mode.sh \
+  scripts/common/i18n.ps1 \
+  scripts/common/i18n.sh \
+  scripts/common/test-i18n.ps1 \
+  scripts/common/test-i18n.sh \
   scripts/common/first-run-config.ps1 \
   scripts/common/first-run-config.sh \
   scripts/common/assert-first-run-config.ps1 \

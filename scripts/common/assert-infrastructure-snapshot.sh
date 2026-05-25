@@ -3,6 +3,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../bash/agent-installer-common.sh
 source "$SCRIPT_DIR/../bash/agent-installer-common.sh"
+# shellcheck source=i18n.sh
+source "$SCRIPT_DIR/i18n.sh"
 
 ROOT="${1:-$(agent_repo_root "$SCRIPT_DIR")}"
 HOSTNAME_VALUE="${HOSTNAME:-$(hostname)}"
@@ -44,15 +46,9 @@ if [[ "${#missing[@]}" -gt 0 ]]; then
     printf '    "%s"%s\n' "${missing[$i]//\"/\\\"}" "$comma"
   done
   printf '  ],\n'
-  printf '  "required_next_step": "Erststart-Konfiguration und aktuelle Baseline ausführen, danach Soll-Ist-Abgleich dokumentieren."\n'
+  printf '  "required_next_step": "%s"\n' "$(agent_msg snapshot_missing_next)"
   printf '}\n'
-  cat >&2 <<'MSG'
-Aktueller Infrastruktur-Snapshot fehlt oder ist unvollständig.
-Der Agent darf im Vollzugriff keine Installation, Löschung, Dienst-, Firewall-, Container- oder Paketmanager-Änderung ausführen, bevor die aktuelle Umgebung geprüft und ein Soll-Ist-Abgleich dokumentiert wurde.
-
-Empfohlener nächster Schritt:
-  bash ./scripts/bash/collect-baseline.sh
-MSG
+  agent_msg snapshot_missing_error >&2
   exit 20
 fi
 
@@ -64,6 +60,6 @@ cat <<JSON
   "first_run_config": "$FIRST_RUN_CONFIG",
   "host_yaml": "$HOST_YAML",
   "baseline_file_count": $baseline_file_count,
-  "required_next_step": "Soll-Ist-Abgleich im Change-Eintrag dokumentieren, dann Änderung nur mit Freigabe ausführen."
+  "required_next_step": "$(agent_msg snapshot_ok_next)"
 }
 JSON

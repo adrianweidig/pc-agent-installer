@@ -7,26 +7,28 @@ param(
 if (-not $RepoRoot) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 }
+. (Join-Path $PSScriptRoot 'i18n.ps1')
+$agentLanguage = Resolve-AgentLanguage
 if (-not $HostName) { $HostName = [System.Net.Dns]::GetHostName() }
 
 $configPath = Join-Path $RepoRoot (Join-Path 'hosts' (Join-Path $HostName 'state/first-run-config.yaml'))
 if ((Test-Path -LiteralPath $configPath) -and (Select-String -LiteralPath $configPath -Pattern '^\s*completed:\s*true\s*$' -Quiet)) {
-    Write-Host "Erststart-Konfiguration vorhanden: $configPath"
+    Write-Host ((Get-AgentText -Key 'first_run_present' -Language $agentLanguage) -f $configPath)
     exit 0
 }
 
 $message = @"
-ERSTSTART-KONFIGURATION NICHT ABGESCHLOSSEN
+$(Get-AgentText -Key 'first_run_missing_title' -Language $agentLanguage)
 
-Der Agent darf noch keine Host-Baseline, Sicherheitsänderung, Installation oder Systemänderung ausführen.
+$(Get-AgentText -Key 'first_run_missing_body' -Language $agentLanguage)
 
-Bitte zuerst ausführen:
+$(Get-AgentText -Key 'first_run_missing_run' -Language $agentLanguage)
   ./scripts/common/first-run-config.ps1
 
-Agentischer Startsatz:
+$(Get-AgentText -Key 'first_run_missing_prompt' -Language $agentLanguage)
   Codex, starte die Agenten-Konfiguration für meinen PC.
 
-Danach diesen Schritt erneut starten.
+$(Get-AgentText -Key 'first_run_missing_retry' -Language $agentLanguage)
 "@
 Write-Error $message
 exit 12

@@ -9,6 +9,7 @@ Du bist ein lokaler Agent zur dokumentierten, reproduzierbaren und rollbackfähi
 - `repo-mode.yaml` steuert den Sicherheitsmodus.
 - `Vorlage/` enthält numerisch sortierte Agenten-Vorlagen für Windows, Linux, WSL, macOS, Container und Profile.
 - `scripts/common/` enthält Repo-Guards und Template-Validierung.
+- `scripts/common/i18n.*` enthält die gemeinsame Sprachwahl für Deutsch als Standard und Englisch als Alternativsprache.
 - `scripts/powershell/` und `scripts/bash/` enthalten Host-, Baseline- und Change-Hilfen.
 - `scripts/container/` enthält Container-Erkennung.
 - `schemas/` enthält YAML-Schemas.
@@ -168,6 +169,8 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 ## Konventionen
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
+- Mehrsprachige Repository-Einstiege werden explizit gepflegt: `README.md` bleibt deutsch, `README.en.md` bleibt englisch, `docs/de/` und `docs/en/` sind sichtbare Spracheinstiege.
+- Nutzer- oder administrationsrelevante Skriptmeldungen sollen neue Texte über die i18n-Hilfen in `scripts/common/i18n.*` beziehen, wenn der Skriptbereich bereits mehrsprachig ist.
 - Dokumentation beschreibt den Agenten-first-Ablauf: Nutzer klont das Template, der Agent arbeitet im Klon, und Public/Private-Einordnung erfolgt vor jeder Änderung.
 - Alle neuen oder geänderten Textdateien werden als UTF-8 geschrieben.
 - Deutsche Fließtexte verwenden echte UTF-8-Umlaute wie `für`, `prüfen`, `Änderung`, `zurück` und `vollständig`; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.

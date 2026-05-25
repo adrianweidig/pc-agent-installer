@@ -1,5 +1,7 @@
 # Code of Conduct
 
+🌐 Sprachen: [Deutsch](CODE_OF_CONDUCT.md) | [English](CODE_OF_CONDUCT.en.md)
+
 ## Erwartung
 
 Dieses Projekt soll eine respektvolle, sachliche und sichere Zusammenarbeit ermöglichen. Alle Beteiligten sollen konstruktiv beitragen können, unabhängig von Erfahrungsstand, Hintergrund oder Arbeitsweise.

@@ -4,7 +4,17 @@ param()
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'i18n.ps1')
 
-if ((Resolve-AgentLanguage) -ne 'de') { throw 'Default language must be German.' }
+$previousPcAgentLang = $env:PC_AGENT_LANG
+try {
+    Remove-Item Env:PC_AGENT_LANG -ErrorAction SilentlyContinue
+    if ((Resolve-AgentLanguage) -ne 'de') { throw 'Default language must be German.' }
+} finally {
+    if ($null -ne $previousPcAgentLang) {
+        $env:PC_AGENT_LANG = $previousPcAgentLang
+    } else {
+        Remove-Item Env:PC_AGENT_LANG -ErrorAction SilentlyContinue
+    }
+}
 if ((Resolve-AgentLanguage -ExplicitLanguage 'en-US' -ConfigLanguage 'de') -ne 'en') { throw 'Explicit language must win over config language.' }
 if ((Resolve-AgentLanguage -ConfigLanguage 'en_GB') -ne 'en') { throw 'Configured English language was not detected.' }
 if ((Get-AgentText -Key 'allow_update_maintenance' -Language 'de') -notmatch 'prüfen') { throw 'German UTF-8 umlaut text was not preserved.' }

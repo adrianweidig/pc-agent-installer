@@ -1,5 +1,5 @@
-name: Verbesserungsvorschlag
-description: Eine generische Verbesserung für Vorlagen, Skripte oder Dokumentation vorschlagen.
+name: Verbesserungsvorschlag / Improvement proposal
+description: Eine generische Verbesserung für Vorlagen, Skripte oder Dokumentation vorschlagen. Suggest a generic improvement.
 title: "[Verbesserung] "
 labels:
   - enhancement
@@ -8,17 +8,19 @@ body:
     attributes:
       value: |
         Vorschläge müssen für das öffentliche Template geeignet sein. Bitte keine Hostdaten, privaten Pfade oder Secrets einfügen.
+
+        English is welcome. Proposals must fit the public template. Do not include host data, private paths, or secrets.
   - type: textarea
     id: goal
     attributes:
-      label: Ziel
-      description: Welches Problem soll gelöst werden?
+      label: Ziel / Goal
+      description: Welches Problem soll gelöst werden? Which problem should be solved?
     validations:
       required: true
   - type: dropdown
     id: area
     attributes:
-      label: Betroffener Bereich
+      label: Betroffener Bereich / Affected area
       options:
         - Dokumentation
         - Vorlagen
@@ -26,6 +28,7 @@ body:
         - Bash-Skripte
         - Container-Erkennung
         - Schemas
+        - Internationalisierung
         - CI oder Repository-Hygiene
         - anderes
     validations:
@@ -33,24 +36,24 @@ body:
   - type: textarea
     id: proposal
     attributes:
-      label: Vorschlag
-      description: Wie könnte die Änderung aussehen?
+      label: Vorschlag / Proposal
+      description: Wie könnte die Änderung aussehen? What could the change look like?
     validations:
       required: true
   - type: textarea
     id: benefit
     attributes:
-      label: Nutzen
-      description: Was wird dadurch klarer, sicherer oder wartbarer?
+      label: Nutzen / Benefit
+      description: Was wird dadurch klarer, sicherer oder wartbarer? What becomes clearer, safer, or more maintainable?
   - type: textarea
     id: risks
     attributes:
-      label: Risiken oder Grenzen
-      description: Gibt es Kompatibilitäts-, Sicherheits- oder Scope-Risiken?
+      label: Risiken oder Grenzen / Risks or boundaries
+      description: Gibt es Kompatibilitäts-, Sicherheits- oder Scope-Risiken? Are there compatibility, security, or scope risks?
   - type: textarea
     id: checks
     attributes:
-      label: Bereits geprüfte Befehle
+      label: Bereits geprüfte Befehle / Commands already checked
       placeholder: |
         ./scripts/common/verify-template.ps1
         git diff --check

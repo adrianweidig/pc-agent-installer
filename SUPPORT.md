@@ -1,5 +1,7 @@
 # Support
 
+🌐 Sprachen: [Deutsch](SUPPORT.md) | [English](SUPPORT.en.md)
+
 ## Wo bekomme ich Hilfe?
 
 Für Fragen und Fehlerberichte zum öffentlichen Template nutze bitte GitHub Issues:
