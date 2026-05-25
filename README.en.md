@@ -47,6 +47,7 @@ The repository is not primarily a manual admin tool. The normal flow is agent-fi
 | Validation | Check structure, frontmatter, script syntax, encoding, secret patterns, and Git diff whitespace |
 | Documentation | Explain the agent-first flow, security model, rollback concept, and workspace hygiene |
 | Internationalization | Provide German as the default language, English as an alternative language, and UTF-8/Unicode checks |
+| Product components i18n | Provide product-facing module names and summaries centrally in twelve languages |
 
 ## Limits
 
@@ -81,6 +82,7 @@ The agent should derive the flow itself. It reads `AGENTS.md` and `Vorlage/commo
 | Check host write permissions | `./scripts/common/assert-private-repo.ps1` | `bash ./scripts/common/assert-private-repo.sh` |
 | Start or reopen agent configuration | `./scripts/common/first-run-config.ps1` | `bash ./scripts/common/first-run-config.sh` |
 | Check host work readiness | `./scripts/common/assert-first-run-config.ps1` and `./scripts/common/assert-infrastructure-snapshot.ps1` | `bash ./scripts/common/assert-first-run-config.sh` and `bash ./scripts/common/assert-infrastructure-snapshot.sh` |
+| Show product components for a language | `./scripts/common/list-product-components.ps1 -Language es` | `bash ./scripts/common/list-product-components.sh es` |
 
 `assert-private-repo.*` may intentionally fail in public `template` mode. That is a safety boundary, not a template defect.
 
@@ -118,6 +120,8 @@ German is the default language of this project. English is maintained as the pri
 
 The first-run configuration supports a stored language setting in `hosts/<HOSTNAME>/state/first-run-config.yaml`. Language resolution follows this order: explicit script parameter, stored project configuration, `PC_AGENT_LANG`, then German as the stable fallback. UTF-8 is preserved throughout; template validation checks German umlauts and the PowerShell/Bash i18n helpers.
 
+Product components such as repository guards, first-run configuration, infrastructure snapshot, validation suite, and template upstream sync are additionally localized centrally in twelve languages: `de`, `en`, `es`, `fr`, `it`, `pt`, `nl`, `pl`, `tr`, `ru`, `zh-Hans`, and `ja`. The catalog lives in `i18n/product-components.tsv` and is checked by `validate-product-i18n.*`.
+
 See [docs/en/I18N.md](docs/en/I18N.md) for details. The German version is [docs/I18N.md](docs/I18N.md).
 
 ## Project Structure
@@ -130,6 +134,7 @@ scripts/powershell/    Windows host, baseline, and change helpers
 scripts/bash/          Linux, WSL, macOS, and Unix-oriented helpers
 scripts/container/     container, Compose, Swarm, Kubernetes, Podman, and NVIDIA detection
 schemas/               YAML schemas for host, baseline, change, rollback, and repository mode data
+i18n/                  product component catalog and language list
 docs/                  German default documentation plus multilingual entry points
 examples/              safe example artifacts without real host data
 private.example/       examples for private configuration and secret references
@@ -165,13 +170,15 @@ bash ./scripts/common/detect-repo-mode.sh
 bash ./scripts/common/verify-template.sh
 ```
 
-The relevant checks are bundled in `verify-template.*`: guard scripts, template structure, YAML frontmatter, PowerShell/Bash syntax, i18n tests, encoding, secret scanning, and Git diff whitespace.
+The relevant checks are bundled in `verify-template.*`: guard scripts, template structure, YAML frontmatter, PowerShell/Bash syntax, i18n tests, product component i18n, encoding, secret scanning, and Git diff whitespace.
 
 ## Documentation
 
 Language entry points: [Deutsch](docs/de/index.md) | [English](docs/en/index.md)
 
 Important German source documents are listed in [README.md](README.md#dokumentation). The English entry point summarizes the same structure and links to the canonical German documents where no full English page exists yet.
+
+Product component localization is documented in [docs/en/product-components.md](docs/en/product-components.md).
 
 ## Contributing
 

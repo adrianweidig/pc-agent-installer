@@ -29,8 +29,12 @@ for path in \
   docs/de/index.md \
   docs/en/index.md \
   docs/en/I18N.md \
+  docs/21-produktkomponenten-i18n.md \
+  docs/en/product-components.md \
   docs/CI_CD.md \
   docs/19-template-upstream-sync.md \
+  i18n/languages.tsv \
+  i18n/product-components.tsv \
   scripts/apply-codex-project-standard.sh \
   schemas/host.schema.yaml \
   schemas/repo-mode.schema.yaml \
@@ -40,6 +44,10 @@ for path in \
   scripts/common/i18n.sh \
   scripts/common/test-i18n.ps1 \
   scripts/common/test-i18n.sh \
+  scripts/common/validate-product-i18n.ps1 \
+  scripts/common/validate-product-i18n.sh \
+  scripts/common/list-product-components.ps1 \
+  scripts/common/list-product-components.sh \
   scripts/common/first-run-config.ps1 \
   scripts/common/first-run-config.sh \
   scripts/common/assert-first-run-config.ps1 \

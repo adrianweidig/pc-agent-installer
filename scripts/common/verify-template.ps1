@@ -47,6 +47,10 @@ Invoke-Check 'PowerShell-i18n testen' {
     & (Join-Path $RepoRoot 'scripts/common/test-i18n.ps1') | Out-Host
 }
 
+Invoke-Check 'Produktkomponenten-i18n validieren' {
+    & (Join-Path $RepoRoot 'scripts/common/validate-product-i18n.ps1') -RepoRoot $RepoRoot | Out-Host
+}
+
 Invoke-Check 'PowerShell-Encoding prüfen' {
     $missingBom = New-Object System.Collections.Generic.List[string]
     Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'scripts') -Recurse -File -Filter '*.ps1' | ForEach-Object {

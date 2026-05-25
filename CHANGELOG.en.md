@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- Added product component i18n with twelve directly integrated languages, catalog lookup, and PowerShell/Bash validation.
 - Added internationalization with German as the default language, an English README, multilingual documentation entry points, community files, and PowerShell/Bash i18n tests.
 - Added automatic GitHub release workflow after successful `main` validation, including ZIP asset and complete `release-notes.md` with commit history.
 - Analyzed GitHub security alerts and removed security-relevant `Invoke-Expression` use from Docker baseline collection.

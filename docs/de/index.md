@@ -30,6 +30,7 @@ Dies ist der deutsche Einstieg in die Dokumentation. Deutsch ist die Standardspr
 - [Infrastruktur-Soll-Ist-Abgleich](../18-infrastruktur-soll-ist-abgleich.md)
 - [Template-Upstream-Sync](../19-template-upstream-sync.md)
 - [Allgemeine Computer-Konfiguration](../20-allgemeine-computer-konfiguration.md)
+- [Produktkomponenten-i18n](../21-produktkomponenten-i18n.md)
 
 ## Projektpflege
 

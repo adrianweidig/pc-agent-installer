@@ -1,0 +1,13 @@
+code	native_name	english_name	role
+de	Deutsch	German	source
+en	English	English	primary-alternative
+es	Español	Spanish	common-product-language
+fr	Français	French	common-product-language
+it	Italiano	Italian	common-product-language
+pt	Português	Portuguese	common-product-language
+nl	Nederlands	Dutch	common-product-language
+pl	Polski	Polish	common-product-language
+tr	Türkçe	Turkish	common-product-language
+ru	Русский	Russian	common-product-language
+zh-Hans	简体中文	Chinese Simplified	common-product-language
+ja	日本語	Japanese	common-product-language
