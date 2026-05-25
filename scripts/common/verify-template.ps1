@@ -54,6 +54,17 @@ Invoke-Check 'PowerShell-Encoding prüfen' {
     if ($missingBom.Count -gt 0) { throw ("UTF-8-BOM fehlt: " + ($missingBom -join ', ')) }
 }
 
+Invoke-Check 'Deutsche UTF-8-Umlaute prüfen' {
+    if (-not (Get-Command rg -ErrorAction SilentlyContinue)) {
+        Write-Host 'rg nicht verfügbar, Umlaut-Scan übersprungen.'
+        return
+    }
+    $pattern = '(^|[^[:alnum:]_])(fuer|Fuer|fuehrt|Fuehrt|pruefen|Pruefen|prueft|Prueft|pruefung|Pruefung|geprueft|Geprueft|Aenderung|Aenderungen|aendern|aendert|bestaetigen|Bestaetigen|bestaetigt|Bestaetigt|beruecksichtigen|Beruecksichtigen|beruecksichtigt|Beruecksichtigt|zuruecksetzen|Zuruecksetzen|zurueckgesetzt|Zurueckgesetzt|ueberschreiben|Ueberschreiben|ueberschreibt|Ueberschreibt|koennen|Koennen|moeglich|Moeglich|ermoeglichen|Ermoeglichen|ermoeglicht|Ermoeglicht|vollstaendig|Vollstaendig|vollstaendige|Vollstaendige|geloescht|Geloescht|loeschen|Loeschen|loeschung|Loeschung|Datentraeger|Geraeteverschluesselung|Verschluesselung|Schluessel|Unterstuetzung|Oberflaeche|Konfliktloesung)([^[:alnum:]_]|$)'
+    & rg -n --hidden -S $pattern -g '*.md' -g '*.ps1' -g '*.sh' -g '*.yml' -g '*.yaml' -g '*.txt' -g '!.git/**' -g '!scripts/common/verify-template.*' $RepoRoot
+    if ($LASTEXITCODE -eq 0) { throw 'ASCII-Umlaut-Schreibweisen in deutschem Text gefunden.' }
+    if ($LASTEXITCODE -gt 1) { throw "rg Umlaut-Scan fehlgeschlagen mit Exitcode $LASTEXITCODE." }
+}
+
 Invoke-Check 'Secret-Pattern-Scan' {
     if (-not (Get-Command rg -ErrorAction SilentlyContinue)) {
         Write-Host 'rg nicht verfügbar, Secret-Pattern-Scan übersprungen.'

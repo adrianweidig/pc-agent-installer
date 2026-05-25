@@ -23,6 +23,8 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
 - Keine Klartext-Secrets erfassen oder speichern.
 - Vor systemwirksamen Änderungen Ausgangszustand dokumentieren.
 - Änderungen nur mit passender Validierung und Rollback-Pfad ausführen.
+- Neue oder geänderte Textdateien als UTF-8 schreiben.
+- Deutsche Fließtexte mit echten Umlauten schreiben; ASCII-Umschreibungen mit `ue`, `oe` oder `ae` nur in technischen Tokens, Pfaden, IDs oder externen Originalzitaten belassen.
 
 ## Ablauf
 1. Plattform- und Host-Kontext erkennen.
@@ -30,6 +32,7 @@ Diese Vorlage beschreibt den generischen Soll-Prozess für $area.
 3. Geplante Änderung unter hosts/<HOSTNAME>/changes/ dokumentieren.
 4. Falls `rollback_required: true`, Rollback-Datei unter `hosts/<HOSTNAME>/rollback/` anlegen.
 5. Validierung ausführen und Ergebnis im Change-Eintrag festhalten.
+6. Nach Dokumentationsänderungen `verify-template.*` ausführen, damit Encoding und Umlaut-Regeln geprüft werden.
 
 ## Erwartete Nachweise
 - Baseline- oder Reportdatei im passenden Host-Unterordner.

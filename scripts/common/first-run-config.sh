@@ -71,22 +71,22 @@ echo "AGENTEN-KONFIGURATION"
 if [[ "$configuration_mode" == "reconfigure" ]]; then
   echo "Bestehende Werte werden als Defaults genutzt. Leere Antworten behalten sie bei."
 else
-  echo "Vor Abschluss dieser Konfiguration fuehrt der Agent keine Host-Arbeit aus."
+  echo "Vor Abschluss dieser Konfiguration führt der Agent keine Host-Arbeit aus."
 fi
 
-person_description="$(ask_text 'Beschreibe dich kurz fuer sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler":' "$(yaml_string_default person_description '')")"
+person_description="$(ask_text 'Beschreibe dich kurz für sinnvolle Programmempfehlungen, z. B. "Ich bin Entwickler":' "$(yaml_string_default person_description '')")"
 allow_baseline="$(ask_yes_no 'Host-Baseline erfassen und dokumentieren?' "$(yaml_bool_default allow_baseline true)")"
 allow_security_recommendations="$(ask_yes_no 'Usability-first Sicherheitsempfehlungen anzeigen?' "$(yaml_bool_default allow_security_recommendations true)")"
 allow_package_recommendations="$(ask_yes_no 'Kostenlose, aktuelle Tools und Updates empfehlen?' "$(yaml_bool_default allow_package_recommendations true)")"
-allow_update_maintenance="$(ask_yes_no 'Betriebssystem-, App- und Paketupdates pruefen?' "$(yaml_bool_default allow_update_maintenance true)")"
-allow_package_source_audit="$(ask_yes_no 'Paketquellen, Stores und Dritt-Repositories pruefen?' "$(yaml_bool_default allow_package_source_audit true)")"
-allow_disk_health_review="$(ask_yes_no 'Datentraegerzustand, Dateisystem und Speicherplatz pruefen?' "$(yaml_bool_default allow_disk_health_review true)")"
-allow_encryption_recommendations="$(ask_yes_no 'Geraeteverschluesselung pruefen und empfehlen?' "$(yaml_bool_default allow_encryption_recommendations true)")"
-allow_security_exception_review="$(ask_yes_no 'Security-Ausnahmen wie AV-Exclusions pruefen?' "$(yaml_bool_default allow_security_exception_review true)")"
+allow_update_maintenance="$(ask_yes_no 'Betriebssystem-, App- und Paketupdates prüfen?' "$(yaml_bool_default allow_update_maintenance true)")"
+allow_package_source_audit="$(ask_yes_no 'Paketquellen, Stores und Dritt-Repositories prüfen?' "$(yaml_bool_default allow_package_source_audit true)")"
+allow_disk_health_review="$(ask_yes_no 'Datenträgerzustand, Dateisystem und Speicherplatz prüfen?' "$(yaml_bool_default allow_disk_health_review true)")"
+allow_encryption_recommendations="$(ask_yes_no 'Geräteverschlüsselung prüfen und empfehlen?' "$(yaml_bool_default allow_encryption_recommendations true)")"
+allow_security_exception_review="$(ask_yes_no 'Security-Ausnahmen wie AV-Exclusions prüfen?' "$(yaml_bool_default allow_security_exception_review true)")"
 allow_startup_service_review="$(ask_yes_no 'Autostart, Dienste und Hintergrundprozesse bewerten?' "$(yaml_bool_default allow_startup_service_review true)")"
-allow_workspace_hygiene_review="$(ask_yes_no 'Workspace-Hygiene, Backups und Duplikate pruefen?' "$(yaml_bool_default allow_workspace_hygiene_review true)")"
+allow_workspace_hygiene_review="$(ask_yes_no 'Workspace-Hygiene, Backups und Duplikate prüfen?' "$(yaml_bool_default allow_workspace_hygiene_review true)")"
 allow_developer_toolchain_review="$(ask_yes_no 'Entwickler-Toolchains und Paketmanager bewerten?' "$(yaml_bool_default allow_developer_toolchain_review true)")"
-allow_container_exposure_review="$(ask_yes_no 'Container-Ports, Volumes und Secrets pruefen?' "$(yaml_bool_default allow_container_exposure_review true)")"
+allow_container_exposure_review="$(ask_yes_no 'Container-Ports, Volumes und Secrets prüfen?' "$(yaml_bool_default allow_container_exposure_review true)")"
 allow_optional_av="$(ask_yes_no 'Optionalen kostenlosen On-Demand-Malware-Scanner anbieten?' "$(yaml_bool_default allow_optional_av false)")"
 allow_blocklist_pilot="$(ask_yes_no 'DNS-/Host-Blocklisten nur im Pilotmodus anbieten?' "$(yaml_bool_default allow_blocklist_pilot false)")"
 allow_firewall_ip_blocklists="$(ask_yes_no 'IP-Firewall-Blocklisten als riskante Option anbieten?' "$(yaml_bool_default allow_firewall_ip_blocklists false)")"
@@ -95,11 +95,11 @@ windows_wsl_with_docker="$(yaml_bool_default windows_wsl_with_docker false)"
 windows_portainer_ui="$(yaml_bool_default windows_portainer_ui false)"
 windows_wsl_recommendations="$(yaml_bool_default windows_wsl_recommendations false)"
 if [[ "${OS:-}" == "Windows_NT" ]] || grep -qi microsoft /proc/version 2>/dev/null; then
-  windows_wsl_backend="$(ask_yes_no 'Windows/WSL: WSL-Backend fuer Linux-Tools vorbereiten oder beruecksichtigen?' "$windows_wsl_backend")"
+  windows_wsl_backend="$(ask_yes_no 'Windows/WSL: WSL-Backend für Linux-Tools vorbereiten oder berücksichtigen?' "$windows_wsl_backend")"
   if [[ "$windows_wsl_backend" == "true" ]]; then
-    windows_wsl_with_docker="$(ask_yes_no 'Windows/WSL: Docker mit WSL-Unterstuetzung einplanen?' "$windows_wsl_with_docker")"
+    windows_wsl_with_docker="$(ask_yes_no 'Windows/WSL: Docker mit WSL-Unterstützung einplanen?' "$windows_wsl_with_docker")"
     if [[ "$windows_wsl_with_docker" == "true" ]]; then
-      windows_portainer_ui="$(ask_yes_no 'Windows/WSL: Portainer CE als Docker-Verwaltungsoberflaeche empfehlen?' "$windows_portainer_ui")"
+      windows_portainer_ui="$(ask_yes_no 'Windows/WSL: Portainer CE als Docker-Verwaltungsoberfläche empfehlen?' "$windows_portainer_ui")"
     else
       windows_portainer_ui=false
     fi
@@ -110,8 +110,8 @@ if [[ "${OS:-}" == "Windows_NT" ]] || grep -qi microsoft /proc/version 2>/dev/nu
     windows_wsl_recommendations=false
   fi
 fi
-require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Aenderungen immer bestaetigen lassen?' "$(yaml_bool_default require_confirmation_for_system_changes true)")"
-note="$(ask_text 'Optionale Notiz fuer den Agenten:' "$(yaml_string_default note '')")"
+require_confirmation_for_system_changes="$(ask_yes_no 'Vor systemwirksamen Änderungen immer bestätigen lassen?' "$(yaml_bool_default require_confirmation_for_system_changes true)")"
+note="$(ask_text 'Optionale Notiz für den Agenten:' "$(yaml_string_default note '')")"
 person_description="$(printf '%s' "$person_description" | agent_redact | sed 's/"/\\"/g')"
 note="$(printf '%s' "$note" | agent_redact | sed 's/"/\\"/g')"
 

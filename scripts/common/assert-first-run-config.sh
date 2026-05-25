@@ -22,7 +22,7 @@ Bitte zuerst ausführen:
   bash ./scripts/common/first-run-config.sh
 
 Agentischer Startsatz:
-  Codex, starte die Agenten-Konfiguration fuer meinen PC.
+  Codex, starte die Agenten-Konfiguration für meinen PC.
 
 Danach diesen Schritt erneut starten.
 EOF

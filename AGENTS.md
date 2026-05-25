@@ -169,7 +169,8 @@ Bei Security- oder GitHub-Alert-Aufgaben gilt zusätzlich:
 
 - Dokumentation ist deutsch, knapp und technisch eindeutig.
 - Dokumentation beschreibt den Agenten-first-Ablauf: Nutzer klont das Template, der Agent arbeitet im Klon, und Public/Private-Einordnung erfolgt vor jeder Änderung.
-- Deutsche Fließtexte verwenden echte UTF-8-Umlaute; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
+- Alle neuen oder geänderten Textdateien werden als UTF-8 geschrieben.
+- Deutsche Fließtexte verwenden echte UTF-8-Umlaute wie `für`, `prüfen`, `Änderung`, `zurück` und `vollständig`; keine blinden `ue/oe/ae`-Ersetzungen in technischen Tokens, Pfaden, IDs oder Code.
 - Markdown-Dateien verwenden klare Überschriften, kurze Abschnitte und relative Pfade in Codeformatierung.
 - Öffentliche Dokumentation bleibt sachlich: keine erfundenen Features, Roadmap-Zusagen, Supportversprechen oder Sicherheitsgarantien.
 - PowerShell-Skripte müssen ohne expliziten `-RepoRoot` aus dem Repository heraus laufen.
