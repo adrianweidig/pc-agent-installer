@@ -1,0 +1,108 @@
+name: Docker image
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_run:
+    workflows:
+      - Validate template
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: Optional commit SHA to build. Defaults to the selected ref.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    name: Build and publish validation image
+    runs-on: ubuntu-latest
+    if: >-
+      ${{
+        github.event_name == 'pull_request' ||
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.event.inputs.target_sha || github.sha }}
+
+      - name: Prepare image metadata
+        id: meta
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+
+          repo_lower="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
+          image="ghcr.io/${repo_lower}"
+          target_sha="$(git rev-parse HEAD)"
+          short_sha="$(git rev-parse --short=12 HEAD)"
+          push_image=false
+          tags=()
+
+          if [[ "${EVENT_NAME}" == "pull_request" ]]; then
+            tags+=("${image}:pr-${PR_NUMBER}")
+          else
+            branch="${WORKFLOW_HEAD_BRANCH:-${GITHUB_REF_NAME:-main}}"
+            branch="${branch//\//-}"
+            tags+=("${image}:sha-${short_sha}")
+            if [[ "${branch}" == "main" ]]; then
+              tags+=("${image}:main")
+              tags+=("${image}:latest")
+              push_image=true
+            fi
+          fi
+
+          {
+            echo "image=${image}"
+            echo "target_sha=${target_sha}"
+            echo "short_sha=${short_sha}"
+            echo "push_image=${push_image}"
+            echo "tags<<EOF"
+            printf '%s\n' "${tags[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: steps.meta.outputs.push_image == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          printf '%s' "${GITHUB_TOKEN}" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ steps.meta.outputs.push_image == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.title=pc-agent-installer
+            org.opencontainers.image.description=PC Agent Installer template validation image
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.meta.outputs.target_sha }}
+            org.opencontainers.image.version=sha-${{ steps.meta.outputs.short_sha }}

@@ -145,6 +145,7 @@ docs/                  German default documentation plus multilingual entry poin
 examples/              safe example artifacts without real host data
 private.example/       examples for private configuration and secret references
 hosts/                 remains empty in the template and contains only .gitkeep
+Dockerfile             generic GHCR validation image for the public template
 ```
 
 ## Requirements
@@ -152,6 +153,7 @@ hosts/                 remains empty in the template and contains only .gitkeep
 - Git
 - PowerShell for Windows workflows
 - Bash for Linux, WSL, macOS, and Unix-oriented workflows
+- Optional: Docker to build the GHCR validation image locally
 - Optional: GitHub CLI `gh` for GitHub visibility checks or private copy creation
 
 ## Validation

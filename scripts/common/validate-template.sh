@@ -24,6 +24,9 @@ for path in \
   .github/PULL_REQUEST_TEMPLATE.md \
   .github/workflows/validate.yml \
   .github/workflows/release-artifact.yml \
+  .github/workflows/docker-ghcr.yml \
+  Dockerfile \
+  .dockerignore \
   docs/CODEX_NEW_PROJECT_STANDARD.md \
   docs/I18N.md \
   docs/de/index.md \

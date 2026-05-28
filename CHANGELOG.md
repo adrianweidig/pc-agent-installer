@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- GHCR-Validierungsimage und Docker-Workflow für Veröffentlichungen nach erfolgreicher `main`-Validierung ergänzt.
 - Produktkomponenten-i18n mit zwölf direkt integrierten Sprachen, Katalogabfrage und PowerShell-/Bash-Validierung ergänzt.
 - Internationalisierung mit Deutsch als Standardsprache, englischer README, mehrsprachigen Doku-Einstiegen, Community-Dateien und i18n-Tests für PowerShell/Bash ergänzt.
 - Automatischen GitHub-Release-Workflow nach erfolgreicher `main`-Validierung ergänzt, inklusive ZIP-Asset und vollständiger `release-notes.md` mit Commit-Historie.

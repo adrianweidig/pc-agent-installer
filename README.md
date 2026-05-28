@@ -201,6 +201,7 @@ docs/                  Konzept-, Sicherheits-, Betriebs- und Validierungsdokumen
 examples/              sichere Beispielartefakte ohne echte Hostdaten
 private.example/       Beispiele für private Konfigurationen und Secret-Referenzen
 hosts/                 bleibt im Template leer und enthält nur .gitkeep
+Dockerfile             generisches GHCR-Validierungsimage für das öffentliche Template
 ```
 
 ## Voraussetzungen
@@ -208,6 +209,7 @@ hosts/                 bleibt im Template leer und enthält nur .gitkeep
 - Git
 - PowerShell für Windows-Workflows
 - Bash für Linux-, WSL-, macOS- und Unix-nahe Workflows
+- Optional: Docker, wenn das GHCR-Validierungsimage lokal gebaut werden soll
 - Optional: GitHub CLI `gh`, wenn GitHub-Sichtbarkeit geprüft oder eine private Kopie erzeugt werden soll
 
 ## Validierung
