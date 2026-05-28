@@ -1,0 +1,6 @@
+.git
+.gitignore
+tests/debian-firstconfig/artifacts/*
+!tests/debian-firstconfig/artifacts/.gitkeep
+tests/debian-firstconfig/reports/*
+!tests/debian-firstconfig/reports/.gitkeep

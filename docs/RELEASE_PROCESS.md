@@ -45,11 +45,24 @@ Der Release enthält:
 - ein ZIP aus dem geprüften Commit
 - eine angehängte `release-notes.md`
 - dieselben Release Notes als Release-Beschreibung
+- Hinweise auf das GHCR-Validierungsimage für denselben Commit
 - eine Zusammenfassung der wichtigsten Änderungen seit dem vorherigen Tag
 - eine vollständige Liste aller bis dahin enthaltenen Commits
 - technische Metadaten zu Commit, Branch, Event, Actor und Workflow-Run
 
-Der Workflow nutzt `actions/checkout`, die GitHub CLI und Python-Standardbibliothek auf dem GitHub-Runner. Er benötigt keine zusätzlichen Secrets und erzeugt keine Docker Images, Package Releases oder produktiven Deployments.
+Der Workflow nutzt `actions/checkout`, die GitHub CLI und Python-Standardbibliothek auf dem GitHub-Runner. Er benötigt keine zusätzlichen Secrets und erzeugt keine Package Releases oder produktiven Deployments.
+
+## GHCR-Image
+
+Der Workflow `.github/workflows/docker-ghcr.yml` baut das Root-`Dockerfile` und veröffentlicht nach erfolgreicher `main`-Validierung ein GHCR-Image:
+
+```text
+ghcr.io/adrianweidig/pc-agent-installer:sha-<short-sha>
+ghcr.io/adrianweidig/pc-agent-installer:main
+ghcr.io/adrianweidig/pc-agent-installer:latest
+```
+
+Das Image ist ein generisches Validierungs- und Distributionsartefakt. Es enthält keine Hostdaten, keine Klartext-Secrets und führt keine Systemkonfiguration auf dem Host aus.
 
 ## Manueller GitHub Release
 

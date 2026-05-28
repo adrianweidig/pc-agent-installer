@@ -10,6 +10,7 @@ Dieses Repository nutzt GitHub Actions für schnelle, nicht destruktive Prüfung
 | --- | --- | --- |
 | Validate template | `.github/workflows/validate.yml` | PowerShell- und Bash-Validierung des öffentlichen Templates |
 | Release | `.github/workflows/release-artifact.yml` | GitHub Release mit ZIP-Archiv und vollständiger Release-Notes-Datei erzeugen |
+| Docker image | `.github/workflows/docker-ghcr.yml` | Validierungsimage bauen und nach erfolgreicher `main`-Validierung in GHCR veröffentlichen |
 
 ## Validate template
 
@@ -51,16 +52,27 @@ Er erzeugt:
 Er erzeugt nicht:
 
 - Package-Veröffentlichungen
-- Docker Images
 - Deployments
 
-Docker Images werden weiterhin nur ergänzt, wenn später eine echte Docker-Grundlage entsteht.
+Das zugehörige GHCR-Image wird über den separaten Docker-Workflow veröffentlicht, nachdem `Validate template` für `main` erfolgreich war.
 
 ## Docker und GHCR
 
-Dieses Repository enthält aktuell keine Docker-Grundlage. Deshalb gibt es keinen Docker-/GHCR-Workflow.
+Dieses Repository veröffentlicht ein generisches Validierungsimage unter:
 
-Wenn später Docker-Unterstützung ergänzt wird, darf ein GHCR-Workflow nur eingerichtet werden, wenn `Dockerfile`, Compose-Dateien, `.dockerignore` oder dokumentierte Docker-Build-Befehle vorhanden sind. Der Workflow soll `GITHUB_TOKEN` nutzen, minimale Berechtigungen setzen und keine zusätzlichen Secrets verlangen.
+```text
+ghcr.io/adrianweidig/pc-agent-installer
+```
+
+Das Image enthält eine Kopie des öffentlichen Templates und führt standardmäßig die strukturelle PowerShell-/Bash-Template-Validierung aus. Es ist kein Host-Konfigurationslauf, schreibt keine Hostdaten und ersetzt keine lokale `verify-template`-Prüfung im Git-Checkout.
+
+Der Workflow:
+
+- baut bei Pull Requests ohne Push
+- veröffentlicht nach erfolgreichem `Validate template` auf `main`
+- nutzt `GITHUB_TOKEN` und minimale Berechtigungen
+- setzt die Tags `sha-<short-sha>`, `main` und `latest`
+- setzt OCI-Labels mit Source, Revision und Version
 
 ## Dependabot
 

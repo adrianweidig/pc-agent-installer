@@ -214,6 +214,25 @@ jobs:
                   f"- Repository-ZIP: `{os.environ['ARCHIVE_NAME']}`",
                   "- Vollständige Release Notes: `release-notes.md`",
                   "",
+              ]
+          )
+
+          if Path("Dockerfile").exists():
+              image_repo = f"ghcr.io/{repo.lower()}"
+              lines.extend(
+                  [
+                      "## Container Image",
+                      "",
+                      f"- GHCR-Image: `{image_repo}:sha-{os.environ['SHORT_SHA']}`",
+                      f"- Default-Branch-Tag: `{image_repo}:main`",
+                      f"- Latest-Tag: `{image_repo}:latest`",
+                      "- Das Image enthält eine generische Template-Kopie und führt standardmäßig die strukturelle PowerShell-/Bash-Template-Validierung aus.",
+                      "",
+                  ]
+              )
+
+          lines.extend(
+              [
                   "## Alle enthaltenen Commits",
                   "",
                   "| Datum | Commit | Autor | Änderung |",
@@ -239,7 +258,7 @@ jobs:
                   "## Hinweise",
                   "",
                   "- Dieser Release enthält keine Hostdaten und keine Klartext-Secrets.",
-                  "- Dieses Repository enthält aktuell keine Docker-Grundlage; es wird deshalb kein GHCR-Image erzeugt.",
+                  "- Das GHCR-Image ist ein Validierungs- und Distributionsartefakt, kein Host-Konfigurationslauf.",
               ]
           )
 
