@@ -1,5 +1,8 @@
 # PC Agent Installer
 
+> ab 22.06.2026 keine Änderungen mehr - aktueller Freeze-Zustand und keine weitere Bearbeitung
+
+
 🌐 Sprachen: [Deutsch](README.md) | [English](README.en.md)
 
 ![PC Agent Installer Hero](docs/assets/pc-agent-installer-hero.png)
