@@ -38,7 +38,7 @@ jobs:
       }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.event.inputs.target_sha || github.sha }}
 
@@ -95,7 +95,7 @@ jobs:
           printf '%s' "${GITHUB_TOKEN}" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
 
       - name: Build image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: ${{ steps.meta.outputs.push_image == 'true' }}
